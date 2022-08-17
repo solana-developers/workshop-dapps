@@ -1,0 +1,457 @@
+{
+  "version": "0.1.0",
+  "name": "emoji_exchange",
+  "instructions": [
+    {
+      "name": "createVault",
+      "accounts": [
+        {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "storeWallet",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "fundVault",
+      "accounts": [
+        {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "storeWallet",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "vaultBump",
+          "type": "u8"
+        },
+        {
+          "name": "lamports",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "closeVault",
+      "accounts": [
+        {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "storeWallet",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "createStoreEmoji",
+      "accounts": [
+        {
+          "name": "storeEmoji",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "storeWallet",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "emojiSeed",
+          "type": "string"
+        },
+        {
+          "name": "display",
+          "type": "string"
+        },
+        {
+          "name": "startingBalance",
+          "type": "u8"
+        },
+        {
+          "name": "startingPrice",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "updateStoreEmojiPrice",
+      "accounts": [
+        {
+          "name": "storeEmoji",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "storeWallet",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "storeEmojiBump",
+          "type": "u8"
+        },
+        {
+          "name": "emojiSeed",
+          "type": "string"
+        },
+        {
+          "name": "newPrice",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "closeStoreEmoji",
+      "accounts": [
+        {
+          "name": "storeEmoji",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "storeWallet",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "createUserAccount",
+      "accounts": [
+        {
+          "name": "userAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userWallet",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "username",
+          "type": "string"
+        },
+        {
+          "name": "initialEbucks",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "closeUserAccount",
+      "accounts": [
+        {
+          "name": "userAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "storeWallet",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "createUserEmoji",
+      "accounts": [
+        {
+          "name": "storeEmoji",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userEmoji",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userWallet",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "storeEmojiBump",
+          "type": "u8"
+        },
+        {
+          "name": "emojiSeed",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "closeUserEmoji",
+      "accounts": [
+        {
+          "name": "userEmoji",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "storeWallet",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "placeOrder",
+      "accounts": [
+        {
+          "name": "userAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userEmoji",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "storeEmoji",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userWallet",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "userAccountBump",
+          "type": "u8"
+        },
+        {
+          "name": "userEmojiBump",
+          "type": "u8"
+        },
+        {
+          "name": "storeEmojiBump",
+          "type": "u8"
+        },
+        {
+          "name": "vaultBump",
+          "type": "u8"
+        },
+        {
+          "name": "emojiSeed",
+          "type": "string"
+        },
+        {
+          "name": "orderType",
+          "type": {
+            "defined": "OrderType"
+          }
+        },
+        {
+          "name": "quantity",
+          "type": "u8"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "StoreEmoji",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "emojiName",
+            "type": "string"
+          },
+          {
+            "name": "display",
+            "type": "string"
+          },
+          {
+            "name": "balance",
+            "type": "u8"
+          },
+          {
+            "name": "price",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UserAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "username",
+            "type": "string"
+          },
+          {
+            "name": "ebucksBalance",
+            "type": "u64"
+          },
+          {
+            "name": "tradeCount",
+            "type": "u32"
+          },
+          {
+            "name": "cashedOut",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UserEmoji",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "emojiName",
+            "type": "string"
+          },
+          {
+            "name": "display",
+            "type": "string"
+          },
+          {
+            "name": "balance",
+            "type": "u8"
+          },
+          {
+            "name": "costAverage",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Vault",
+      "type": {
+        "kind": "struct",
+        "fields": []
+      }
+    }
+  ],
+  "types": [
+    {
+      "name": "OrderType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Buy"
+          },
+          {
+            "name": "Sell"
+          }
+        ]
+      }
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "InsufficientStoreBalance",
+      "msg": "Insufficient store balance."
+    },
+    {
+      "code": 6001,
+      "name": "InsufficientUserBalance",
+      "msg": "Insufficient user balance."
+    }
+  ],
+  "metadata": {
+    "address": "CrMdx78x6xJCpCkBkQ5Fdqyd99HBynYGK5t9AezgNbCN"
+  }
+}

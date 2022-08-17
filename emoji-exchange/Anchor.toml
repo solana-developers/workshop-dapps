@@ -1,0 +1,14 @@
+[features]
+seeds = false
+[programs.devnet]
+emoji_exchange = "CrMdx78x6xJCpCkBkQ5Fdqyd99HBynYGK5t9AezgNbCN"
+
+[registry]
+url = "https://anchor.projectserum.com"
+
+[provider]
+cluster = "devnet"
+wallet = "~/.config/solana/id.json"
+
+[scripts]
+test = "cp ./target/idl/emoji_exchange.json ./app/src/utils/idl.json && yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/emoji-exchange.ts"
