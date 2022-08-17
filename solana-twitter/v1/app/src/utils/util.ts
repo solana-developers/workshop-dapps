@@ -4,7 +4,7 @@ import * as constants from './const';
 import { ProfileObject, TweetObject } from '../models/types';
 
 
-function getAnchorConfigs(wallet: AnchorWallet): [anchor.AnchorProvider, anchor.Program] | [null, null] {
+export function getAnchorConfigs(wallet: AnchorWallet): [anchor.AnchorProvider, anchor.Program] | [null, null] {
     if (!wallet) {
         return [null, null];
     }
