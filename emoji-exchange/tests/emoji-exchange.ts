@@ -3,7 +3,6 @@ import { assert } from "chai";
 import * as constants from '../app/src/utils/const';
 import * as util from '../app/src/utils/util';
 import { OrderType } from '../app/src/models/types';
-import { exit } from "process";
 
 
 function createKeypairFromFile(path: string): anchor.web3.Keypair {
