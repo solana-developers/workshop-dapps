@@ -7,7 +7,7 @@ pub struct LikeMintMetadata {}
 impl LikeMintMetadata {
     pub const TITLE: &'static str = "Solana Twitter Like";
     pub const SYMBOL: &'static str = "STWLK";
-    pub const URI: &'static str = "https://www.dictionary.com/e/wp-content/uploads/2018/05/20200727_emoji_twoHearts_1000x700.png";
+    pub const URI: &'static str = "https://raw.githubusercontent.com/solana-developers/workshop-dapps/v2-program-spl/solana-twitter/assets/like.json";
 }
 
 #[account]
@@ -32,7 +32,7 @@ pub struct RetweetMintMetadata {}
 impl RetweetMintMetadata {
     pub const TITLE: &'static str = "Solana Twitter Retweet";
     pub const SYMBOL: &'static str = "STWRT";
-    pub const URI: &'static str = "https://cdn.cms-twdigitalassets.com/content/dam/help-twitter/en/twitter-tips/desktop-assets/ch-01/ch13retweeticon.png.twimg.1920.png";
+    pub const URI: &'static str = "https://raw.githubusercontent.com/solana-developers/workshop-dapps/v2-program-spl/solana-twitter/assets/retweet.json";
 }
 
 #[account]
