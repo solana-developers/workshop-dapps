@@ -6,7 +6,7 @@ pub mod instructions;
 pub mod state;
 
 
-declare_id!("Etez1vCVYGuvr1hg1Qsjj8yVyWAafWbRKAzqN98eDGus");
+declare_id!("CbD6Z9S63vvQqfM88QcDLrYVLKuBkHtCGcifKpeS2Dir");
 
 
 #[program]
@@ -59,11 +59,29 @@ pub mod solana_twitter {
         )
     }
 
+    pub fn create_like_mint(
+        ctx: Context<CreateLikeMint>, 
+    ) -> Result<()> {
+
+        instructions::create_mint::create_like_mint(
+            ctx, 
+        )
+    }
+
     pub fn create_retweet(
         ctx: Context<CreateRetweet>, 
     ) -> Result<()> {
 
         instructions::create_retweet::create_retweet(
+            ctx, 
+        )
+    }
+
+    pub fn create_retweet_mint(
+        ctx: Context<CreateRetweetMint>, 
+    ) -> Result<()> {
+
+        instructions::create_mint::create_retweet_mint(
             ctx, 
         )
     }

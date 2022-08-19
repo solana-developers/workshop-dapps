@@ -3,6 +3,15 @@ import * as constants from '../app/src/utils/const';
 import * as util from '../app/src/utils/util';
 
 
+
+const MASTER_WALLET = new anchor.Wallet(
+    anchor.web3.Keypair.fromSecretKey(
+        Buffer.from(
+            JSON.parse(require('fs').readFileSync(
+                __dirname + '/../app/wallet/master.json', 
+                "utf-8"
+)))));
+
 const connection: anchor.web3.Connection = new anchor.web3.Connection(
     constants.NETWORK, 
     constants.PREFLIGHT_COMMITMENT
@@ -27,6 +36,16 @@ const testDisplayName2: string = "Darryl";
 
 
 describe("Solana Twitter Anchor Tests", async () => {
+
+    it("Create the \"Like\" & \"Retweet\" mints", async () => {
+        await anchor.web3.sendAndConfirmTransaction(
+            connection,
+            (await util.createMints(
+                MASTER_WALLET
+            ))[0],
+            [MASTER_WALLET.payer]
+        );
+    });
 
     it("Prepare a new user wallet for testing", async () => {
         testWallet1 = await primeNewWallet("Test Wallet");
@@ -189,7 +208,7 @@ describe("Solana Twitter Anchor Tests", async () => {
     it("Like a tweet", async () => {
         await anchor.web3.sendAndConfirmTransaction(
             connection,
-            (await util.likeTweetTransaction(
+            (await util.createLikeTransaction(
                 testWallet2, testWallet1TweetPda
             ))[0],
             [testWallet2.payer]
@@ -199,7 +218,7 @@ describe("Solana Twitter Anchor Tests", async () => {
         try {
             await anchor.web3.sendAndConfirmTransaction(
                 connection,
-                (await util.likeTweetTransaction(
+                (await util.createLikeTransaction(
                     testWallet2, testWallet1TweetPda
                 ))[0],
                 [testWallet2.payer]
@@ -211,7 +230,7 @@ describe("Solana Twitter Anchor Tests", async () => {
     it("Retweet a tweet", async () => {
         await anchor.web3.sendAndConfirmTransaction(
             connection,
-            (await util.retweetTweetTransaction(
+            (await util.createRetweetTransaction(
                 testWallet2, testWallet1TweetPda
             ))[0],
             [testWallet2.payer]
@@ -221,7 +240,7 @@ describe("Solana Twitter Anchor Tests", async () => {
         try {
             await anchor.web3.sendAndConfirmTransaction(
                 connection,
-                (await util.retweetTweetTransaction(
+                (await util.createRetweetTransaction(
                     testWallet2, testWallet1TweetPda
                 ))[0],
                 [testWallet2.payer]
