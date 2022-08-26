@@ -2,182 +2,150 @@ import * as anchor from "@project-serum/anchor";
 import * as constants from './const';
 
 
+export class SeedUtil {
 
-export async function deriveProfileSeeds(
-    walletPubkey: anchor.web3.PublicKey,
-    program: anchor.Program,
-): Promise<[anchor.web3.PublicKey]> {
+    program: anchor.Program;
+    profilePda: anchor.web3.PublicKey;
+    likePda: anchor.web3.PublicKey;
+    likeMintPda: anchor.web3.PublicKey;
+    likeMetadataPda: anchor.web3.PublicKey;
+    likeMintAuthorityPda: anchor.web3.PublicKey;
+    retweetPda: anchor.web3.PublicKey;
+    retweetMintPda: anchor.web3.PublicKey;
+    retweetMetadataPda: anchor.web3.PublicKey;
+    retweetMintAuthorityPda: anchor.web3.PublicKey;
 
-    const [profilePda, _profilePdaBump] = await anchor.web3.PublicKey.findProgramAddress(
-        [
+    constructor(program: anchor.Program) {
+        this.program = program;
+    };
+
+    async derivePda(seeds: Buffer[]) {
+        return (await anchor.web3.PublicKey.findProgramAddress(
+            seeds, this.program.programId
+        ))[0]
+    }
+
+    async deriveMetadataPda(seeds: Buffer[]) {
+        return (await anchor.web3.PublicKey.findProgramAddress(
+            seeds, constants.TOKEN_METADATA_PROGRAM_ID
+        ))[0]
+    }
+
+    async init(
+        walletPubkey: anchor.web3.PublicKey,
+    ) {
+        this.profilePda = await this.derivePda([
             Buffer.from(constants.PROFILE_SEED_PREFIX),
             walletPubkey.toBuffer(), 
-        ],
-        program.programId,
-    );
-    return [profilePda];
-};
-
-
-export async function deriveTweetSeeds(
-    walletPubkey: anchor.web3.PublicKey,
-    program: anchor.Program,
-): Promise<[anchor.web3.PublicKey, anchor.web3.PublicKey]> {
-
-    const [profilePda, _profilePdaBump] = await anchor.web3.PublicKey.findProgramAddress(
-        [
-            Buffer.from(constants.PROFILE_SEED_PREFIX),
-            walletPubkey.toBuffer(), 
-        ],
-        program.programId,
-    );
-    const tweetCount = (await program.account.solanaTwitterProfile.fetch(profilePda)).tweetCount as number;
-    const [tweetPda, _tweetPdaBump] = await anchor.web3.PublicKey.findProgramAddress(
-        [
-            Buffer.from(constants.TWEET_SEED_PREFIX),
-            profilePda.toBuffer(), 
-            Buffer.from((tweetCount + 1).toString()),
-        ],
-        program.programId,
-    );
-    return [profilePda, tweetPda];
-};
-
-
-export async function deriveLikeSeeds(
-    tweetPubkey: anchor.web3.PublicKey,
-    walletPubkey: anchor.web3.PublicKey,
-    program: anchor.Program,
-): Promise<[
-    anchor.web3.PublicKey,
-    anchor.web3.PublicKey,
-    anchor.web3.PublicKey,
-    anchor.web3.PublicKey,
-    anchor.web3.PublicKey,
-    anchor.web3.PublicKey,
-]> {
-
-    const [profilePda, _profilePdaBump] = await anchor.web3.PublicKey.findProgramAddress(
-        [
-            Buffer.from(constants.PROFILE_SEED_PREFIX),
-            walletPubkey.toBuffer(), 
-        ],
-        program.programId,
-    );
-    const [likePda, _likePdaBump] = await anchor.web3.PublicKey.findProgramAddress(
-        [
-            Buffer.from(constants.LIKE_SEED_PREFIX),
-            profilePda.toBuffer(),
-            tweetPubkey.toBuffer(),
-        ],
-        program.programId,
-    );
-    const [likeMintPda, likeMintAuthorityPda] = await deriveLikeMintSeeds(program);
-    const [authorWalletPubkey, authorTokenAccountPubkey] = await deriveAtaForTweet(tweetPubkey, likeMintPda, program);
-    return [
-        profilePda, 
-        likePda, 
-        likeMintPda, 
-        likeMintAuthorityPda, 
-        authorWalletPubkey,
-        authorTokenAccountPubkey,
-    ];
-};
-
-
-export async function deriveLikeMintSeeds(
-    program: anchor.Program,
-): Promise<[anchor.web3.PublicKey, anchor.web3.PublicKey]> {
-
-    const [likeMintPda, _likeMintPdaBump] = await anchor.web3.PublicKey.findProgramAddress(
-        [
+        ]);
+        this.likeMintPda = await this.derivePda([
             Buffer.from(constants.LIKE_MINT_SEED_PREFIX),
-        ],
-        program.programId,
-    );
-    const [likeMintAuthorityPda, _likeMintAuthorityPdaBump] = await anchor.web3.PublicKey.findProgramAddress(
-        [
+        ]);
+        this.likeMetadataPda = await this.deriveMetadataPda([
+            Buffer.from("metadata"),
+            constants.TOKEN_METADATA_PROGRAM_ID.toBuffer(),
+            this.likeMintPda.toBuffer(),
+        ]);
+        this.likeMintAuthorityPda = await this.derivePda([
             Buffer.from(constants.LIKE_MINT_AUTHORITY_SEED_PREFIX),
-            likeMintPda.toBuffer(), 
-        ],
-        program.programId,
-    );
-    return [likeMintPda, likeMintAuthorityPda];
-};
-
-
-export async function deriveRetweetSeeds(
-    tweetPubkey: anchor.web3.PublicKey,
-    walletPubkey: anchor.web3.PublicKey,
-    program: anchor.Program,
-): Promise<[
-    anchor.web3.PublicKey,
-    anchor.web3.PublicKey,
-    anchor.web3.PublicKey,
-    anchor.web3.PublicKey,
-    anchor.web3.PublicKey,
-    anchor.web3.PublicKey,
-]> {
-
-    const [profilePda, _profilePdaBump] = await anchor.web3.PublicKey.findProgramAddress(
-        [
-            Buffer.from(constants.PROFILE_SEED_PREFIX),
-            walletPubkey.toBuffer(), 
-        ],
-        program.programId,
-    );
-    const [retweetPda, _retweetPdaBump] = await anchor.web3.PublicKey.findProgramAddress(
-        [
-            Buffer.from(constants.RETWEET_SEED_PREFIX),
-            profilePda.toBuffer(),
-            tweetPubkey.toBuffer(),
-        ],
-        program.programId,
-    );
-    const [retweetMintPda, retweetMintAuthorityPda] = await deriveRetweetMintSeeds(program);
-    const [authorWalletPubkey, authorTokenAccountPubkey] = await deriveAtaForTweet(tweetPubkey, retweetMintPda, program);
-    return [
-        profilePda, 
-        retweetPda, 
-        retweetMintPda, 
-        retweetMintAuthorityPda, 
-        authorWalletPubkey, 
-        authorTokenAccountPubkey, 
-    ];
-};
-
-
-export async function deriveRetweetMintSeeds(
-    program: anchor.Program,
-): Promise<[anchor.web3.PublicKey, anchor.web3.PublicKey]> {
-
-    const [retweetMintPda, _retweetMintPdaBump] = await anchor.web3.PublicKey.findProgramAddress(
-        [
-            Buffer.from(constants.RETWEET_MINT_SEED_PREFIX),
-        ],
-        program.programId,
-    );
-    const [retweetMintAuthorityPda, _retweetMintAuthorityPdaBump] = await anchor.web3.PublicKey.findProgramAddress(
-        [
+            this.likeMintPda.toBuffer(),
+        ]);
+        this.retweetMintPda = await this.derivePda([
+            Buffer.from(constants.RETWEET_MINT_SEED_PREFIX), 
+        ]);
+        this.retweetMetadataPda = await this.deriveMetadataPda([
+            Buffer.from("metadata"),
+            constants.TOKEN_METADATA_PROGRAM_ID.toBuffer(),
+            this.retweetMintPda.toBuffer(),
+        ]);
+        this.retweetMintAuthorityPda = await this.derivePda([
             Buffer.from(constants.RETWEET_MINT_AUTHORITY_SEED_PREFIX),
-            retweetMintPda.toBuffer(), 
-        ],
-        program.programId,
-    );
-    return [retweetMintPda, retweetMintAuthorityPda];
-};
+            this.retweetMintPda.toBuffer(), 
+        ]);
+    }
 
+    async getTweetPda(): Promise<anchor.web3.PublicKey> {
+        const tweetCount = (
+            await this.program.account.solanaTwitterProfile.fetch(this.profilePda)
+        ).tweetCount as number;
+        return await this.derivePda([
+            Buffer.from(constants.TWEET_SEED_PREFIX),
+            this.profilePda.toBuffer(), 
+            Buffer.from((tweetCount + 1).toString()),
+        ]);
+    }
 
-export async function deriveAtaForTweet(
-    tweetPubkey: anchor.web3.PublicKey, mint: anchor.web3.PublicKey, program: anchor.Program
-): Promise<[anchor.web3.PublicKey, anchor.web3.PublicKey]> {
+    async getLikePda(
+        tweetPubkey: anchor.web3.PublicKey
+    ): Promise<anchor.web3.PublicKey> {
+        return await this.derivePda([
+            Buffer.from(constants.LIKE_SEED_PREFIX),
+            this.profilePda.toBuffer(),
+            tweetPubkey.toBuffer(),
+        ]);
+    }
 
-    const authorWalletPubkey = (
-        await program.account.solanaTweet.fetch(tweetPubkey)
-    ).walletPubkey as anchor.web3.PublicKey;
-    const authorTokenAccountPubkey = await anchor.utils.token.associatedAddress({
-        mint: mint,
-        owner: authorWalletPubkey,
-    });
-    return [authorWalletPubkey, authorTokenAccountPubkey];
+    async getRetweetPda(
+        tweetPubkey: anchor.web3.PublicKey
+    ): Promise<anchor.web3.PublicKey> {
+        return await this.derivePda([
+            Buffer.from(constants.RETWEET_SEED_PREFIX),
+            this.profilePda.toBuffer(),
+            tweetPubkey.toBuffer(),
+        ]);
+    }
+
+    async getLikeTokenAccount(
+        walletPubkey: anchor.web3.PublicKey
+    ): Promise<anchor.web3.PublicKey> {
+        return await anchor.utils.token.associatedAddress({
+            mint: this.likeMintPda, 
+            owner: walletPubkey,
+        });
+    }
+
+    async getRetweetTokenAccount(
+        walletPubkey: anchor.web3.PublicKey
+    ): Promise<anchor.web3.PublicKey> {
+        return await anchor.utils.token.associatedAddress({
+            mint: this.retweetMintPda, 
+            owner: walletPubkey,
+        });
+    }
+
+    async getWalletAndLikeTokenAccountFromTweet(
+        tweetPubkey: anchor.web3.PublicKey
+    ): Promise<[
+        anchor.web3.PublicKey,
+        anchor.web3.PublicKey,
+    ]> {
+        const authorWalletPubkey = (
+            await this.program.account.solanaTweet.fetch(tweetPubkey)
+        ).walletPubkey as anchor.web3.PublicKey;
+        return [
+            authorWalletPubkey,
+            await anchor.utils.token.associatedAddress({
+                mint: this.likeMintPda, 
+                owner: authorWalletPubkey
+            })
+        ];
+    }
+
+    async getWalletAndRetweetTokenAccountFromTweet(
+        tweetPubkey: anchor.web3.PublicKey
+    ): Promise<[
+        anchor.web3.PublicKey,
+        anchor.web3.PublicKey,
+    ]> {
+        const authorWalletPubkey = (
+            await this.program.account.solanaTweet.fetch(tweetPubkey)
+        ).walletPubkey as anchor.web3.PublicKey;
+        return [
+            authorWalletPubkey,
+            await anchor.utils.token.associatedAddress({
+                mint: this.retweetMintPda, 
+                owner: authorWalletPubkey
+            })
+        ];
+    }
 }

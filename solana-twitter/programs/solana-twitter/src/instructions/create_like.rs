@@ -1,10 +1,5 @@
-use {
-    anchor_lang::prelude::*,
-    anchor_spl::{
-        token,
-        associated_token,
-    },
-};
+use anchor_lang::prelude::*;
+use anchor_spl::token;
 
 use crate::state::LikeMintAuthorityPda;
 use crate::state::SolanaLike;
@@ -60,6 +55,10 @@ pub struct CreateLike<'info> {
     //      original tweet author every time someone likes.
     #[account(
         mut,
+        seeds = [
+            LikeMintAuthorityPda::MINT_SEED_PREFIX.as_bytes().as_ref()
+        ],
+        bump = like_mint_authority.mint_bump,
         mint::decimals = 9,
         mint::authority = like_mint_authority.key(),
     )]
@@ -74,8 +73,7 @@ pub struct CreateLike<'info> {
     )]
     pub like_mint_authority: Account<'info, LikeMintAuthorityPda>,
     #[account(
-        init_if_needed,
-        payer = authority,
+        mut,
         associated_token::mint = like_mint,
         associated_token::authority = author_wallet,
     )]
@@ -120,8 +118,7 @@ pub struct CreateLike<'info> {
     
     #[account(mut)]
     pub authority: Signer<'info>,
-    pub rent: Sysvar<'info, Rent>,
     pub system_program: Program<'info, System>,
     pub token_program: Program<'info, token::Token>,
-    pub associated_token_program: Program<'info, associated_token::AssociatedToken>,
 }
+

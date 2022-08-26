@@ -1,5 +1,4 @@
 use anchor_lang::prelude::*;
-use mpl_token_metadata::state::Data;
 
 
 pub struct LikeMintMetadata {}
@@ -13,6 +12,7 @@ impl LikeMintMetadata {
 #[account]
 pub struct LikeMintAuthorityPda {
     pub bump: u8,
+    pub mint_bump: u8,
 }
 
 impl LikeMintAuthorityPda {
@@ -20,9 +20,13 @@ impl LikeMintAuthorityPda {
     pub const MINT_SEED_PREFIX: &'static str = "like_mint";
     pub const SEED_PREFIX: &'static str = "like_mint_authority";
 
-    pub fn new(bump: u8) -> Self {
+    pub fn new(
+        bump: u8,
+        mint_bump: u8,
+    ) -> Self {
         return LikeMintAuthorityPda { 
-            bump
+            bump,
+            mint_bump,
         }
     }
 }
@@ -38,6 +42,7 @@ impl RetweetMintMetadata {
 #[account]
 pub struct RetweetMintAuthorityPda {
     pub bump: u8,
+    pub mint_bump: u8,
 }
 
 impl RetweetMintAuthorityPda {
@@ -45,9 +50,13 @@ impl RetweetMintAuthorityPda {
     pub const MINT_SEED_PREFIX: &'static str = "retweet_mint";
     pub const SEED_PREFIX: &'static str = "retweet_mint_authority";
 
-    pub fn new(bump: u8) -> Self {
+    pub fn new(
+        bump: u8,
+        mint_bump: u8,
+    ) -> Self {
         return RetweetMintAuthorityPda { 
-            bump
+            bump,
+            mint_bump,
         }
     }
 }

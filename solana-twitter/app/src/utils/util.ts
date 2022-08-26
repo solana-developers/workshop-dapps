@@ -1,8 +1,8 @@
-import { AnchorWallet } from "@solana/wallet-adapter-react";
 import * as anchor from "@project-serum/anchor";
-import * as constants from './const';
-import * as seedUtils from './seed-util';
+import { AnchorWallet } from "@solana/wallet-adapter-react";
 import { ProfileObject, TweetObject } from '../models/types';
+import * as constants from './const';
+import { SeedUtil } from './seed-util';
 
 
 /**
@@ -10,9 +10,12 @@ import { ProfileObject, TweetObject } from '../models/types';
  * @param wallet 
  * @returns Provider & Program objects
  */
-export function getAnchorConfigs(wallet: AnchorWallet): [anchor.AnchorProvider, anchor.Program] | [null, null] {
+export async function getAnchorConfigs(
+    wallet: AnchorWallet
+): Promise<[anchor.AnchorProvider, anchor.Program, SeedUtil] | [null, null, null]> {
+
     if (!wallet) {
-        return [null, null];
+        return [null, null, null];
     }
     const provider = new anchor.AnchorProvider(
         new anchor.web3.Connection(constants.NETWORK, constants.PREFLIGHT_COMMITMENT), 
@@ -21,7 +24,9 @@ export function getAnchorConfigs(wallet: AnchorWallet): [anchor.AnchorProvider, 
     );
     const idl = require("../utils/idl.json");
     const program = new anchor.Program(idl, idl.metadata.address, provider);
-    return [provider, program];
+    let seedUtil = new SeedUtil(program);
+    await seedUtil.init(wallet.publicKey);
+    return [provider, program, seedUtil];
 }
 
 /**
@@ -37,14 +42,22 @@ export async function createProfileTransaction(
     displayName: string,
 ): Promise<[anchor.web3.Transaction, anchor.AnchorProvider]> {
 
-    const [provider, program] = getAnchorConfigs(wallet);
+    const [provider, program, seedUtil] = await getAnchorConfigs(wallet);
     if (!provider) throw("Provider is null");
-    const [profilePda] = await seedUtils.deriveProfileSeeds(wallet.publicKey, program);
     const ix = await program.methods.createProfile(handle, displayName)
         .accounts({
-            profile: profilePda,
+            likeMint: seedUtil.likeMintPda,
+            likeMintAuthority: seedUtil.likeMintAuthorityPda,
+            likeTokenAccount: await seedUtil.getLikeTokenAccount(wallet.publicKey),
+            retweetMint: seedUtil.retweetMintPda,
+            retweetMintAuthority: seedUtil.retweetMintAuthorityPda,
+            retweetTokenAccount: await seedUtil.getRetweetTokenAccount(wallet.publicKey),
+            profile: seedUtil.profilePda,
             authority: provider.wallet.publicKey,
+            rent: anchor.web3.SYSVAR_RENT_PUBKEY,
             systemProgram: anchor.web3.SystemProgram.programId,
+            tokenProgram: anchor.utils.token.TOKEN_PROGRAM_ID,
+            associatedTokenProgram: anchor.utils.token.ASSOCIATED_PROGRAM_ID,
         })
         .instruction();
     let tx = new anchor.web3.Transaction().add(ix);
@@ -65,12 +78,11 @@ export async function modifyProfileTransaction(
     displayName: string,
 ): Promise<[anchor.web3.Transaction, anchor.AnchorProvider]> {
 
-    const [provider, program] = getAnchorConfigs(wallet);
+    const [provider, program, seedUtil] = await getAnchorConfigs(wallet);
     if (!provider) throw("Provider is null");
-    const [profilePda] = await seedUtils.deriveProfileSeeds(wallet.publicKey, program);
     const ix = await program.methods.modifyProfile(handle, displayName)
         .accounts({
-            profile: profilePda,
+            profile: seedUtil.profilePda,
             authority: provider.wallet.publicKey,
             systemProgram: anchor.web3.SystemProgram.programId,
         })
@@ -85,13 +97,16 @@ export async function modifyProfileTransaction(
  * @param wallet 
  * @returns The profile, represented by the ProfileObject object from 'models/types.ts'
  */
-export async function getProfile(wallet: AnchorWallet): Promise<ProfileObject> {
+export async function getProfile(
+    wallet: AnchorWallet
+): Promise<ProfileObject> {
 
-    const [provider, program] = getAnchorConfigs(wallet);
+    const [provider, program, seedUtil] = await getAnchorConfigs(wallet);
     if (!provider) throw("Provider is null");
-    const [profilePda] = await seedUtils.deriveProfileSeeds(wallet.publicKey, program);
     try {
-        const profile = await program.account.solanaTwitterProfile.fetch(profilePda);
+        const profile = await program.account.solanaTwitterProfile.fetch(
+            seedUtil.profilePda
+        );
         return {
             walletPubkey: profile.authority as anchor.web3.PublicKey,
             profilePubkey: profile.publicKey as anchor.web3.PublicKey,
@@ -117,13 +132,12 @@ export async function createTweetTransaction(
     message: string,
 ): Promise<[anchor.web3.Transaction, anchor.AnchorProvider]> {
 
-    const [provider, program] = getAnchorConfigs(wallet);
+    const [provider, program, seedUtil] = await getAnchorConfigs(wallet);
     if (!provider) throw("Provider is null");
-    const [profilePda, tweetPda] = await seedUtils.deriveTweetSeeds(wallet.publicKey, program);
     const ix = await program.methods.createTweet(message)
         .accounts({
-            tweet: tweetPda,
-            profile: profilePda,
+            tweet: await seedUtil.getTweetPda(),
+            profile: seedUtil.profilePda,
             authority: provider.wallet.publicKey,
             systemProgram: anchor.web3.SystemProgram.programId,
         })
@@ -138,9 +152,12 @@ export async function createTweetTransaction(
  * @param wallet 
  * @returns The tweet, represented by the TweetObject object from 'models/types.ts'
  */
-export async function getTweet(wallet: AnchorWallet, tweetPubkey: anchor.web3.PublicKey): Promise<TweetObject> {
+export async function getTweet(
+    wallet: AnchorWallet, 
+    tweetPubkey: anchor.web3.PublicKey
+): Promise<TweetObject> {
     
-    const [provider, program] = getAnchorConfigs(wallet);
+    const [provider, program, _seedUtil] = await getAnchorConfigs(wallet);
     if (!provider) throw("Provider is null");
     if (!program) throw("Program is null");
     const tweet = await program.account.solanaTweet.fetch(tweetPubkey);
@@ -160,9 +177,11 @@ export async function getTweet(wallet: AnchorWallet, tweetPubkey: anchor.web3.Pu
  * @param wallet 
  * @returns A list of TweetObject objects from 'models/types.ts'
  */
-export async function getAllTweets(wallet: AnchorWallet): Promise<TweetObject[]> {
+export async function getAllTweets(
+    wallet: AnchorWallet
+): Promise<TweetObject[]> {
     
-    const [provider, program] = getAnchorConfigs(wallet);
+    const [provider, program, _seedUtil] = await getAnchorConfigs(wallet);
     if (!provider) throw("Provider is null");
     if (!program) throw("Program is null");
     let allTweets: TweetObject[] = [];
@@ -192,30 +211,22 @@ export async function createLikeTransaction(
     tweetPubkey: anchor.web3.PublicKey,
 ): Promise<[anchor.web3.Transaction, anchor.AnchorProvider]> {
     
-    const [provider, program] = getAnchorConfigs(wallet);
+    const [provider, program, seedUtil] = await getAnchorConfigs(wallet);
     if (!provider) throw("Provider is null");
-    const [
-        profilePda, 
-        likePda, 
-        likeMintPda, 
-        likeMintAuthorityPda, 
-        authorWalletPubkey, 
-        authorTokenAccountPubkey,
-    ] = await seedUtils.deriveLikeSeeds(tweetPubkey, wallet.publicKey, program);
+    const [authorWalletPubkey, authorLikeTokenAccount] = await seedUtil
+        .getWalletAndLikeTokenAccountFromTweet(tweetPubkey);
     const ix = await program.methods.createLike()
         .accounts({
-            likeMint: likeMintPda,
-            likeMintAuthority: likeMintAuthorityPda,
-            authorTokenAccount: authorTokenAccountPubkey,
-            like: likePda,
+            likeMint: seedUtil.likeMintPda,
+            likeMintAuthority: seedUtil.likeMintAuthorityPda,
+            authorTokenAccount: authorLikeTokenAccount,
+            like: await seedUtil.getLikePda(tweetPubkey),
             tweet: tweetPubkey,
-            submitterProfile: profilePda,
+            submitterProfile: seedUtil.profilePda,
             authorWallet: authorWalletPubkey,
             authority: provider.wallet.publicKey,
-            rent: anchor.web3.SYSVAR_RENT_PUBKEY,
             systemProgram: anchor.web3.SystemProgram.programId,
             tokenProgram: anchor.utils.token.TOKEN_PROGRAM_ID,
-            associatedTokenProgram: anchor.utils.token.ASSOCIATED_PROGRAM_ID,
         })
         .instruction();
     let tx = new anchor.web3.Transaction().add(ix);
@@ -227,15 +238,13 @@ export async function createLikeTransaction(
  * @param wallet 
  * @param tweetPubkey 
  * @returns A list of ProfileObject objects (profiles that have liked)
- * 
- * TODO: Make this faster??
  */
 export async function getAllLikesForTweet(
     wallet: AnchorWallet,
     tweetPubkey: anchor.web3.PublicKey,
 ): Promise<ProfileObject[]> {
     
-    const [provider, program] = getAnchorConfigs(wallet);
+    const [provider, program, _seedUtil] = await getAnchorConfigs(wallet);
     if (!provider) throw("Provider is null");
     if (!program) throw("Program is null");
     let allLikes: ProfileObject[] = [];
@@ -266,30 +275,22 @@ export async function createRetweetTransaction(
     tweetPubkey: anchor.web3.PublicKey,
 ): Promise<[anchor.web3.Transaction, anchor.AnchorProvider]> {
     
-    const [provider, program] = getAnchorConfigs(wallet);
+    const [provider, program, seedUtil] = await getAnchorConfigs(wallet);
     if (!provider) throw("Provider is null");
-    const [
-        profilePda, 
-        retweetPda, 
-        retweetMintPda, 
-        retweetMintAuthorityPda, 
-        authorWalletPubkey, 
-        authorTokenAccountPubkey,
-    ] = await seedUtils.deriveRetweetSeeds(tweetPubkey, wallet.publicKey, program);
+    const [authorWalletPubkey, authorRetweetTokenAccount] = await seedUtil
+        .getWalletAndRetweetTokenAccountFromTweet(tweetPubkey);
     const ix = await program.methods.createRetweet()
         .accounts({
-            retweetMint: retweetMintPda,
-            retweetMintAuthority: retweetMintAuthorityPda,
-            authorTokenAccount: authorTokenAccountPubkey,
-            retweet: retweetPda,
+            retweetMint: seedUtil.retweetMintPda,
+            retweetMintAuthority: seedUtil.retweetMintAuthorityPda,
+            authorTokenAccount: authorRetweetTokenAccount,
+            retweet: await seedUtil.getRetweetPda(tweetPubkey),
             tweet: tweetPubkey,
-            submitterProfile: profilePda,
+            submitterProfile: seedUtil.profilePda,
             authorWallet: authorWalletPubkey,
             authority: provider.wallet.publicKey,
-            rent: anchor.web3.SYSVAR_RENT_PUBKEY,
             systemProgram: anchor.web3.SystemProgram.programId,
             tokenProgram: anchor.utils.token.TOKEN_PROGRAM_ID,
-            associatedTokenProgram: anchor.utils.token.ASSOCIATED_PROGRAM_ID,
         })
         .instruction();
     let tx = new anchor.web3.Transaction().add(ix);
@@ -301,15 +302,13 @@ export async function createRetweetTransaction(
  * @param wallet 
  * @param tweetPubkey 
  * @returns A list of ProfileObject objects (profiles that have retweeted)
- * 
- * TODO: Make this faster??
  */
 export async function getAllRetweetsForTweet(
     wallet: AnchorWallet,
     tweetPubkey: anchor.web3.PublicKey,
 ): Promise<ProfileObject[]> {
     
-    const [provider, program] = getAnchorConfigs(wallet);
+    const [provider, program, _seedUtil] = await getAnchorConfigs(wallet);
     if (!provider) throw("Provider is null");
     if (!program) throw("Program is null");
     let allRetweets: ProfileObject[] = [];
@@ -329,37 +328,41 @@ export async function getAllRetweetsForTweet(
     return allRetweets
 };
 
-
+/**
+ * Create the mints for Likes and Retweets
+ * @param masterWallet 
+ * @returns 
+ */
 export async function createMints(
     masterWallet: AnchorWallet,
 ): Promise<[anchor.web3.Transaction, anchor.AnchorProvider]> {
     
-    const [provider, program] = getAnchorConfigs(masterWallet);
+    const [provider, program, seedUtil] = await getAnchorConfigs(masterWallet);
     if (!provider) throw("Provider is null");
-    const [likeMintPda, likeMintAuthorityPda] = await seedUtils.deriveLikeMintSeeds(program);
     const likeMintIx = await program.methods.createLikeMint()
         .accounts({
-            likeMint: likeMintPda,
-            likeMintAuthority: likeMintAuthorityPda,
+            likeMetadata: seedUtil.likeMetadataPda,
+            likeMint: seedUtil.likeMintPda,
+            likeMintAuthority: seedUtil.likeMintAuthorityPda,
             payer: provider.wallet.publicKey,
             rent: anchor.web3.SYSVAR_RENT_PUBKEY,
             systemProgram: anchor.web3.SystemProgram.programId,
             tokenProgram: anchor.utils.token.TOKEN_PROGRAM_ID,
+            tokenMetadataProgram: constants.TOKEN_METADATA_PROGRAM_ID,
         })
         .instruction();
-    
-    const [retweetMintPda, retweetMintAuthorityPda] = await seedUtils.deriveRetweetMintSeeds(program);
     const retweetMintIx = await program.methods.createRetweetMint()
         .accounts({
-            retweetMint: retweetMintPda,
-            retweetMintAuthority: retweetMintAuthorityPda,
+            retweetMetadata: seedUtil.retweetMetadataPda,
+            retweetMint: seedUtil.retweetMintPda,
+            retweetMintAuthority: seedUtil.retweetMintAuthorityPda,
             payer: provider.wallet.publicKey,
             rent: anchor.web3.SYSVAR_RENT_PUBKEY,
             systemProgram: anchor.web3.SystemProgram.programId,
             tokenProgram: anchor.utils.token.TOKEN_PROGRAM_ID,
+            tokenMetadataProgram: constants.TOKEN_METADATA_PROGRAM_ID,
         })
         .instruction();
-    
     let tx = new anchor.web3.Transaction().add(likeMintIx).add(retweetMintIx);
     return [tx, provider];
 };

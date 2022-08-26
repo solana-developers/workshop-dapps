@@ -1,10 +1,5 @@
-use {
-    anchor_lang::prelude::*,
-    anchor_spl::{
-        token,
-        associated_token,
-    },
-};
+use anchor_lang::prelude::*;
+use anchor_spl::token;
 
 use crate::state::RetweetMintAuthorityPda;
 use crate::state::SolanaRetweet;
@@ -60,6 +55,10 @@ pub struct CreateRetweet<'info> {
     //      original tweet author every time someone retweets.
     #[account(
         mut,
+        seeds = [
+            RetweetMintAuthorityPda::MINT_SEED_PREFIX.as_bytes().as_ref()
+        ],
+        bump =retweet_mint_authority.mint_bump,
         mint::decimals = 9,
         mint::authority = retweet_mint_authority.key(),
     )]
@@ -74,8 +73,7 @@ pub struct CreateRetweet<'info> {
     )]
     pub retweet_mint_authority: Account<'info, RetweetMintAuthorityPda>,
     #[account(
-        init_if_needed,
-        payer = authority,
+        mut,
         associated_token::mint = retweet_mint,
         associated_token::authority = author_wallet,
     )]
@@ -120,8 +118,7 @@ pub struct CreateRetweet<'info> {
     
     #[account(mut)]
     pub authority: Signer<'info>,
-    pub rent: Sysvar<'info, Rent>,
     pub system_program: Program<'info, System>,
     pub token_program: Program<'info, token::Token>,
-    pub associated_token_program: Program<'info, associated_token::AssociatedToken>,
 }
+

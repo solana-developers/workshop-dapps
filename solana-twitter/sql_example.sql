@@ -1,0 +1,3 @@
+
+CREATE TABLE profiles 
+CREATE TABLE tweets

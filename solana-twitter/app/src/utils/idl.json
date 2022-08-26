@@ -6,6 +6,36 @@
       "name": "createProfile",
       "accounts": [
         {
+          "name": "likeMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "likeMintAuthority",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "likeTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "retweetMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "retweetMintAuthority",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "retweetTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "profile",
           "isMut": true,
           "isSigner": false
@@ -16,7 +46,22 @@
           "isSigner": true
         },
         {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "associatedTokenProgram",
           "isMut": false,
           "isSigner": false
         }
@@ -137,22 +182,12 @@
           "isSigner": true
         },
         {
-          "name": "rent",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false
         },
         {
           "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "associatedTokenProgram",
           "isMut": false,
           "isSigner": false
         }
@@ -162,6 +197,11 @@
     {
       "name": "createLikeMint",
       "accounts": [
+        {
+          "name": "likeMetadata",
+          "isMut": true,
+          "isSigner": false
+        },
         {
           "name": "likeMint",
           "isMut": true,
@@ -189,6 +229,11 @@
         },
         {
           "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenMetadataProgram",
           "isMut": false,
           "isSigner": false
         }
@@ -239,22 +284,12 @@
           "isSigner": true
         },
         {
-          "name": "rent",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false
         },
         {
           "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "associatedTokenProgram",
           "isMut": false,
           "isSigner": false
         }
@@ -264,6 +299,11 @@
     {
       "name": "createRetweetMint",
       "accounts": [
+        {
+          "name": "retweetMetadata",
+          "isMut": true,
+          "isSigner": false
+        },
         {
           "name": "retweetMint",
           "isMut": true,
@@ -291,6 +331,11 @@
         },
         {
           "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenMetadataProgram",
           "isMut": false,
           "isSigner": false
         }
@@ -335,6 +380,10 @@
           {
             "name": "bump",
             "type": "u8"
+          },
+          {
+            "name": "mintBump",
+            "type": "u8"
           }
         ]
       }
@@ -346,6 +395,10 @@
         "fields": [
           {
             "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "mintBump",
             "type": "u8"
           }
         ]
@@ -445,6 +498,6 @@
     }
   ],
   "metadata": {
-    "address": "CbD6Z9S63vvQqfM88QcDLrYVLKuBkHtCGcifKpeS2Dir"
+    "address": "2ZBJqi4BrKY5JisDGG8zZHYazLErxCiMmVXABgDf31q2"
   }
 }
