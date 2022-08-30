@@ -1,8 +1,8 @@
 import { FC, useCallback, useEffect, useState } from "react";
 import { useAnchorWallet, useConnection, useWallet } from "@solana/wallet-adapter-react";
 import useUserSOLBalanceStore from '../stores/useUserSOLBalanceStore';
-import useTwitterAccountStore from "../stores/TwitterAccountStore";
-import useTweetsStore from "../stores/TweetStore";
+import useTwitterAccountStore from "../stores/useProfileStore";
+import useTweetsStore from "../stores/useTweetStore";
 import { WriteTweet } from './WriteTweet';
 import { Tweet } from "./Tweet";
 import * as util from '../utils/util';
@@ -21,7 +21,7 @@ export const SolanaTwitter: FC = () => {
     const [handle, setHandle] = useState<string>('');
 
     const { tweets, getAllTweets } = useTweetsStore();
-    const { twitterAccount, getTwitterAccount } = useTwitterAccountStore();
+    const { profile, getProfile } = useTwitterAccountStore();
 
     async function createSolanaTwitterAccount() {
         var newHandle = handle;
@@ -33,7 +33,7 @@ export const SolanaTwitter: FC = () => {
         const [tx, provider] = await util.createProfileTransaction(wallet, newHandle, displayName);
         const sx = await sendTransaction(tx, provider.connection);
         await provider.connection.confirmTransaction(sx);
-        getTwitterAccount(wallet);
+        getProfile(wallet);
     };
 
     const onClickCreateAccount = useCallback(async () => {
@@ -41,7 +41,7 @@ export const SolanaTwitter: FC = () => {
     }, [wallet, handle, displayName]);
 
     useEffect(() => {
-        getTwitterAccount(wallet);
+        getProfile(wallet);
         getAllTweets(wallet);
     }, [wallet]);
 
@@ -59,11 +59,26 @@ export const SolanaTwitter: FC = () => {
                 <div className="text-center">
                     {wallet && <p>SOL Balance: {(balance || 0).toLocaleString()}</p>}
                 </div>
-                { twitterAccount ?
+                { profile ?
                     <div>
-                        <WriteTweet getAllTweets={getAllTweets} publicKey={wallet.publicKey} displayName={twitterAccount.displayName} handle={twitterAccount.handle} tweetCount={twitterAccount.tweetCount}/>
+                        <WriteTweet 
+                            getAllTweets={getAllTweets} 
+                            walletPubkey={profile.walletPubkey} 
+                            profilePubkey={profile.profilePubkey} 
+                            displayName={profile.displayName} 
+                            handle={profile.handle} 
+                            tweetCount={profile.tweetCount}
+                        />
                         {tweets.map((tweet, i) => {
-                            return <Tweet key={i} publicKey={tweet.publicKey} displayName={tweet.displayName} handle={tweet.handle} message={tweet.message}/>
+                            return <Tweet 
+                                        key={i} 
+                                        walletPubkey={tweet.walletPubkey} 
+                                        profilePubkey={tweet.profilePubkey} 
+                                        tweetPubkey={tweet.tweetPubkey} 
+                                        displayName={tweet.displayName} 
+                                        handle={tweet.handle} 
+                                        message={tweet.message}
+                                    />
                         })}
                     </div>
                     :

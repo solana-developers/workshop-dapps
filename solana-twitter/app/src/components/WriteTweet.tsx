@@ -7,7 +7,8 @@ import * as util from '../utils/util';
 
 interface WriteTweetProps {
     getAllTweets: (wallet: AnchorWallet | undefined) => void,
-    publicKey: anchor.web3.PublicKey,
+    walletPubkey: anchor.web3.PublicKey, 
+    profilePubkey: anchor.web3.PublicKey, 
     displayName: string,
     handle: string,
     tweetCount: number,
@@ -31,15 +32,15 @@ export const WriteTweet: FC<WriteTweetProps> = (props: WriteTweetProps) => {
         await provider.connection.confirmTransaction(sx);
     };
 
-    const onClickPublishTweet = useCallback(async (form: TweetObject) => {
-        await publishTweet(form.message);
+    const onClickPublishTweet = useCallback(async (message: string) => {
+        await publishTweet(message);
         props.getAllTweets(wallet);
     }, [wallet, props]);
 
     return(
         <div className="text-lg border-2 rounded-lg border-[#6e6e6e] px-6 py-2 my-6 bg-[#1f1f1f]">
             <p className="text-[#a3a3a3]">
-                {props.publicKey.toString()}
+                {props.walletPubkey.toString()}
             </p>
             <p className="text-2xl my-2">
                 <span className="text-[#29d688]">
@@ -54,14 +55,7 @@ export const WriteTweet: FC<WriteTweetProps> = (props: WriteTweetProps) => {
                 placeholder="What's on your mind?" onChange={(e) => setMessage(e.target.value)}/>
             <button 
                 className="text-lg text-black border-2 rounded-lg border-[#6e6e6e] px-6 py-2 mt-2 ml-4 bg-[#74a8fc]"
-                onClick={() => onClickPublishTweet(
-                {
-                    publicKey: props.publicKey,
-                    displayName: props.displayName,
-                    handle: props.handle,
-                    message: message,
-                }
-            )}><span>Publish</span></button>
+                onClick={() => onClickPublishTweet(message)}><span>Publish</span></button>
         </div>
     );
 };
