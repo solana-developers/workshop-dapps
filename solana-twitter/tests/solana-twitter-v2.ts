@@ -48,12 +48,11 @@ describe("Solana Twitter Anchor Tests", async () => {
         [provider, program, seedUtil] = await util.getAnchorConfigs(testWallet1);
         testWallet1ProfilePda = seedUtil.profilePda;
     });
+
     it("Create new profile", async () => {
         await anchor.web3.sendAndConfirmTransaction(
             connection,
-            (await util.createProfileTransaction(
-                testWallet1, testHandle1, testDisplayName1
-            ))[0],
+            (await util.createProfileTransaction(testWallet1, testHandle1, testDisplayName1))[0],
             [testWallet1.payer]
         );
     });
@@ -67,13 +66,12 @@ describe("Solana Twitter Anchor Tests", async () => {
         };
         await anchor.web3.sendAndConfirmTransaction(
             connection,
-            (await util.modifyProfileTransaction(
-                testWallet1, "dwightkschrute", existingDisplayName
-            ))[0],
+            (await util.modifyProfileTransaction(testWallet1, "dwightkschrute", existingDisplayName))[0],
             [testWallet1.payer]
         );
         await printProfileInfo(testWallet1ProfilePda);
     });
+
     it("Update profile's display name", async () => {
         let existingHandle;
         try {
@@ -83,9 +81,7 @@ describe("Solana Twitter Anchor Tests", async () => {
         };
         await anchor.web3.sendAndConfirmTransaction(
             connection,
-            (await util.modifyProfileTransaction(
-                testWallet1, existingHandle, "Dwight Schrute"
-            ))[0],
+            (await util.modifyProfileTransaction(testWallet1, existingHandle, "Dwight Schrute"))[0],
             [testWallet1.payer]
         );
         await printProfileInfo(testWallet1ProfilePda);
@@ -94,39 +90,23 @@ describe("Solana Twitter Anchor Tests", async () => {
     async function writeTweet(message: string) {
         await anchor.web3.sendAndConfirmTransaction(
             connection,
-            (await util.createTweetTransaction(
-                testWallet1, message,
-            ))[0],
+            (await util.createTweetTransaction(testWallet1, message))[0],
             [testWallet1.payer]
         );
-        const tweetCount = (await program.account.solanaTwitterProfile.fetch(testWallet1ProfilePda)).tweetCount;
-        testWallet1TweetPda = (await anchor.web3.PublicKey.findProgramAddress(
-            [
-                Buffer.from(constants.TWEET_SEED_PREFIX),
-                testWallet1ProfilePda.toBuffer(), 
-                Buffer.from(tweetCount.toString()),
-            ],
-            program.programId,
-        ))[0];
+        testWallet1TweetPda = await seedUtil.getLatestTweetPda();
         await printTweet(testWallet1TweetPda);
     }
-    it("Write new tweet", async () => {
+    it("Write a tweet (1/4)", async () => {
         await writeTweet("Hello everybody");
     });
-    it("Write another tweet (1/3)", async () => {
+    it("Write a tweet (2/4)", async () => {
         await writeTweet("Yoooo sup!");
     });
-    it("Write another tweet (2/3)", async () => {
+    it("Write a tweet (3/4)", async () => {
         await writeTweet("Peace everybody :)");
     });
-    it("Write another tweet (3/3)", async () => {
+    it("Write a tweet (4/4)", async () => {
         await writeTweet("Goodbye");
-    });
-
-    it("Print all tweets", async () => {
-        for (var tweet of (await util.getAllTweets(testWallet1))) {
-            await printTweet(tweet.tweetPubkey);
-        }
     });
 
     it("Prepare a second user wallet for testing", async () => {
@@ -134,12 +114,11 @@ describe("Solana Twitter Anchor Tests", async () => {
         [provider, program, seedUtil] = await util.getAnchorConfigs(testWallet2);
         testWallet2ProfilePda = seedUtil.profilePda;
     });
+
     it("Create a profile for the second wallet", async () => {
         await anchor.web3.sendAndConfirmTransaction(
             connection,
-            (await util.createProfileTransaction(
-                testWallet2, testHandle2, testDisplayName2
-            ))[0],
+            (await util.createProfileTransaction(testWallet2, testHandle2, testDisplayName2))[0],
             [testWallet2.payer]
         );
     });
@@ -147,19 +126,16 @@ describe("Solana Twitter Anchor Tests", async () => {
     it("Like a tweet", async () => {
         await anchor.web3.sendAndConfirmTransaction(
             connection,
-            (await util.createLikeTransaction(
-                testWallet2, testWallet1TweetPda
-            ))[0],
+            (await util.createLikeTransaction(testWallet2, testWallet1TweetPda))[0],
             [testWallet2.payer]
         );
     });
+
     it("Try to like the same tweet again", async () => {
         try {
             await anchor.web3.sendAndConfirmTransaction(
                 connection,
-                (await util.createLikeTransaction(
-                    testWallet2, testWallet1TweetPda
-                ))[0],
+                (await util.createLikeTransaction(testWallet2, testWallet1TweetPda))[0],
                 [testWallet2.payer]
             );
             throw("Test failed. User was able to like a tweet again.")
@@ -169,19 +145,16 @@ describe("Solana Twitter Anchor Tests", async () => {
     it("Retweet a tweet", async () => {
         await anchor.web3.sendAndConfirmTransaction(
             connection,
-            (await util.createRetweetTransaction(
-                testWallet2, testWallet1TweetPda
-            ))[0],
+            (await util.createRetweetTransaction(testWallet2, testWallet1TweetPda))[0],
             [testWallet2.payer]
         );
     });
+
     it("Try to retweet the same tweet again", async () => {
         try {
             await anchor.web3.sendAndConfirmTransaction(
                 connection,
-                (await util.createRetweetTransaction(
-                    testWallet2, testWallet1TweetPda
-                ))[0],
+                (await util.createRetweetTransaction(testWallet2, testWallet1TweetPda))[0],
                 [testWallet2.payer]
             );
             throw("Test failed. User was able to retweet a tweet again.")

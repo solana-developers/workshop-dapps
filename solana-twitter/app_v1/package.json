@@ -4,10 +4,10 @@
   "license": "MIT",
   "private": false,
   "scripts": {
-    "dev": "cp ../target/idl/solana_twitter.json ./src/utils/idl.json && next dev",
-    "build": "cp ../target/idl/solana_twitter.json ./src/utils/idl.json && next build",
-    "start": "cp ../target/idl/solana_twitter.json ./src/utils/idl.json && next start",
-    "lint": "cp ../target/idl/solana_twitter.json ./src/utils/idl.json && next lint"
+    "dev": "cp ../target/idl/solana_twitter_v1.json ./src/utils/idl.json && next dev",
+    "build": "cp ../target/idl/solana_twitter_v1.json ./src/utils/idl.json && next build",
+    "start": "cp ../target/idl/solana_twitter_v1.json ./src/utils/idl.json && next start",
+    "lint": "cp ../target/idl/solana_twitter_v1.json ./src/utils/idl.json && next lint"
   },
   "dependencies": {
     "@heroicons/react": "^1.0.5",

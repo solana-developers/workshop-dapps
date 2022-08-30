@@ -64,7 +64,7 @@ export class SeedUtil {
         ]);
     }
 
-    async getTweetPda(): Promise<anchor.web3.PublicKey> {
+    async getNextTweetPda(): Promise<anchor.web3.PublicKey> {
         const tweetCount = (
             await this.program.account.solanaTwitterProfile.fetch(this.profilePda)
         ).tweetCount as number;
@@ -72,6 +72,17 @@ export class SeedUtil {
             Buffer.from(constants.TWEET_SEED_PREFIX),
             this.profilePda.toBuffer(), 
             Buffer.from((tweetCount + 1).toString()),
+        ]);
+    }
+
+    async getLatestTweetPda(): Promise<anchor.web3.PublicKey> {
+        const tweetCount = (
+            await this.program.account.solanaTwitterProfile.fetch(this.profilePda)
+        ).tweetCount as number;
+        return await this.derivePda([
+            Buffer.from(constants.TWEET_SEED_PREFIX),
+            this.profilePda.toBuffer(), 
+            Buffer.from((tweetCount).toString()),
         ]);
     }
 

@@ -1,5 +1,6 @@
 import * as anchor from '@project-serum/anchor';
 import * as constants from '../app_v1/src/utils/const';
+import { SeedUtil } from '../app_v2/src/utils/seed-util';
 import * as util from '../app_v1/src/utils/util';
 
 
@@ -10,18 +11,16 @@ const connection: anchor.web3.Connection = new anchor.web3.Connection(
 
 let provider: anchor.AnchorProvider;
 let program: anchor.Program;
+let seedUtil: SeedUtil;
 
 let testWallet1: anchor.Wallet;
 let testWallet1ProfilePda: anchor.web3.PublicKey;
-let testWallet1ProfilePdaBump: number;
 let testWallet1TweetPda: anchor.web3.PublicKey;
-let testWallet1TweetPdaBump: number;
 const testHandle1: string = "realwillferrel";
 const testDisplayName1: string = "Will Ferrel";
 
 let testWallet2: anchor.Wallet;
 let testWallet2ProfilePda: anchor.web3.PublicKey;
-let testWallet2ProfilePdaBump: number;
 const testHandle2: string = "darryl";
 const testDisplayName2: string = "Darryl";
 
@@ -30,21 +29,14 @@ describe("Solana Twitter Anchor Tests", async () => {
 
     it("Prepare a new user wallet for testing", async () => {
         testWallet1 = await primeNewWallet("Test Wallet");
-        [provider, program] = util.getAnchorConfigs(testWallet1);
-        [testWallet1ProfilePda, testWallet1ProfilePdaBump] = await anchor.web3.PublicKey.findProgramAddress(
-            [
-                Buffer.from(constants.PROFILE_SEED_PREFIX),
-                testWallet1.publicKey.toBuffer(), 
-            ],
-            program.programId,
-        );
+        [provider, program, seedUtil] = await util.getAnchorConfigs(testWallet1);
+        testWallet1ProfilePda = seedUtil.profilePda;
     });
+
     it("Create new profile", async () => {
         await anchor.web3.sendAndConfirmTransaction(
             connection,
-            (await util.createProfileTransaction(
-                testWallet1, testHandle1, testDisplayName1
-            ))[0],
+            (await util.createProfileTransaction(testWallet1, testHandle1, testDisplayName1))[0],
             [testWallet1.payer]
         );
     });
@@ -58,13 +50,12 @@ describe("Solana Twitter Anchor Tests", async () => {
         };
         await anchor.web3.sendAndConfirmTransaction(
             connection,
-            (await util.modifyProfileTransaction(
-                testWallet1, "dwightkschrute", existingDisplayName
-            ))[0],
+            (await util.modifyProfileTransaction(testWallet1, "dwightkschrute", existingDisplayName))[0],
             [testWallet1.payer]
         );
         await printProfileInfo(testWallet1ProfilePda);
     });
+
     it("Update profile's display name", async () => {
         let existingHandle;
         try {
@@ -74,114 +65,44 @@ describe("Solana Twitter Anchor Tests", async () => {
         };
         await anchor.web3.sendAndConfirmTransaction(
             connection,
-            (await util.modifyProfileTransaction(
-                testWallet1, existingHandle, "Dwight Schrute"
-            ))[0],
+            (await util.modifyProfileTransaction(testWallet1, existingHandle, "Dwight Schrute"))[0],
             [testWallet1.payer]
         );
         await printProfileInfo(testWallet1ProfilePda);
     });
 
-    it("Write new tweet", async () => {
+    async function writeTweet(message: string) {
         await anchor.web3.sendAndConfirmTransaction(
             connection,
-            (await util.createTweetTransaction(
-                testWallet1, "Hello everybody",
-            ))[0],
+            (await util.createTweetTransaction(testWallet1, message))[0],
             [testWallet1.payer]
         );
-        const tweetCount = (await program.account.solanaTwitterProfile.fetch(testWallet1ProfilePda)).tweetCount;
-        [testWallet1TweetPda, testWallet1TweetPdaBump] = await anchor.web3.PublicKey.findProgramAddress(
-            [
-                Buffer.from(constants.TWEET_SEED_PREFIX),
-                testWallet1ProfilePda.toBuffer(), 
-                Buffer.from(tweetCount.toString()),
-            ],
-            program.programId,
-        );
+        testWallet1TweetPda = await seedUtil.getLatestTweetPda();
         await printTweet(testWallet1TweetPda);
+    }
+    it("Write a tweet (1/4)", async () => {
+        await writeTweet("Hello everybody");
     });
-    it("Write another tweet (1/3)", async () => {
-        await anchor.web3.sendAndConfirmTransaction(
-            connection,
-            (await util.createTweetTransaction(
-                testWallet1, "Peace everybody :)",
-            ))[0],
-            [testWallet1.payer]
-        );
-        const tweetCount = (await program.account.solanaTwitterProfile.fetch(testWallet1ProfilePda)).tweetCount;
-        [testWallet1TweetPda, testWallet1TweetPdaBump] = await anchor.web3.PublicKey.findProgramAddress(
-            [
-                Buffer.from(constants.TWEET_SEED_PREFIX),
-                testWallet1ProfilePda.toBuffer(), 
-                Buffer.from(tweetCount.toString()),
-            ],
-            program.programId,
-        );
-        await printTweet(testWallet1TweetPda);
+    it("Write a tweet (2/4)", async () => {
+        await writeTweet("Yoooo sup!");
     });
-    it("Write another tweet (2/3)", async () => {
-        await anchor.web3.sendAndConfirmTransaction(
-            connection,
-            (await util.createTweetTransaction(
-                testWallet1, "Peace everybody :)",
-            ))[0],
-            [testWallet1.payer]
-        );
-        const tweetCount = (await program.account.solanaTwitterProfile.fetch(testWallet1ProfilePda)).tweetCount;
-        [testWallet1TweetPda, testWallet1TweetPdaBump] = await anchor.web3.PublicKey.findProgramAddress(
-            [
-                Buffer.from(constants.TWEET_SEED_PREFIX),
-                testWallet1ProfilePda.toBuffer(), 
-                Buffer.from(tweetCount.toString()),
-            ],
-            program.programId,
-        );
-        await printTweet(testWallet1TweetPda);
+    it("Write a tweet (3/4)", async () => {
+        await writeTweet("Peace everybody :)");
     });
-    it("Write another tweet (3/3)", async () => {
-        await anchor.web3.sendAndConfirmTransaction(
-            connection,
-            (await util.createTweetTransaction(
-                testWallet1, "Goodbye",
-            ))[0],
-            [testWallet1.payer]
-        );
-        const tweetCount = (await program.account.solanaTwitterProfile.fetch(testWallet1ProfilePda)).tweetCount;
-        [testWallet1TweetPda, testWallet1TweetPdaBump] = await anchor.web3.PublicKey.findProgramAddress(
-            [
-                Buffer.from(constants.TWEET_SEED_PREFIX),
-                testWallet1ProfilePda.toBuffer(), 
-                Buffer.from(tweetCount.toString()),
-            ],
-            program.programId,
-        );
-        await printTweet(testWallet1TweetPda);
-    });
-
-    it("Print all tweets", async () => {
-        for (var tweet of (await util.getAllTweets(testWallet1))) {
-            await printTweet(tweet.tweetPubkey);
-        }
+    it("Write a tweet (4/4)", async () => {
+        await writeTweet("Goodbye");
     });
 
     it("Prepare a second user wallet for testing", async () => {
         testWallet2 = await primeNewWallet("Test Wallet");
-        [provider, program] = util.getAnchorConfigs(testWallet2);
-        [testWallet2ProfilePda, testWallet2ProfilePdaBump] = await anchor.web3.PublicKey.findProgramAddress(
-            [
-                Buffer.from(constants.PROFILE_SEED_PREFIX),
-                testWallet2.publicKey.toBuffer(),
-            ],
-            program.programId,
-        );
+        [provider, program, seedUtil] = await util.getAnchorConfigs(testWallet2);
+        testWallet2ProfilePda = seedUtil.profilePda;
     });
+
     it("Create a profile for the second wallet", async () => {
         await anchor.web3.sendAndConfirmTransaction(
             connection,
-            (await util.createProfileTransaction(
-                testWallet2, testHandle2, testDisplayName2
-            ))[0],
+            (await util.createProfileTransaction(testWallet2, testHandle2, testDisplayName2))[0],
             [testWallet2.payer]
         );
     });
@@ -189,19 +110,16 @@ describe("Solana Twitter Anchor Tests", async () => {
     it("Like a tweet", async () => {
         await anchor.web3.sendAndConfirmTransaction(
             connection,
-            (await util.likeTweetTransaction(
-                testWallet2, testWallet1TweetPda
-            ))[0],
+            (await util.createLikeTransaction(testWallet2, testWallet1TweetPda))[0],
             [testWallet2.payer]
         );
     });
+
     it("Try to like the same tweet again", async () => {
         try {
             await anchor.web3.sendAndConfirmTransaction(
                 connection,
-                (await util.likeTweetTransaction(
-                    testWallet2, testWallet1TweetPda
-                ))[0],
+                (await util.createLikeTransaction(testWallet2, testWallet1TweetPda))[0],
                 [testWallet2.payer]
             );
             throw("Test failed. User was able to like a tweet again.")
@@ -211,19 +129,16 @@ describe("Solana Twitter Anchor Tests", async () => {
     it("Retweet a tweet", async () => {
         await anchor.web3.sendAndConfirmTransaction(
             connection,
-            (await util.retweetTweetTransaction(
-                testWallet2, testWallet1TweetPda
-            ))[0],
+            (await util.createRetweetTransaction(testWallet2, testWallet1TweetPda))[0],
             [testWallet2.payer]
         );
     });
+
     it("Try to retweet the same tweet again", async () => {
         try {
             await anchor.web3.sendAndConfirmTransaction(
                 connection,
-                (await util.retweetTweetTransaction(
-                    testWallet2, testWallet1TweetPda
-                ))[0],
+                (await util.createRetweetTransaction(testWallet2, testWallet1TweetPda))[0],
                 [testWallet2.payer]
             );
             throw("Test failed. User was able to retweet a tweet again.")

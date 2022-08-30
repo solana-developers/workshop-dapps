@@ -6,11 +6,11 @@ pub mod instructions;
 pub mod state;
 
 
-declare_id!("Etez1vCVYGuvr1hg1Qsjj8yVyWAafWbRKAzqN98eDGus");
+declare_id!("6qjoZbo7CcNq3bfL8kVva7K6zPjoamdPjWQRhrVYaD6y");
 
 
 #[program]
-pub mod solana_twitter {
+pub mod solana_twitter_v1 {
     use super::*;
 
     pub fn create_profile(

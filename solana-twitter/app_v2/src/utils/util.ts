@@ -136,7 +136,7 @@ export async function createTweetTransaction(
     if (!provider) throw("Provider is null");
     const ix = await program.methods.createTweet(message)
         .accounts({
-            tweet: await seedUtil.getTweetPda(),
+            tweet: await seedUtil.getNextTweetPda(),
             profile: seedUtil.profilePda,
             authority: provider.wallet.publicKey,
             systemProgram: anchor.web3.SystemProgram.programId,

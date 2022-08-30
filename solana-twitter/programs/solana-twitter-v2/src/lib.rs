@@ -6,11 +6,11 @@ pub mod instructions;
 pub mod state;
 
 
-declare_id!("ECRSKA4enYByxHYfpNQ4JRvd98y81CGwvtg88iP6RjVF");
+declare_id!("J6CQfWfnsg7XCUAYYwHmUB6PMzH9wrvepGx8JnXv8mp6");
 
 
 #[program]
-pub mod solana_twitter {
+pub mod solana_twitter_v2 {
     use super::*;
 
     pub fn create_like_mint(
