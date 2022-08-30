@@ -1,0 +1,503 @@
+{
+  "version": "0.1.0",
+  "name": "solana_twitter",
+  "instructions": [
+    {
+      "name": "createLikeMint",
+      "accounts": [
+        {
+          "name": "likeMetadata",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "likeMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "likeMintAuthority",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenMetadataProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "createRetweetMint",
+      "accounts": [
+        {
+          "name": "retweetMetadata",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "retweetMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "retweetMintAuthority",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenMetadataProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "createProfile",
+      "accounts": [
+        {
+          "name": "likeMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "likeMintAuthority",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "likeTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "retweetMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "retweetMintAuthority",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "retweetTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "profile",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "handle",
+          "type": "string"
+        },
+        {
+          "name": "displayName",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "modifyProfile",
+      "accounts": [
+        {
+          "name": "profile",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "handle",
+          "type": "string"
+        },
+        {
+          "name": "displayName",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "createTweet",
+      "accounts": [
+        {
+          "name": "tweet",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "profile",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "body",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "createLike",
+      "accounts": [
+        {
+          "name": "likeMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "likeMintAuthority",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authorTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "like",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tweet",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "submitterProfile",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authorWallet",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "createRetweet",
+      "accounts": [
+        {
+          "name": "retweetMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "retweetMintAuthority",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authorTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "retweet",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tweet",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "submitterProfile",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authorWallet",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    {
+      "name": "SolanaLike",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "walletPubkey",
+            "type": "publicKey"
+          },
+          {
+            "name": "profilePubkey",
+            "type": "publicKey"
+          },
+          {
+            "name": "tweetPubkey",
+            "type": "publicKey"
+          },
+          {
+            "name": "authority",
+            "type": "publicKey"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "LikeMintAuthorityPda",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "mintBump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "RetweetMintAuthorityPda",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "mintBump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SolanaTwitterProfile",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "handle",
+            "type": "string"
+          },
+          {
+            "name": "displayName",
+            "type": "string"
+          },
+          {
+            "name": "tweetCount",
+            "type": "u32"
+          },
+          {
+            "name": "authority",
+            "type": "publicKey"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SolanaRetweet",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "walletPubkey",
+            "type": "publicKey"
+          },
+          {
+            "name": "profilePubkey",
+            "type": "publicKey"
+          },
+          {
+            "name": "tweetPubkey",
+            "type": "publicKey"
+          },
+          {
+            "name": "authority",
+            "type": "publicKey"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SolanaTweet",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "walletPubkey",
+            "type": "publicKey"
+          },
+          {
+            "name": "profilePubkey",
+            "type": "publicKey"
+          },
+          {
+            "name": "tweetNumber",
+            "type": "u32"
+          },
+          {
+            "name": "likeCount",
+            "type": "u32"
+          },
+          {
+            "name": "retweetCount",
+            "type": "u32"
+          },
+          {
+            "name": "body",
+            "type": "string"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    }
+  ],
+  "metadata": {
+    "address": "ECRSKA4enYByxHYfpNQ4JRvd98y81CGwvtg88iP6RjVF"
+  }
+}

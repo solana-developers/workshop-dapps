@@ -1,14 +1,14 @@
 import * as anchor from '@project-serum/anchor';
-import * as constants from '../app/src/utils/const';
-import { SeedUtil } from '../app/src/utils/seed-util';
-import * as util from '../app/src/utils/util';
+import * as constants from '../app_v2/src/utils/const';
+import { SeedUtil } from '../app_v2/src/utils/seed-util';
+import * as util from '../app_v2/src/utils/util';
 
 
 const MASTER_WALLET = new anchor.Wallet(
     anchor.web3.Keypair.fromSecretKey(
         Buffer.from(
             JSON.parse(require('fs').readFileSync(
-                __dirname + '/../app/wallet/master.json', 
+                __dirname + '/../app_v2/wallet/master.json', 
                 "utf-8"
 )))));
 
@@ -38,9 +38,7 @@ describe("Solana Twitter Anchor Tests", async () => {
     it("Create the \"Like\" & \"Retweet\" mints", async () => {
         await anchor.web3.sendAndConfirmTransaction(
             connection,
-            (await util.createMints(
-                MASTER_WALLET
-            ))[0],
+            (await util.createMints(MASTER_WALLET))[0],
             [MASTER_WALLET.payer]
         );
     });

@@ -10,24 +10,23 @@ const MASTER_WALLET: anchor.Wallet = new anchor.Wallet(
                 __dirname + '/../app/wallet/master.json', 
                 "utf-8"
 )))));
+const connection: anchor.web3.Connection = new anchor.web3.Connection(
+    constants.NETWORK, 
+    constants.PREFLIGHT_COMMITMENT
+);
 
 
 async function main() {
 
-    console.log("Creating new mint for likes...");
-    var [tx, provider] = await util.createLikeMint(MASTER_WALLET);
-    await provider.connection.confirmTransaction(
-        (await provider.connection.sendTransaction(tx, [MASTER_WALLET.payer]))
-    );
-    console.log("Success.");
-
-    console.log("Creating new mint for retweets...");
-    var [tx, provider] = await util.createRetweetMint(MASTER_WALLET);
-    await provider.connection.confirmTransaction(
-        (await provider.connection.sendTransaction(tx, [MASTER_WALLET.payer]))
+    console.log("Creating a new mint for likes and retweets...");
+    await anchor.web3.sendAndConfirmTransaction(
+        connection,
+        (await util.createMints(MASTER_WALLET))[0],
+        [MASTER_WALLET.payer]
     );
     console.log("Success.");
 }
+
 
 main().then(
     () => process.exit(),

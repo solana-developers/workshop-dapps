@@ -1,11 +1,11 @@
 [package]
-name = "solana-twitter"
+name = "solana-twitter-v2"
 version = "0.1.0"
 edition = "2021"
 
 [lib]
 crate-type = ["cdylib", "lib"]
-name = "solana_twitter"
+name = "solana_twitter_v2"
 
 [features]
 no-entrypoint = []
