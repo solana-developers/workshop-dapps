@@ -9,8 +9,6 @@ pub fn create_tweet(
     body: String,
 ) -> Result<()> {
 
-    msg!("Publishing new tweet...");
-    msg!("  Profile address: {}", ctx.accounts.profile.key());
     let profile = &mut ctx.accounts.profile;
     let tweet = SolanaTweet::new(
         ctx.accounts.authority.key(),

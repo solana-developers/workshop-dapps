@@ -9,9 +9,6 @@ pub fn create_like(
     ctx: Context<CreateLike>,
 ) -> Result<()> {
 
-    msg!("Submitting new Like...");
-    msg!("  Tweet to be liked: {}", ctx.accounts.tweet.key());
-    msg!("  Submitter's profile: {}", ctx.accounts.profile.key());
     let tweet = &mut ctx.accounts.tweet;
     let like = SolanaLike::new(
         ctx.accounts.authority.key(),
@@ -22,7 +19,6 @@ pub fn create_like(
     );
     ctx.accounts.like.set_inner(like.clone());
     tweet.like_count += 1;
-    msg!("Like submitted successfully.");
     Ok(())
 }
 

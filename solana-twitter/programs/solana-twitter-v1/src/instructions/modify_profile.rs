@@ -9,12 +9,9 @@ pub fn modify_profile(
     display_name: String,
 ) -> Result<()> {
 
-    msg!("Modifying profile...");
-    msg!("  Profile address: {}", ctx.accounts.profile.key());
     let existing_profile = &mut ctx.accounts.profile;
     existing_profile.handle = handle;
     existing_profile.display_name = display_name;
-    msg!("Profile updated successfully.");
     Ok(())
 }
 

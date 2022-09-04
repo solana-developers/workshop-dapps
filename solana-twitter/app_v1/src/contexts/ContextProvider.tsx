@@ -18,23 +18,25 @@ import { NetworkConfigurationProvider, useNetworkConfiguration } from './Network
 
 const WalletContextProvider: FC<{ children: ReactNode }> = ({ children }) => {
     const { autoConnect } = useAutoConnect();
-    const { networkConfiguration } = useNetworkConfiguration();
-    const network = networkConfiguration as WalletAdapterNetwork;
-    const endpoint = useMemo(() => clusterApiUrl(network), [network]);
+    // const { networkConfiguration } = useNetworkConfiguration();
+    // const network = networkConfiguration as WalletAdapterNetwork;
+    // const endpoint = useMemo(() => clusterApiUrl(network), [network]);
+    const endpoint = "http://localhost:8899";
 
-    console.log(network);
+    // console.log(network);
 
     const wallets = useMemo(
         () => [
             new PhantomWalletAdapter(),
             new SolflareWalletAdapter(),
-            new SolletWalletAdapter({ network }),
-            new SolletExtensionWalletAdapter({ network }),
+            // new SolletWalletAdapter({ network }),
+            // new SolletExtensionWalletAdapter({ network }),
             new TorusWalletAdapter(),
             // new LedgerWalletAdapter(),
             // new SlopeWalletAdapter(),
         ],
-        [network]
+        // [network]
+        []
     );
 
     const onError = useCallback(

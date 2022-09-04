@@ -6,7 +6,7 @@ pub mod instructions;
 pub mod state;
 
 
-declare_id!("J6CQfWfnsg7XCUAYYwHmUB6PMzH9wrvepGx8JnXv8mp6");
+declare_id!("8F4ess66QE6ZcLLttrRuvWvq41hYvUeu2oZ6TabQycKK");
 
 
 #[program]
@@ -41,19 +41,6 @@ pub mod solana_twitter_v2 {
             ctx, 
             handle,
             display_name
-        )
-    }
-
-    pub fn modify_profile(
-        ctx: Context<ModifyProfile>, 
-        handle: String,
-        display_name: String,
-    ) -> Result<()> {
-
-        instructions::modify_profile::modify_profile(
-            ctx, 
-            handle,
-            display_name,
         )
     }
 

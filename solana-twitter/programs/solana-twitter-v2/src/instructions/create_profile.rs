@@ -17,7 +17,6 @@ pub fn create_profile(
     display_name: String,
 ) -> Result<()> {
 
-    msg!("Creating new profile...");
     let profile = SolanaTwitterProfile::new(
         handle,
         display_name,
@@ -25,7 +24,6 @@ pub fn create_profile(
         *ctx.bumps.get(SolanaTwitterProfile::SEED_PREFIX).expect("Bump not found."),
     );
     ctx.accounts.profile.set_inner(profile.clone());
-    msg!("Profile created successfully.");
     Ok(())
 }
 
@@ -33,6 +31,7 @@ pub fn create_profile(
 pub struct CreateProfile<'info> {
     
     // We need the Mint & Mint Authority to derive the user's ATAs
+    // Likes
     #[account(
         mut,
         seeds = [
@@ -59,6 +58,8 @@ pub struct CreateProfile<'info> {
         associated_token::authority = authority,
     )]
     pub like_token_account: Account<'info, token::TokenAccount>,
+
+    // Retweets
     #[account(
         mut,
         seeds = [

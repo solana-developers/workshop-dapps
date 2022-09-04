@@ -25,7 +25,7 @@ const testHandle2: string = "darryl";
 const testDisplayName2: string = "Darryl";
 
 
-describe("Solana Twitter Anchor Tests", async () => {
+describe("Solana Twitter v1 Tests", async () => {
 
     it("Prepare a new user wallet for testing", async () => {
         testWallet1 = await primeNewWallet("Test Wallet");
@@ -36,7 +36,7 @@ describe("Solana Twitter Anchor Tests", async () => {
     it("Create new profile", async () => {
         await anchor.web3.sendAndConfirmTransaction(
             connection,
-            (await util.createProfileTransaction(testWallet1, testHandle1, testDisplayName1))[0],
+            await util.createProfileTransaction(testWallet1, testHandle1, testDisplayName1),
             [testWallet1.payer]
         );
     });
@@ -50,7 +50,7 @@ describe("Solana Twitter Anchor Tests", async () => {
         };
         await anchor.web3.sendAndConfirmTransaction(
             connection,
-            (await util.modifyProfileTransaction(testWallet1, "dwightkschrute", existingDisplayName))[0],
+            await util.modifyProfileTransaction(testWallet1, "dwightkschrute", existingDisplayName),
             [testWallet1.payer]
         );
         await printProfileInfo(testWallet1ProfilePda);
@@ -65,7 +65,7 @@ describe("Solana Twitter Anchor Tests", async () => {
         };
         await anchor.web3.sendAndConfirmTransaction(
             connection,
-            (await util.modifyProfileTransaction(testWallet1, existingHandle, "Dwight Schrute"))[0],
+            await util.modifyProfileTransaction(testWallet1, existingHandle, "Dwight Schrute"),
             [testWallet1.payer]
         );
         await printProfileInfo(testWallet1ProfilePda);
@@ -74,7 +74,7 @@ describe("Solana Twitter Anchor Tests", async () => {
     async function writeTweet(message: string) {
         await anchor.web3.sendAndConfirmTransaction(
             connection,
-            (await util.createTweetTransaction(testWallet1, message))[0],
+            await util.createTweetTransaction(testWallet1, message),
             [testWallet1.payer]
         );
         testWallet1TweetPda = await seedUtil.getLatestTweetPda();
@@ -102,7 +102,7 @@ describe("Solana Twitter Anchor Tests", async () => {
     it("Create a profile for the second wallet", async () => {
         await anchor.web3.sendAndConfirmTransaction(
             connection,
-            (await util.createProfileTransaction(testWallet2, testHandle2, testDisplayName2))[0],
+            await util.createProfileTransaction(testWallet2, testHandle2, testDisplayName2),
             [testWallet2.payer]
         );
     });
@@ -110,7 +110,7 @@ describe("Solana Twitter Anchor Tests", async () => {
     it("Like a tweet", async () => {
         await anchor.web3.sendAndConfirmTransaction(
             connection,
-            (await util.createLikeTransaction(testWallet2, testWallet1TweetPda))[0],
+            await util.createLikeTransaction(testWallet2, testWallet1TweetPda),
             [testWallet2.payer]
         );
     });
@@ -119,7 +119,7 @@ describe("Solana Twitter Anchor Tests", async () => {
         try {
             await anchor.web3.sendAndConfirmTransaction(
                 connection,
-                (await util.createLikeTransaction(testWallet2, testWallet1TweetPda))[0],
+                await util.createLikeTransaction(testWallet2, testWallet1TweetPda),
                 [testWallet2.payer]
             );
             throw("Test failed. User was able to like a tweet again.")
@@ -129,7 +129,7 @@ describe("Solana Twitter Anchor Tests", async () => {
     it("Retweet a tweet", async () => {
         await anchor.web3.sendAndConfirmTransaction(
             connection,
-            (await util.createRetweetTransaction(testWallet2, testWallet1TweetPda))[0],
+            await util.createRetweetTransaction(testWallet2, testWallet1TweetPda),
             [testWallet2.payer]
         );
     });
@@ -138,7 +138,7 @@ describe("Solana Twitter Anchor Tests", async () => {
         try {
             await anchor.web3.sendAndConfirmTransaction(
                 connection,
-                (await util.createRetweetTransaction(testWallet2, testWallet1TweetPda))[0],
+                await util.createRetweetTransaction(testWallet2, testWallet1TweetPda),
                 [testWallet2.payer]
             );
             throw("Test failed. User was able to retweet a tweet again.")
