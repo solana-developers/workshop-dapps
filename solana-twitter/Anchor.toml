@@ -1,8 +1,9 @@
 [features]
 seeds = false
 [programs.devnet]
-solana_twitter_v1 = "6qjoZbo7CcNq3bfL8kVva7K6zPjoamdPjWQRhrVYaD6y"
-solana_twitter_v2 = "J6CQfWfnsg7XCUAYYwHmUB6PMzH9wrvepGx8JnXv8mp6"
+solana_twitter_v1 = "9uZA5EotAkraSDGZfodkm3uUHQu6b9fLAhsv6s5qsDCD"
+solana_twitter_v2 = "8F4ess66QE6ZcLLttrRuvWvq41hYvUeu2oZ6TabQycKK"
+nft_minter = "8hD9e6gzTvo86cboLJEuz51Ar7petzmaMvvdZFubPNAE"
 
 [registry]
 url = "https://anchor.projectserum.com"
@@ -14,3 +15,4 @@ wallet = "~/.config/solana/id.json"
 [scripts]
 test-v1 = "cp ./target/idl/solana_twitter_v1.json ./app_v1/src/utils/idl.json && yarn run ts-mocha -p ./tests/tsconfig.tests.json -t 1000000 tests/solana-twitter-v1.ts"
 test-v2 = "cp ./target/idl/solana_twitter_v2.json ./app_v2/src/utils/idl.json && yarn run ts-mocha -p ./tests/tsconfig.tests.json -t 1000000 tests/solana-twitter-v2.ts"
+test-minter = "cp ./target/idl/nft_minter.json ./app_nft_minter/src/utils/idl.json && yarn run ts-mocha -p ./tests/tsconfig.tests.json -t 1000000 tests/nft-minter.ts"
