@@ -20,12 +20,6 @@ export class SeedUtil {
         ))[0]
     }
 
-    async deriveMetadataPda(seeds: Buffer[]) {
-        return (await anchor.web3.PublicKey.findProgramAddress(
-            seeds, constants.TOKEN_METADATA_PROGRAM_ID
-        ))[0]
-    }
-
     async init(
         walletPubkey: anchor.web3.PublicKey,
     ) {

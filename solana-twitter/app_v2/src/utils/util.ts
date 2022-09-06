@@ -35,6 +35,7 @@ export async function getAnchorConfigs(
     return [provider, program, seedUtil];
 }
 
+
 /**
  * Creates a user profile
  * @param wallet 
@@ -63,31 +64,6 @@ export async function createProfileTransaction(
             systemProgram: anchor.web3.SystemProgram.programId,
             tokenProgram: anchor.utils.token.TOKEN_PROGRAM_ID,
             associatedTokenProgram: anchor.utils.token.ASSOCIATED_PROGRAM_ID,
-        })
-        .instruction();
-    return new anchor.web3.Transaction().add(ix);
-};
-
-
-/**
- * Modifies an existing profile
- * @param wallet 
- * @param handle 
- * @param displayName 
- * @returns ModifyProfile Transaction
- */
-export async function modifyProfileTransaction(
-    wallet: AnchorWallet,
-    handle: string,
-    displayName: string,
-): Promise<anchor.web3.Transaction> {
-
-    const [provider, program, seedUtil] = await getAnchorConfigs(wallet);
-    const ix = await program.methods.modifyProfile(handle, displayName)
-        .accounts({
-            profile: seedUtil.profilePda,
-            authority: provider.wallet.publicKey,
-            systemProgram: anchor.web3.SystemProgram.programId,
         })
         .instruction();
     return new anchor.web3.Transaction().add(ix);
