@@ -38,15 +38,6 @@ export const Tweet: FC<TweetProps> = (props: TweetProps) => {
     const [tweetLiked, setTweetLiked] = useState<boolean>(props.tweetLiked);
 
 
-    const onClickShowRetweets = () => {
-        console.log("Displaying Retweets"); // TODO
-    };
-
-    const onClickShowLikes = () => {
-        console.log("Displaying Likes"); // TODO
-    };
-
-
     async function getTweetLiked(wallet: AnchorWallet, tweetPubkey: PublicKey) {
         try {
             const like = await getLike(wallet, tweetPubkey);
@@ -96,9 +87,6 @@ export const Tweet: FC<TweetProps> = (props: TweetProps) => {
             <p className="text-[#a3a3a3]">
                 {props.walletPubkey.toString()}
             </p>
-            <p className="my-2text-[#a3a3a3]">
-                {props.tweetPubkey.toString()}
-            </p>
             <p className="text-2xl my-2">
                 <span className="text-[#29d688]">
                     {props.displayName}
@@ -115,13 +103,13 @@ export const Tweet: FC<TweetProps> = (props: TweetProps) => {
                     {tweetRetweeted ? <span>⚪</span> : <button>🔁</button>}
                 </span>
                 <span className="ml-4 text-[#29d688]" onClick={() => onClickShowRetweets()}>
-                    <button>{props.retweetCount}</button>
+                    {props.retweetCount}
                 </span>
                 <span className="ml-10 text-[#de6fd8]" onClick={() => onClickLikeTweet()}>
                     {tweetLiked ? <span>🤍</span> : <button>💖</button>}
                 </span>
                 <span className="ml-4 text-[#de6fd8]" onClick={() => onClickShowLikes()}>
-                    <button>{props.likeCount}</button>
+                    {props.likeCount}
                 </span>
             </p>
         </div>

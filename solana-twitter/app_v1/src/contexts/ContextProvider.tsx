@@ -2,38 +2,26 @@ import { WalletAdapterNetwork, WalletError } from '@solana/wallet-adapter-base';
 import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
 import { WalletModalProvider as ReactUIWalletModalProvider } from '@solana/wallet-adapter-react-ui';
 import {
+    GlowWalletAdapter,
     PhantomWalletAdapter,
     SolflareWalletAdapter,
-    SolletExtensionWalletAdapter,
-    SolletWalletAdapter,
-    TorusWalletAdapter,
-    // LedgerWalletAdapter,
-    // SlopeWalletAdapter,
 } from '@solana/wallet-adapter-wallets';
 import { Cluster, clusterApiUrl } from '@solana/web3.js';
 import { FC, ReactNode, useCallback, useMemo } from 'react';
 import { AutoConnectProvider, useAutoConnect } from './AutoConnectProvider';
 import { notify } from "../utils/notifications";
 import { NetworkConfigurationProvider, useNetworkConfiguration } from './NetworkConfigurationProvider';
+import * as constants from '../utils/const';
 
 const WalletContextProvider: FC<{ children: ReactNode }> = ({ children }) => {
     const { autoConnect } = useAutoConnect();
-    // const { networkConfiguration } = useNetworkConfiguration();
-    // const network = networkConfiguration as WalletAdapterNetwork;
-    // const endpoint = useMemo(() => clusterApiUrl(network), [network]);
-    const endpoint = "http://localhost:8899";
-
-    // console.log(network);
+    const endpoint = constants.NETWORK;
 
     const wallets = useMemo(
         () => [
+            new GlowWalletAdapter(),
             new PhantomWalletAdapter(),
             new SolflareWalletAdapter(),
-            // new SolletWalletAdapter({ network }),
-            // new SolletExtensionWalletAdapter({ network }),
-            new TorusWalletAdapter(),
-            // new LedgerWalletAdapter(),
-            // new SlopeWalletAdapter(),
         ],
         // [network]
         []
@@ -48,7 +36,6 @@ const WalletContextProvider: FC<{ children: ReactNode }> = ({ children }) => {
     );
 
     return (
-        // TODO: updates needed for updating and referencing endpoint: wallet adapter rework
         <ConnectionProvider endpoint={endpoint}>
             <WalletProvider wallets={wallets} onError={onError} autoConnect={autoConnect}>
                 <ReactUIWalletModalProvider>{children}</ReactUIWalletModalProvider>

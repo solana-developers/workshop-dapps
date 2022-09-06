@@ -29,7 +29,7 @@ export const SolanaTwitter: FC = () => {
         if (newHandle.charAt(0) !== '@') {
             newHandle = "@" + newHandle;
             setHandle("@" + handle);
-        }
+        };
         const tx = await util.createProfileTransaction(wallet, newHandle, displayName);
         await connection.confirmTransaction(await sendTransaction(tx, connection));
         getProfile(wallet);

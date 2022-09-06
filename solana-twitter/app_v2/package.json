@@ -4,10 +4,10 @@
   "license": "MIT",
   "private": false,
   "scripts": {
-    "dev": "cp ../target/idl/solana_twitter_v2.json ./src/utils/idl.json && next dev",
-    "build": "cp ../target/idl/solana_twitter_v2.json ./src/utils/idl.json && next build",
-    "start": "cp ../target/idl/solana_twitter_v2.json ./src/utils/idl.json && next start",
-    "lint": "cp ../target/idl/solana_twitter_v2.json ./src/utils/idl.json && next lint"
+    "dev": "ts-node init/init.ts && cp ../target/idl/solana_twitter_v2.json ./src/utils/idl.json && next dev",
+    "build": "ts-node init/init.ts && cp ../target/idl/solana_twitter_v2.json ./src/utils/idl.json && next build",
+    "start": "ts-node init/init.ts && cp ../target/idl/solana_twitter_v2.json ./src/utils/idl.json && next start",
+    "lint": "ts-node init/init.ts && cp ../target/idl/solana_twitter_v2.json ./src/utils/idl.json && next lint"
   },
   "dependencies": {
     "@heroicons/react": "^1.0.5",
@@ -25,6 +25,7 @@
     "next-transpile-modules": "^9.0.0",
     "react": "17.0.2",
     "react-dom": "17.0.2",
+    "ts-node": "^10.9.1",
     "zustand": "^3.6.9"
   },
   "devDependencies": {

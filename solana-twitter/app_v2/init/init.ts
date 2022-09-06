@@ -7,7 +7,7 @@ const MASTER_WALLET: anchor.Wallet = new anchor.Wallet(
     anchor.web3.Keypair.fromSecretKey(
         Buffer.from(JSON.parse(
             require('fs').readFileSync(
-                __dirname + '/../app/wallet/master.json', 
+                __dirname + '/../wallet/master.json', 
                 "utf-8"
 )))));
 const connection: anchor.web3.Connection = new anchor.web3.Connection(

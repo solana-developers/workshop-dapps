@@ -1,14 +1,18 @@
 import { FC, useCallback, useState } from "react";
-import { AnchorWallet, useAnchorWallet, useWallet } from "@solana/wallet-adapter-react";
-import { TweetObject } from "../models/types";
-import * as anchor from "@project-serum/anchor";
+import { 
+    AnchorWallet, 
+    useAnchorWallet, 
+    useConnection, 
+    useWallet 
+} from "@solana/wallet-adapter-react";
+import { PublicKey } from "@solana/web3.js";
 import * as util from '../utils/util';
 
 
 interface WriteTweetProps {
     getAllTweets: (wallet: AnchorWallet | undefined) => void,
-    walletPubkey: anchor.web3.PublicKey, 
-    profilePubkey: anchor.web3.PublicKey, 
+    walletPubkey: PublicKey, 
+    profilePubkey: PublicKey, 
     displayName: string,
     handle: string,
     tweetCount: number,
@@ -16,26 +20,19 @@ interface WriteTweetProps {
 
 export const WriteTweet: FC<WriteTweetProps> = (props: WriteTweetProps) => {
 
+    const { connection } = useConnection();
     const { publicKey, sendTransaction } = useWallet();
     const wallet = useAnchorWallet();
 
-    const [displayName, setName] = useState(props.displayName);
-    const [handle, setHandle] = useState(props.handle);
-    const [tweetCount, setTweetCount] = useState(props.tweetCount);
-
     const [message, setMessage] = useState('');
 
-    async function publishTweet(message: string) {
-        if (!wallet) throw("Wallet not connected!");
-        const [tx, provider] = await util.createTweetTransaction(wallet, message);
-        const sx = await sendTransaction(tx, provider.connection);
-        await provider.connection.confirmTransaction(sx);
-    };
 
     const onClickPublishTweet = useCallback(async (message: string) => {
-        await publishTweet(message);
+        const tx = await util.createTweetTransaction(wallet, message);
+        await connection.confirmTransaction(await sendTransaction(tx, connection));
         props.getAllTweets(wallet);
     }, [wallet, props]);
+
 
     return(
         <div className="text-lg border-2 rounded-lg border-[#6e6e6e] px-6 py-2 my-6 bg-[#1f1f1f]">

@@ -1,27 +1,45 @@
-import * as anchor from "@project-serum/anchor";
+import { PublicKey } from "@solana/web3.js";
 
 
 export type EndpointTypes = 'mainnet' | 'devnet' | 'localnet'
 
 export interface ProfileObject {
-    walletPubkey: anchor.web3.PublicKey,
-    profilePubkey: anchor.web3.PublicKey,
+    walletPubkey: PublicKey,
+    profilePubkey: PublicKey,
     displayName: string,
     handle: string,
     tweetCount: number,
 };
 
 export interface TweetObject {
-    walletPubkey: anchor.web3.PublicKey,
-    profilePubkey: anchor.web3.PublicKey,
-    tweetPubkey: anchor.web3.PublicKey,
+    walletPubkey: PublicKey,
+    profilePubkey: PublicKey,
+    tweetPubkey: PublicKey,
     displayName: string,
     handle: string,
     message: string,
+    likeCount: number,
+    retweetCount: number,
+    tweetLiked: boolean,
+    tweetRetweeted: boolean,
+};
+
+export interface RetweetObject {
+    retweeterProfilePubkey: PublicKey,
+    walletPubkey: PublicKey,
+    profilePubkey: PublicKey,
+    tweetPubkey: PublicKey,
+    displayName: string,
+    handle: string,
+    message: string,
+    likeCount: number,
+    retweetCount: number,
+    tweetLiked: boolean,
+    tweetRetweeted: boolean,
 };
 
 export interface WriteTweetObject {
-    publicKey: anchor.web3.PublicKey,
+    publicKey: PublicKey,
     displayName: string,
     handle: string,
     tweetCount: number,
