@@ -9,7 +9,6 @@ pub fn create_profile(
     display_name: String,
 ) -> Result<()> {
 
-    msg!("Creating new profile...");
     let profile = SolanaTwitterProfile::new(
         handle,
         display_name,
@@ -17,7 +16,6 @@ pub fn create_profile(
         *ctx.bumps.get(SolanaTwitterProfile::SEED_PREFIX).expect("Bump not found."),
     );
     ctx.accounts.profile.set_inner(profile.clone());
-    msg!("Profile created successfully.");
     Ok(())
 }
 

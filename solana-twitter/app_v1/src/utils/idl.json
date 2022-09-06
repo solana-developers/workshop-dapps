@@ -33,36 +33,6 @@
       ]
     },
     {
-      "name": "modifyProfile",
-      "accounts": [
-        {
-          "name": "profile",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "authority",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "handle",
-          "type": "string"
-        },
-        {
-          "name": "displayName",
-          "type": "string"
-        }
-      ]
-    },
-    {
       "name": "createTweet",
       "accounts": [
         {
@@ -279,6 +249,6 @@
     }
   ],
   "metadata": {
-    "address": "6qjoZbo7CcNq3bfL8kVva7K6zPjoamdPjWQRhrVYaD6y"
+    "address": "9uZA5EotAkraSDGZfodkm3uUHQu6b9fLAhsv6s5qsDCD"
   }
 }

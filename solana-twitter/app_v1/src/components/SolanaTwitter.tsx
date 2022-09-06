@@ -10,9 +10,12 @@ import * as util from '../utils/util';
 
 export const SolanaTwitter: FC = () => {
 
+    const { connection } = useConnection();
     const { publicKey, sendTransaction } = useWallet();
     const wallet = useAnchorWallet();
-    const { connection } = useConnection();
+
+    const { tweets, getAllTweets } = useTweetsStore();
+    const { profile, getProfile } = useTwitterAccountStore();
 
     const balance = useUserSOLBalanceStore((s) => s.balance)
     const { getUserSOLBalance } = useUserSOLBalanceStore()
@@ -20,38 +23,32 @@ export const SolanaTwitter: FC = () => {
     const [displayName, setName] = useState<string>('');
     const [handle, setHandle] = useState<string>('');
 
-    const { tweets, getAllTweets } = useTweetsStore();
-    const { profile, getProfile } = useTwitterAccountStore();
 
-    async function createSolanaTwitterAccount() {
+    const onClickCreateAccount = useCallback(async () => {
         var newHandle = handle;
         if (newHandle.charAt(0) !== '@') {
             newHandle = "@" + newHandle;
             setHandle("@" + handle);
-        }
-        if (!wallet) throw("Wallet not connected!")
-        const [tx, provider] = await util.createProfileTransaction(wallet, newHandle, displayName);
-        const sx = await sendTransaction(tx, provider.connection);
-        await provider.connection.confirmTransaction(sx);
+        };
+        const tx = await util.createProfileTransaction(wallet, newHandle, displayName);
+        await connection.confirmTransaction(await sendTransaction(tx, connection));
         getProfile(wallet);
-    };
+    }, [wallet, handle, displayName, getProfile]);
 
-    const onClickCreateAccount = useCallback(async () => {
-        await createSolanaTwitterAccount();
-    }, [wallet, handle, displayName]);
 
     useEffect(() => {
         getProfile(wallet);
         getAllTweets(wallet);
-    }, [wallet]);
+    }, [wallet, getProfile, getAllTweets]);
 
     useEffect(() => {
         if (publicKey) {
-        console.log(publicKey.toBase58())
-        getUserSOLBalance(publicKey, connection)
+            console.log(publicKey.toBase58())
+            getUserSOLBalance(publicKey, connection)
         }
     }, [publicKey, connection, getUserSOLBalance])
 
+    
     return (
         <div>
             { wallet ?
@@ -72,12 +69,17 @@ export const SolanaTwitter: FC = () => {
                         {tweets.map((tweet, i) => {
                             return <Tweet 
                                         key={i} 
+                                        getAllTweets={getAllTweets}
                                         walletPubkey={tweet.walletPubkey} 
                                         profilePubkey={tweet.profilePubkey} 
                                         tweetPubkey={tweet.tweetPubkey} 
                                         displayName={tweet.displayName} 
                                         handle={tweet.handle} 
                                         message={tweet.message}
+                                        likeCount={tweet.likeCount}
+                                        retweetCount={tweet.retweetCount}
+                                        tweetLiked={tweet.tweetLiked}
+                                        tweetRetweeted={tweet.tweetRetweeted}
                                     />
                         })}
                     </div>

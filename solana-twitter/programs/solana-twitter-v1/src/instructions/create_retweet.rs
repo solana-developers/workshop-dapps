@@ -9,9 +9,6 @@ pub fn create_retweet(
     ctx: Context<CreateRetweet>,
 ) -> Result<()> {
 
-    msg!("Submitting new Retweet...");
-    msg!("  Tweet to be retweeted: {}", ctx.accounts.tweet.key());
-    msg!("  Submitter's profile: {}", ctx.accounts.profile.key());
     let tweet = &mut ctx.accounts.tweet;
     let retweet = SolanaRetweet::new(
         ctx.accounts.authority.key(),
@@ -22,7 +19,6 @@ pub fn create_retweet(
     );
     ctx.accounts.retweet.set_inner(retweet.clone());
     tweet.retweet_count += 1;
-    msg!("Retweet submitted successfully.");
     Ok(())
 }
 

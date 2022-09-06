@@ -1,6 +1,6 @@
 {
   "version": "0.1.0",
-  "name": "solana_twitter",
+  "name": "solana_twitter_v2",
   "instructions": [
     {
       "name": "createLikeMint",
@@ -154,36 +154,6 @@
         },
         {
           "name": "associatedTokenProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "handle",
-          "type": "string"
-        },
-        {
-          "name": "displayName",
-          "type": "string"
-        }
-      ]
-    },
-    {
-      "name": "modifyProfile",
-      "accounts": [
-        {
-          "name": "profile",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "authority",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "systemProgram",
           "isMut": false,
           "isSigner": false
         }
@@ -498,6 +468,6 @@
     }
   ],
   "metadata": {
-    "address": "ECRSKA4enYByxHYfpNQ4JRvd98y81CGwvtg88iP6RjVF"
+    "address": "8F4ess66QE6ZcLLttrRuvWvq41hYvUeu2oZ6TabQycKK"
   }
 }

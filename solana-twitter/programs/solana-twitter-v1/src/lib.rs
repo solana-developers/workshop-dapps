@@ -6,19 +6,22 @@ pub mod instructions;
 pub mod state;
 
 
-declare_id!("6qjoZbo7CcNq3bfL8kVva7K6zPjoamdPjWQRhrVYaD6y");
+declare_id!("9uZA5EotAkraSDGZfodkm3uUHQu6b9fLAhsv6s5qsDCD");
 
 
 #[program]
 pub mod solana_twitter_v1 {
     use super::*;
 
+    // Create Profile instruction
+    //
     pub fn create_profile(
         ctx: Context<CreateProfile>, 
         handle: String,
         display_name: String,
     ) -> Result<()> {
 
+        // Calls 'create_profile' from instructions/create_profile.rs
         instructions::create_profile::create_profile(
             ctx, 
             handle,
@@ -26,43 +29,39 @@ pub mod solana_twitter_v1 {
         )
     }
 
-    pub fn modify_profile(
-        ctx: Context<ModifyProfile>, 
-        handle: String,
-        display_name: String,
-    ) -> Result<()> {
-
-        instructions::modify_profile::modify_profile(
-            ctx, 
-            handle,
-            display_name,
-        )
-    }
-
+    // Create Tweet instruction
+    //
     pub fn create_tweet(
         ctx: Context<CreateTweet>, 
         body: String,
     ) -> Result<()> {
 
+        // Calls 'create_tweet' from instructions/create_tweet.rs
         instructions::create_tweet::create_tweet(
             ctx, 
             body,
         )
     }
 
+    // Create Like instructions
+    //
     pub fn create_like(
         ctx: Context<CreateLike>, 
     ) -> Result<()> {
 
+        // Calls 'create_like' from instructions/create_like.rs
         instructions::create_like::create_like(
             ctx, 
         )
     }
 
+    // Create Retweet instructions
+    //
     pub fn create_retweet(
         ctx: Context<CreateRetweet>, 
     ) -> Result<()> {
 
+        // Calls 'create_retweet' from instructions/create_retweet.rs
         instructions::create_retweet::create_retweet(
             ctx, 
         )
