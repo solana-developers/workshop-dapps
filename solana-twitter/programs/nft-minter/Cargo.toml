@@ -1,11 +1,11 @@
 [package]
-name = "nft-minting"
+name = "nft-minter"
 version = "0.1.0"
 edition = "2021"
 
 [lib]
 crate-type = ["cdylib", "lib"]
-name = "nft_minting"
+name = "nft_minter"
 
 [features]
 no-entrypoint = []

@@ -12,8 +12,6 @@ import {
     getLike,
     getRetweet,
  } from '../utils/util';
-import useRetweetsStore from "stores/useRetweetStore";
-import useLikesStore from "stores/useLikeStore";
 
 
 interface TweetProps {

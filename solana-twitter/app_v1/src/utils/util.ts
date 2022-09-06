@@ -216,7 +216,6 @@ export async function getAllTweets(
         } catch(_) {
             profileNotFoundErr(profilePubkey);
         };
-        console.log(`TWEET PUBKEY: ${tweetPubkey}`);
         let tweetLiked: boolean;
         try {
             let like = await getLike(wallet, tweetPubkey);
@@ -227,7 +226,6 @@ export async function getAllTweets(
             let retweet = await getRetweet(wallet, tweetPubkey);
             tweetRetweeted = true;
         } catch(_) {};
-        console.log(`TWEET PUBKEY 2: ${tweetPubkey}`);
         allTweets.push({
             walletPubkey: profile.authority,
             profilePubkey: profilePubkey,
@@ -241,7 +239,6 @@ export async function getAllTweets(
             tweetRetweeted: tweetRetweeted,
         });
     };
-    console.log(`LENGTH OF TWEETS: ${allTweets.length}`);
     return allTweets
 };
 

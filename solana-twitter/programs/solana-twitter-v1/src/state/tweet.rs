@@ -5,7 +5,6 @@ use anchor_lang::prelude::*;
 pub struct SolanaTweet {
     pub wallet_pubkey: Pubkey,
     pub profile_pubkey: Pubkey,
-    pub block_hash: u64,
     pub tweet_number: u32,
     pub like_count: u32,
     pub retweet_count: u32,
@@ -22,7 +21,6 @@ impl SolanaTweet {
     pub fn new(
         wallet_pubkey: Pubkey,
         profile_pubkey: Pubkey,
-        block_hash: u64,
         tweet_number: u32,
         body: String,
         bump: u8,
@@ -31,7 +29,6 @@ impl SolanaTweet {
         SolanaTweet {
             wallet_pubkey,
             profile_pubkey,
-            block_hash,
             tweet_number,
             like_count: 0,
             retweet_count: 0,

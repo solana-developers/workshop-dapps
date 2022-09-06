@@ -20,15 +20,6 @@ pub fn mint_tweet_canvas_nft(
     metadata_uri: String,
 ) -> Result<()> {
 
-    let mint_authority_pda_bump = *ctx.bumps
-        .get(MintAuthorityPda::SEED_PREFIX)
-        .expect("Bump not found.");
-    
-    let mint_authority = MintAuthorityPda::new(
-        mint_authority_pda_bump
-    );
-    ctx.accounts.mint_authority.set_inner(mint_authority.clone());
-
     // invoke_signed(
     //     &mpl_instruction::create_metadata_accounts_v2(
     //         ctx.accounts.token_metadata_program.key(),
@@ -58,8 +49,7 @@ pub fn mint_tweet_canvas_nft(
     //     &[
     //         &[
     //             MintAuthorityPda::SEED_PREFIX.as_bytes().as_ref(), 
-    //             ctx.accounts.mint_account.key().as_ref(),
-    //             &[mint_authority_pda_bump],
+    //             &[ctx.accounts.mint_authority.bump],
     //         ]
     //     ]
     // )?;
@@ -74,8 +64,7 @@ pub fn mint_tweet_canvas_nft(
             },
             &[&[
                 MintAuthorityPda::SEED_PREFIX.as_bytes().as_ref(), 
-                ctx.accounts.mint_account.key().as_ref(),
-                &[mint_authority_pda_bump],
+                &[ctx.accounts.mint_authority.bump],
             ]]
         ),
         1,
@@ -90,8 +79,7 @@ pub fn mint_tweet_canvas_nft(
     //         },
     //         &[&[
     //             MintAuthorityPda::SEED_PREFIX.as_bytes().as_ref(), 
-    //             ctx.accounts.mint_account.key().as_ref(),
-    //             &[mint_authority_pda_bump],
+    //             &[ctx.accounts.mint_authority.bump],
     //         ]]
     //     ),
     // )?;
@@ -112,14 +100,11 @@ pub struct MintTweetCanvasNft<'info> {
     )]
     pub mint_account: Account<'info, token::Mint>,
     #[account(
-        init, 
-        payer = payer,
-        space = 8 + 32,
+        mut, 
         seeds = [
             MintAuthorityPda::SEED_PREFIX.as_bytes().as_ref(), 
-            mint_account.key().as_ref(),
         ],
-        bump
+        bump = mint_authority.bump
     )]
     pub mint_authority: Account<'info, MintAuthorityPda>,
     /// CHECK: This is for airdrops
