@@ -102,13 +102,13 @@ export const Tweet: FC<TweetProps> = (props: TweetProps) => {
                 <span className="text-[#29d688]" onClick={() => onClickRetweetTweet()}>
                     {tweetRetweeted ? <span>⚪</span> : <button>🔁</button>}
                 </span>
-                <span className="ml-4 text-[#29d688]" onClick={() => onClickShowRetweets()}>
+                <span className="ml-4 text-[#29d688]">
                     {props.retweetCount}
                 </span>
                 <span className="ml-10 text-[#de6fd8]" onClick={() => onClickLikeTweet()}>
                     {tweetLiked ? <span>🤍</span> : <button>💖</button>}
                 </span>
-                <span className="ml-4 text-[#de6fd8]" onClick={() => onClickShowLikes()}>
+                <span className="ml-4 text-[#de6fd8]">
                     {props.likeCount}
                 </span>
             </p>
