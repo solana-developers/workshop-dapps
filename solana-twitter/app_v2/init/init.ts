@@ -19,11 +19,13 @@ const connection: anchor.web3.Connection = new anchor.web3.Connection(
 async function main() {
 
     console.log("Creating a new mint for likes and retweets...");
-    await anchor.web3.sendAndConfirmTransaction(
-        connection,
-        (await util.createMints(MASTER_WALLET))[0],
-        [MASTER_WALLET.payer]
-    );
+    try {
+        await anchor.web3.sendAndConfirmTransaction(
+            connection,
+            (await util.createMints(MASTER_WALLET))[0],
+            [MASTER_WALLET.payer]
+        );
+    } catch (_) {};
     console.log("Success.");
 }
 
