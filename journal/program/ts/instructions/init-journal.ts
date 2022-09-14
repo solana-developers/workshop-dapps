@@ -1,4 +1,4 @@
-import { Assignable } from '../util/util';
+import { Assignable, InstructionType } from '../util/util';
 import * as borsh from "borsh";
 import { Buffer } from "buffer";
 import { 
@@ -54,7 +54,7 @@ export function createInitializeJournalInstruction(
         ],
         programId: programId,
         data: initInstructionObject.toBuffer(),
-    }); 
+    });
 
     return [ix, journalAddress];
 }

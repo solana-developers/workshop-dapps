@@ -1,4 +1,4 @@
-import { Assignable } from '../util/util';
+import { Assignable, InstructionType } from '../util/util';
 import * as borsh from "borsh";
 import { Buffer } from "buffer";
 import { 
@@ -7,7 +7,7 @@ import {
     SystemProgram,
     TransactionInstruction 
 } from '@solana/web3.js';
-import { JournalEntry, JournalMetadata } from '../state';
+import { JournalMetadata } from '../state';
 
 
 export class NewEntry extends Assignable {
@@ -24,6 +24,7 @@ export const NewEntrySchema = new Map([
     [ NewEntry, { 
         kind: 'struct', 
         fields: [ 
+            ['irrelevant_int', 'u8'],
             ['message', 'string'],
             ['bump', 'u8'],
         ],
@@ -47,17 +48,19 @@ export async function createNewEntryInstruction(
     const journalData = JournalMetadata.fromBuffer(
         (await connection.getAccountInfo(journalAddress)).data
     );
+    const entryCount = journalData.entries;
     
     const [entryAddress, entryBump] = PublicKey.findProgramAddressSync(
         [
             Buffer.from("entry"),
-            Buffer.from((journalData.entries + 1).toString()),
+            Buffer.from((entryCount + 1).toString()),
             journalAddress.toBuffer(),
         ],
         programId
     );
 
     const newEntryInstructionObject = new NewEntry({
+        discriminator: 1,
         message: message,
         bump: entryBump,
     });
@@ -71,7 +74,7 @@ export async function createNewEntryInstruction(
         ],
         programId: programId,
         data: newEntryInstructionObject.toBuffer(),
-    }); 
+    });
 
     return [ix, entryAddress];
 }

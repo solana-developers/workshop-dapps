@@ -19,7 +19,7 @@ export const JournalEntrySchema = new Map([
         fields: [ 
             ['entry_number', 'u32'],
             ['message', 'string'],
-            ['journal', 'string'],
+            ['journal', [32]],
             ['bump', 'u8'],
         ],
     }]

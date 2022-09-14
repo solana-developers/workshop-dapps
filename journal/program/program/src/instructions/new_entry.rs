@@ -11,6 +11,7 @@ use solana_program::{
     sysvar::Sysvar,
 };
 
+use crate::instructions::JournalInstructionType;
 use crate::state::JournalEntry;
 use crate::state::JournalMetadata;
 
@@ -19,6 +20,7 @@ use crate::state::JournalMetadata;
 //
 #[derive(BorshSerialize, BorshDeserialize, Debug)]
 pub struct NewEntry {
+    pub ixd: JournalInstructionType,
     pub message: String,
     pub bump: u8,
 }
@@ -61,16 +63,18 @@ pub fn new_entry(
     let account_span = (journal_entry_metadata.try_to_vec()?).len();
     let lamports_required = (Rent::get()?).minimum_balance(account_span);
 
+    // Invoke the System Program to create the new account
+    //
     invoke_signed(
         &system_instruction::create_account(
-            &journal.key,
+            &payer.key,
             &entry.key,
             lamports_required,
             account_span as u64,
             program_id,
         ),
         &[
-            journal.clone(), entry.clone(), system_program.clone()
+            payer.clone(), entry.clone(), system_program.clone()
         ],
         &[&[
             JournalEntry::SEED_PREFIX.as_bytes().as_ref(),
@@ -78,6 +82,12 @@ pub fn new_entry(
             journal.key.as_ref(),
             &[journal_entry_metadata.bump],
         ]]
+    )?;
+
+    // Set the data
+    //
+    journal_entry_metadata.serialize(
+        &mut &mut entry.data.borrow_mut()[..]
     )?;
 
     // Now increment the number of entries in the journal

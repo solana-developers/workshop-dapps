@@ -6,10 +6,8 @@ use solana_program::{
     pubkey::Pubkey,
 };
 
-use crate::instructions::InitJournal;
-use crate::instructions::init_journal;
-use crate::instructions::NewEntry;
-use crate::instructions::new_entry;
+use crate::instructions::JournalInstruction;
+use crate::instructions::JournalInstructionType;
 
 
 pub fn process_instruction(
@@ -17,24 +15,18 @@ pub fn process_instruction(
     accounts: &[AccountInfo],
     instruction_data: &[u8],
 ) -> ProgramResult {
-    
-    match InitJournal::try_from_slice(&instruction_data) {
-        Ok(init_ix) => return init_journal(
+
+    match JournalInstruction::unpack(&instruction_data) {
+        JournalInstructionType::InitJournal(obj) => init_journal(
             program_id,
             accounts,
-            init_ix,
+            obj,
         ),
-        Err(_) => {},
-    };
-
-    match NewEntry::try_from_slice(&instruction_data) {
-        Ok(new_entry_ix) => return new_entry(
+        JournalInstructionType::NewEntry(obj) => new_entry(
             program_id,
             accounts,
-            new_entry_ix,
+            obj,
         ),
-        Err(_) => {},
-    };
-
-    Err(ProgramError::InvalidInstructionData)
+        _ => Err(ProgramError::InvalidInstructionData),
+    }
 }

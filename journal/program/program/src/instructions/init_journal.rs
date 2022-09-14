@@ -10,6 +10,7 @@ use solana_program::{
     sysvar::Sysvar,
 };
 
+use crate::instructions::JournalInstructionType;
 use crate::state::JournalMetadata;
 
 
@@ -17,6 +18,7 @@ use crate::state::JournalMetadata;
 //
 #[derive(BorshSerialize, BorshDeserialize, Debug)]
 pub struct InitJournal {
+    pub ixd: JournalInstructionType,
     pub nickname: String,
     pub bump: u8,
 }

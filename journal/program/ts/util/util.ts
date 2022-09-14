@@ -7,3 +7,8 @@ export class Assignable {
         });
     };
 };
+
+export enum InstructionType {
+    InitializeJournal,
+    NewEntry,
+};

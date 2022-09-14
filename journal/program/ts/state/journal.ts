@@ -18,7 +18,7 @@ export const JournalMetadataSchema = new Map([
         kind: 'struct', 
         fields: [ 
             ['nickname', 'string'],
-            ['authority', 'string'],
+            ['authority', [32]],
             ['entries', 'u32'],
             ['bump', 'u8'],
         ],
