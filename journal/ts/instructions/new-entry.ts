@@ -6,7 +6,7 @@ import {
     SystemProgram,
     TransactionInstruction 
 } from '@solana/web3.js';
-import { JournalInstruction } from '.';
+import { JournalInstruction } from './instruction';
 import { JournalMetadata } from '../state';
 import { Assignable } from '../util/util';
 
