@@ -3,7 +3,8 @@ import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import useJournalStore from "stores/useJournalStore";
 import useEntryStore from "stores/useEntryStore";
 import { PublicKey, Transaction } from "@solana/web3.js";
-import { createInitializeJournalInstruction } from '../../../ts/instructions/init-journal';
+import { createInitializeJournalInstruction } from '../idl/instructions/init-journal';
+import { createNewEntryInstruction } from "../idl/instructions/new-entry";
 
 
 export const Journal: FC = () => {
@@ -12,7 +13,7 @@ export const Journal: FC = () => {
     const { publicKey, sendTransaction } = useWallet();
 
     const [ programId, setProgramId ] = useState<PublicKey>(
-        new PublicKey("")
+        new PublicKey("HAhEvS67NL6R7EmJkc5kGE1Bd7tXFj8M4KPTQ1jS49jE")
     );
 
     const [ journalInit, setJournalInit ] = useState<boolean>(false);
@@ -23,7 +24,7 @@ export const Journal: FC = () => {
     const { entries, getEntries } = useEntryStore();
 
     const onClickCreateJournal = useCallback(async () => {
-        const [ix, _] = createInitializeJournalInstruction(
+        const [ix, _] = await createInitializeJournalInstruction(
             publicKey, 
             programId,
             journalNickname,
@@ -33,21 +34,25 @@ export const Journal: FC = () => {
             connection, 
         );
         setJournalNickname(journalNickname);
+        setJournalInit(true);
         getJournal(publicKey, programId, connection);
     }, [
-        journalNickname, 
-        setJournalNickname, 
         publicKey, 
         programId, 
         connection, 
+        journalNickname, 
+        setJournalNickname, 
+        journalInit, 
+        setJournalInit, 
         getJournal
     ]);
 
     const onClickCreateEntry = useCallback(async () => {
-        const [ix, _] = createInitializeJournalInstruction(
+        const [ix, _] = await createNewEntryInstruction(
+            connection,
             publicKey, 
             programId,
-            journalNickname,
+            entryMessage,
         );
         await sendTransaction(
             new Transaction().add(ix),
@@ -56,12 +61,26 @@ export const Journal: FC = () => {
         setEntryMessage(undefined);
         getEntries(publicKey, programId, connection);
     }, [
-        entryMessage, 
-        setEntryMessage, 
         publicKey, 
         programId, 
         connection, 
+        entryMessage, 
+        setEntryMessage, 
         getEntries
+    ]);
+
+    useEffect(() => {
+        getJournal(publicKey, programId, connection);
+        if (journal) { setJournalInit(true) };
+        getEntries(publicKey, programId, connection);
+    }, [
+        publicKey, 
+        programId, 
+        connection, 
+        journal, 
+        getJournal, 
+        journalInit, 
+        setJournalInit
     ]);
 
     return(
@@ -71,6 +90,7 @@ export const Journal: FC = () => {
                     { journalInit ? 
                         <div>
                             <div className="">
+                                <p className="">Nickname: {journalNickname}</p>
                                 <input className="" 
                                     type="text" placeholder="Write something..." 
                                     onChange={e => setEntryMessage(e.target.value)}

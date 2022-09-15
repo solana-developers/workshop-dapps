@@ -1,7 +1,7 @@
 import create, { State } from 'zustand'
 import { Connection, PublicKey } from '@solana/web3.js'
 import { JournalMetadataInterface } from 'models/types';
-import { JournalMetadata } from '../../../ts/state/journal';
+import { JournalMetadata } from '../idl/state/journal';
 
 interface JournalStore extends State {
   journal: JournalMetadataInterface;
@@ -16,14 +16,15 @@ const useJournalStore = create<JournalStore>((set, _get) => ({
   journal: undefined,
   getJournal: async (walletPubkey, programId, connection) => {
     let journal: JournalMetadataInterface = undefined;
-    const [journalAddress, _] = await PublicKey.findProgramAddress(
-      [ Buffer.from("journal"), walletPubkey.toBuffer() ],
-      programId,
-  );
     try {
+      const [journalAddress, _] = await PublicKey.findProgramAddress(
+        [ Buffer.from("journal"), walletPubkey.toBuffer() ],
+        programId,
+      );
       const data = JournalMetadata.fromBuffer(
         (await connection.getAccountInfo(journalAddress)).data
       );
+      console.log(`Journal fetched successfully!`);
       return {
         nickname: data.nickname,
         authority: data.authority,
@@ -35,7 +36,6 @@ const useJournalStore = create<JournalStore>((set, _get) => ({
     }
     set((s) => {
       s.journal = journal;
-      console.log(`Journal fetched successfully!`);
     })
   },
 }));

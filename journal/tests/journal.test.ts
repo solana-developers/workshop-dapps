@@ -10,7 +10,7 @@ import {
     createNewEntryInstruction,
     EntryMetadata,
     JournalMetadata,
-} from '../ts';
+} from '../app/src/idl';
 
 
 describe("Journal dApp!", async () => {
@@ -20,7 +20,7 @@ describe("Journal dApp!", async () => {
     const program = createKeypairFromFile('./target/deploy/journal-keypair.json');
 
     it("Initialize the Journal", async () => {
-        const [ix, journalAddress] = createInitializeJournalInstruction(
+        const [ix, journalAddress] = await createInitializeJournalInstruction(
             payer.publicKey, 
             program.publicKey,
             "Joe's Journal",

@@ -1,7 +1,7 @@
 import create, { State } from 'zustand'
 import { Connection, PublicKey } from '@solana/web3.js'
 import { EntryMetadataInterface } from 'models/types';
-import { EntryMetadata } from '../../../ts/state/entry';
+import { EntryMetadata } from '../idl/state/entry';
 
 interface EntryStore extends State {
   entries: EntryMetadataInterface[];
@@ -16,19 +16,34 @@ const useEntryStore = create<EntryStore>((set, _get) => ({
   entries: [],
   getEntries: async (walletPubkey, programId, connection) => {
     let entries: EntryMetadataInterface[] = [];
-    const [journalAddress, _] = await PublicKey.findProgramAddress(
-      [ Buffer.from("journal"), walletPubkey.toBuffer() ],
-      programId,
-  );
     try {
+      const [journalAddress, _] = await PublicKey.findProgramAddress(
+        [ Buffer.from("journal"), walletPubkey.toBuffer() ],
+        programId,
+      );
       entries = (await connection.getProgramAccounts(
         programId,
-        // {
-        //   filters: ?? // TODO
-        // }
+        {
+          filters: [
+            {
+              dataSize: new EntryMetadata({
+                entry_number: 1,
+                message: "",
+                journal: journalAddress,
+                bump: 1,
+              }).toBuffer().length,
+            },
+            // {
+            // memcmp: {
+            //   bytes: J,
+            // },
+            // }
+          ],
+        }
       )).map((a) => {
         const data = EntryMetadata.fromBuffer(a.account.data);
         if (data.journal === journalAddress) {
+          console.log(`Entries fetched successfully!`);
           return {
             entryNumber: data.entry_number,
             message: data.message,
@@ -42,7 +57,6 @@ const useEntryStore = create<EntryStore>((set, _get) => ({
     }
     set((s) => {
       s.entries = entries;
-      console.log(`Entries fetched successfully!`);
     })
   },
 }));

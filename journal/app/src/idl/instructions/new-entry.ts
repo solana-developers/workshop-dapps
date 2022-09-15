@@ -12,12 +12,12 @@ import { JournalMetadata } from '../state';
 
 export class NewEntry {
 
-    instruction: number;
+    instruction: JournalInstruction;
     message: string;
     bump: number;
 
     constructor(props: {
-        instruction: number,
+        instruction: JournalInstruction,
         message: string,
         bump: number,
     }) {
@@ -53,7 +53,7 @@ export async function createNewEntryInstruction(
     message: string,
 ): Promise<[TransactionInstruction, PublicKey]> {
 
-    const [journalAddress, _journalBump] = PublicKey.findProgramAddressSync(
+    const [journalAddress, _] = await PublicKey.findProgramAddress(
         [
             Buffer.from("journal"),
             payer.toBuffer(),
@@ -65,7 +65,7 @@ export async function createNewEntryInstruction(
     );
     const entryCount = journalData.entries;
     
-    const [entryAddress, entryBump] = PublicKey.findProgramAddressSync(
+    const [entryAddress, entryBump] = await PublicKey.findProgramAddress(
         [
             Buffer.from("entry"),
             Buffer.from((entryCount + 1).toString()),

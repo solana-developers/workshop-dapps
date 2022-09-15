@@ -10,12 +10,12 @@ import { JournalInstruction } from './instruction';
 
 export class InitJournal {
 
-    instruction: number;
+    instruction: JournalInstruction;
     nickname: string;
     bump: number;
 
     constructor(props: {
-        instruction: number,
+        instruction: JournalInstruction,
         nickname: string,
         bump: number,
     }) {
@@ -44,13 +44,13 @@ export const InitJournalSchema = new Map([
     }]
 ]);
 
-export function createInitializeJournalInstruction(
+export async function createInitializeJournalInstruction(
     payer: PublicKey,
     programId: PublicKey,
     nickname: string,
-): [TransactionInstruction, PublicKey] {
+): Promise<[TransactionInstruction, PublicKey]> {
 
-    const [journalAddress, journalBump] = PublicKey.findProgramAddressSync(
+    const [journalAddress, journalBump] = await PublicKey.findProgramAddress(
         [
             Buffer.from("journal"),
             payer.toBuffer(),

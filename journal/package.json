@@ -1,6 +1,8 @@
 {
   "scripts": {
-    "test": "yarn run ts-mocha -p ./tests/tsconfig.test.json -t 1000000 ./tests/journal.test.ts"
+    "reset": "rm -rf target/deploy && bash cicd.sh",
+    "test": " yarn run ts-mocha -p ./tests/tsconfig.test.json -t 1000000 ./tests/journal.test.ts",
+    "get-program-id": "yarn run ts-mocha -p ./tests/tsconfig.test.json -t 1000000 ./tests/get-program-id.test.ts"
   },
   "dependencies": {
     "@solana/web3.js": "^1.47.3",
