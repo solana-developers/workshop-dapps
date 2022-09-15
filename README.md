@@ -41,6 +41,9 @@ Your instructor may use one of the applications stored in this repository to con
     * Ensure you add the following config to Cargo.toml under `[lib]`: `crate-type = ["cdylib", "lib"]`
     * `cargo build-sbf --manifest-path=path/to/Cargo.toml`
 ### Using the Redacted Code to Code Along
+* Simply clone this repo but use only the `redacted-code` branch
+    * `git clone git@github.com:solana-developers/workshop-dapps.git`
+    * `git checkout redacted-code`
 ### Sharing Your Workspace on Solana Playground IDE
 * Click the little arrow symbol underneath your project's name/path. If you hover over it, it should say "Share" (Not "Export").
     * This will generate a unique URL that will allow anyone to route to your specific SolPG workspace.
