@@ -17,7 +17,7 @@ describe("Journal dApp!", async () => {
 
     const connection = new Connection(`http://localhost:8899`, 'confirmed');
     const payer = createKeypairFromFile(require('os').homedir() + '/.config/solana/id.json');
-    const program = createKeypairFromFile('./program/target/so/journal-keypair.json');
+    const program = createKeypairFromFile('./target/deploy/journal-keypair.json');
 
     it("Initialize the Journal", async () => {
         const [ix, journalAddress] = createInitializeJournalInstruction(
