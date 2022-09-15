@@ -6,10 +6,24 @@ import {
     TransactionInstruction 
 } from '@solana/web3.js';
 import { JournalInstruction } from './instruction';
-import { Assignable } from '../util/util';
 
 
-export class InitJournal extends Assignable {
+export class InitJournal {
+
+    instruction: number;
+    nickname: string;
+    bump: number;
+
+    constructor(props: {
+        instruction: number,
+        nickname: string,
+        bump: number,
+    }) {
+        this.instruction = props.instruction;
+        this.nickname = props.nickname;
+        this.bump = props.bump;
+    }
+
     toBuffer() { 
         return Buffer.from(borsh.serialize(InitJournalSchema, this)) 
     };

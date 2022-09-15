@@ -8,10 +8,24 @@ import {
 } from '@solana/web3.js';
 import { JournalInstruction } from './instruction';
 import { JournalMetadata } from '../state';
-import { Assignable } from '../util/util';
 
 
-export class NewEntry extends Assignable {
+export class NewEntry {
+
+    instruction: number;
+    message: string;
+    bump: number;
+
+    constructor(props: {
+        instruction: number,
+        message: string,
+        bump: number,
+    }) {
+        this.instruction = props.instruction;
+        this.message = props.message;
+        this.bump = props.bump;
+    }
+
     toBuffer() { 
         return Buffer.from(borsh.serialize(NewEntrySchema, this)) 
     };

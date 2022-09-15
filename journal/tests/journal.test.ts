@@ -8,7 +8,7 @@ import {
     createInitializeJournalInstruction,
     createKeypairFromFile,
     createNewEntryInstruction,
-    JournalEntry,
+    EntryMetadata,
     JournalMetadata,
 } from '../ts';
 
@@ -45,7 +45,7 @@ describe("Journal dApp!", async () => {
             new Transaction().add(ix),
             [payer]
         );
-        await printJournalEntry(entryAddress);
+        await printEntryMetadata(entryAddress);
     }
     
     it("Write a new entry (1/3)", async () => {
@@ -68,13 +68,13 @@ describe("Journal dApp!", async () => {
         console.log(`   Nickname:       ${journalData.nickname}`);
     }
 
-    async function printJournalEntry(pubkey: PublicKey): Promise<void> {
-        const journalEntryData = JournalEntry.fromBuffer(
+    async function printEntryMetadata(pubkey: PublicKey): Promise<void> {
+        const EntryMetadataData = EntryMetadata.fromBuffer(
             (await connection.getAccountInfo(pubkey)).data
         );
         console.log("Journal Entry:");
-        console.log(`   Entry #:       ${journalEntryData.entry_number}`);
-        console.log(`   Message:       ${journalEntryData.message}`);
+        console.log(`   Entry #:       ${EntryMetadataData.entry_number}`);
+        console.log(`   Message:       ${EntryMetadataData.message}`);
     }
   });
   

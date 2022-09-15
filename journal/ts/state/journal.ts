@@ -1,9 +1,27 @@
+import { PublicKey } from "@solana/web3.js";
 import * as borsh from "borsh";
 import { Buffer } from "buffer";
-import { Assignable } from '../util/util';
 
 
-export class JournalMetadata extends Assignable {
+export class JournalMetadata {
+
+    nickname: string;
+    authority: PublicKey;
+    entries: number;
+    bump: number;
+
+    constructor(props: {
+        nickname: string,
+        authority: PublicKey,
+        entries: number,
+        bump: number,
+    }) {
+        this.nickname = props.nickname;
+        this.authority = props.authority;
+        this.entries = props.entries;
+        this.bump = props.bump;
+    }
+
     toBuffer() { 
         return Buffer.from(borsh.serialize(JournalMetadataSchema, this)) 
     };

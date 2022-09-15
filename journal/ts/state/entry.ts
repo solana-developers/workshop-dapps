@@ -1,20 +1,38 @@
+import { PublicKey } from "@solana/web3.js";
 import * as borsh from "borsh";
 import { Buffer } from "buffer";
-import { Assignable } from '../util/util';
 
 
-export class JournalEntry extends Assignable {
+export class EntryMetadata {
+
+    entry_number: number;
+    message: string;
+    journal: PublicKey;
+    bump: number;
+
+    constructor(props: {
+        entry_number: number,
+        message: string,
+        journal: PublicKey,
+        bump: number,
+    }) {
+        this.entry_number = props.entry_number;
+        this.message = props.message;
+        this.journal = props.journal;
+        this.bump = props.bump;
+    }
+
     toBuffer() { 
-        return Buffer.from(borsh.serialize(JournalEntrySchema, this)) 
+        return Buffer.from(borsh.serialize(EntryMetadataSchema, this)) 
     };
     
     static fromBuffer(buffer: Buffer) {
-        return borsh.deserialize(JournalEntrySchema, JournalEntry, buffer);
+        return borsh.deserialize(EntryMetadataSchema, EntryMetadata, buffer);
     };
 };
 
-export const JournalEntrySchema = new Map([
-    [ JournalEntry, { 
+export const EntryMetadataSchema = new Map([
+    [ EntryMetadata, { 
         kind: 'struct', 
         fields: [ 
             ['entry_number', 'u32'],
