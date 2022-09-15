@@ -21,7 +21,9 @@ describe("Journal dApp!", async () => {
 
     it("Initialize the Journal", async () => {
         const [ix, journalAddress] = createInitializeJournalInstruction(
-            payer.publicKey, program.publicKey
+            payer.publicKey, 
+            program.publicKey,
+            "Joe's Journal",
         );
         await sendAndConfirmTransaction(
             connection, 
@@ -30,11 +32,13 @@ describe("Journal dApp!", async () => {
         );
         await printJournal(journalAddress);
     });
-    
-    it("Write a new entry (1/3)", async () => {
+
+    async function writeNewEntry(message: string): Promise<void> {
         const [ix, entryAddress] = await createNewEntryInstruction(
-            connection, payer.publicKey, program.publicKey,
-            "Just got back from the Solana Hacker House"
+            connection, 
+            payer.publicKey, 
+            program.publicKey,
+            message
         );
         await sendAndConfirmTransaction(
             connection, 
@@ -42,32 +46,18 @@ describe("Journal dApp!", async () => {
             [payer]
         );
         await printJournalEntry(entryAddress);
+    }
+    
+    it("Write a new entry (1/3)", async () => {
+        await writeNewEntry("Just got back from the Solana Hacker House");
     });
 
     it("Write a new entry (2/3)", async () => {
-        const [ix, entryAddress] = await createNewEntryInstruction(
-            connection, payer.publicKey, program.publicKey,
-            "Just built my first Solana program"
-        );
-        await sendAndConfirmTransaction(
-            connection, 
-            new Transaction().add(ix),
-            [payer]
-        );
-        await printJournalEntry(entryAddress);
+        await writeNewEntry("Just built my first Solana program");
     });
     
     it("Write a new entry (3/3)", async () => {
-        const [ix, entryAddress] = await createNewEntryInstruction(
-            connection, payer.publicKey, program.publicKey, 
-            "I got a job at a Solana protocol!"
-        );
-        await sendAndConfirmTransaction(
-            connection, 
-            new Transaction().add(ix),
-            [payer]
-        );
-        await printJournalEntry(entryAddress);
+        await writeNewEntry("I got a job at a Solana protocol!");
     });
 
     async function printJournal(pubkey: PublicKey): Promise<void> {
@@ -83,7 +73,7 @@ describe("Journal dApp!", async () => {
             (await connection.getAccountInfo(pubkey)).data
         );
         console.log("Journal Entry:");
-        console.log(`   Entry #:       ${journalEntryData.entryCount}`);
+        console.log(`   Entry #:       ${journalEntryData.entry_number}`);
         console.log(`   Message:       ${journalEntryData.message}`);
     }
   });

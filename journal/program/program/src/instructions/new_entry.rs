@@ -1,4 +1,4 @@
-use borsh::{BorshDeserialize, BorshSerialize};
+use borsh::{ BorshDeserialize, BorshSerialize };
 use solana_program::{
     account_info::{ AccountInfo, next_account_info }, 
     entrypoint::ProgramResult, 
@@ -10,29 +10,26 @@ use solana_program::{
     sysvar::rent::Rent,
     sysvar::Sysvar,
 };
-
-use crate::instructions::JournalInstructionType;
-use crate::state::JournalEntry;
+use crate::state::EntryMetadata;
 use crate::state::JournalMetadata;
 
 
-// The instruction data struct to create a new entry
+// Args to create a new entry
 //
 #[derive(BorshSerialize, BorshDeserialize, Debug)]
-pub struct NewEntry {
-    pub ixd: JournalInstructionType,
+pub struct NewEntryArgs {
     pub message: String,
     pub bump: u8,
 }
 
 
-// Create a new PDA (the new entry)
+// Create a new PDA for the entry
 //  & increment the number of entries for the journal
 //
 pub fn new_entry(
     program_id: &Pubkey,
     accounts: &[AccountInfo],
-    new_entry_ix: NewEntry,
+    args: NewEntryArgs,
 ) -> ProgramResult {
 
     msg!("Creating new entry account...");
@@ -53,14 +50,14 @@ pub fn new_entry(
     };
 
     let entry_number = journal_account_data.entries + 1;
-    let journal_entry_metadata = JournalEntry::new(
+    let entry_metadata = EntryMetadata::new(
         entry_number,
-        new_entry_ix.message,
+        args.message,
         journal.key.clone(),
-        new_entry_ix.bump,
+        args.bump,
     );
 
-    let account_span = (journal_entry_metadata.try_to_vec()?).len();
+    let account_span = (entry_metadata.try_to_vec()?).len();
     let lamports_required = (Rent::get()?).minimum_balance(account_span);
 
     // Invoke the System Program to create the new account
@@ -77,16 +74,16 @@ pub fn new_entry(
             payer.clone(), entry.clone(), system_program.clone()
         ],
         &[&[
-            JournalEntry::SEED_PREFIX.as_bytes().as_ref(),
+            EntryMetadata::SEED_PREFIX.as_bytes().as_ref(),
             entry_number.to_string().as_ref(),
             journal.key.as_ref(),
-            &[journal_entry_metadata.bump],
+            &[entry_metadata.bump],
         ]]
     )?;
 
     // Set the data
     //
-    journal_entry_metadata.serialize(
+    entry_metadata.serialize(
         &mut &mut entry.data.borrow_mut()[..]
     )?;
 

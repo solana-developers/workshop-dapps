@@ -1,6 +1,6 @@
-import { Assignable } from '../util/util';
 import * as borsh from "borsh";
 import { Buffer } from "buffer";
+import { Assignable } from '../util/util';
 
 
 export class JournalEntry extends Assignable {

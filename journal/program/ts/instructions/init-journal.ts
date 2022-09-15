@@ -1,4 +1,3 @@
-import { Assignable, InstructionType } from '../util/util';
 import * as borsh from "borsh";
 import { Buffer } from "buffer";
 import { 
@@ -6,6 +5,8 @@ import {
     SystemProgram,
     TransactionInstruction 
 } from '@solana/web3.js';
+import { JournalInstruction } from '.';
+import { Assignable } from '../util/util';
 
 
 export class InitJournal extends Assignable {
@@ -22,6 +23,7 @@ export const InitJournalSchema = new Map([
     [ InitJournal, { 
         kind: 'struct', 
         fields: [ 
+            ['instruction', 'u8'],
             ['nickname', 'string'],
             ['bump', 'u8'],
         ],
@@ -31,6 +33,7 @@ export const InitJournalSchema = new Map([
 export function createInitializeJournalInstruction(
     payer: PublicKey,
     programId: PublicKey,
+    nickname: string,
 ): [TransactionInstruction, PublicKey] {
 
     const [journalAddress, journalBump] = PublicKey.findProgramAddressSync(
@@ -42,7 +45,8 @@ export function createInitializeJournalInstruction(
     );
 
     const initInstructionObject = new InitJournal({
-        nickname: "Joe's Journal",
+        instruction: JournalInstruction.InitJournal,
+        nickname: nickname,
         bump: journalBump,
     });
 

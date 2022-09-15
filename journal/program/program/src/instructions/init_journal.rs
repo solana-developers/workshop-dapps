@@ -1,4 +1,4 @@
-use borsh::{BorshDeserialize, BorshSerialize};
+use borsh::{ BorshDeserialize, BorshSerialize };
 use solana_program::{
     account_info::{ AccountInfo, next_account_info }, 
     entrypoint::ProgramResult, 
@@ -9,27 +9,24 @@ use solana_program::{
     sysvar::rent::Rent,
     sysvar::Sysvar,
 };
-
-use crate::instructions::JournalInstructionType;
 use crate::state::JournalMetadata;
 
 
-// The instruction data struct to create a new journal
+// Args to create a new journal
 //
 #[derive(BorshSerialize, BorshDeserialize, Debug)]
-pub struct InitJournal {
-    pub ixd: JournalInstructionType,
+pub struct InitJournalArgs {
     pub nickname: String,
     pub bump: u8,
 }
 
 
-// Create a new PDA (the journal)
+// Create a new PDA for the journal
 //
 pub fn init_journal(
     program_id: &Pubkey,
     accounts: &[AccountInfo],
-    init_ix: InitJournal,
+    args: InitJournalArgs,
 ) -> ProgramResult {
 
     msg!("Creating new journal account...");
@@ -39,10 +36,12 @@ pub fn init_journal(
     let payer = next_account_info(accounts_iter)?;
     let system_program = next_account_info(accounts_iter)?;
 
+    // Create the object that will represent our account's data
+    //
     let journal_metadata = JournalMetadata::new(
-        init_ix.nickname,
+        args.nickname,
         payer.key.clone(),
-        init_ix.bump,
+        args.bump,
     );
     
     let account_span = (journal_metadata.try_to_vec()?).len();

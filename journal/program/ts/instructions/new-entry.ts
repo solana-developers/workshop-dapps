@@ -1,4 +1,3 @@
-import { Assignable, InstructionType } from '../util/util';
 import * as borsh from "borsh";
 import { Buffer } from "buffer";
 import { 
@@ -7,7 +6,9 @@ import {
     SystemProgram,
     TransactionInstruction 
 } from '@solana/web3.js';
+import { JournalInstruction } from '.';
 import { JournalMetadata } from '../state';
+import { Assignable } from '../util/util';
 
 
 export class NewEntry extends Assignable {
@@ -24,7 +25,7 @@ export const NewEntrySchema = new Map([
     [ NewEntry, { 
         kind: 'struct', 
         fields: [ 
-            ['irrelevant_int', 'u8'],
+            ['instruction', 'u8'],
             ['message', 'string'],
             ['bump', 'u8'],
         ],
@@ -60,7 +61,7 @@ export async function createNewEntryInstruction(
     );
 
     const newEntryInstructionObject = new NewEntry({
-        discriminator: 1,
+        instruction: JournalInstruction.NewEntry,
         message: message,
         bump: entryBump,
     });

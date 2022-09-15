@@ -2,7 +2,7 @@ use borsh::{ BorshDeserialize, BorshSerialize };
 use solana_program::pubkey::Pubkey;
 
 
-// The struct representing the journal account's data
+// The journal account's data
 //
 #[derive(BorshDeserialize, BorshSerialize, Debug)]
 pub struct JournalMetadata {
@@ -25,7 +25,7 @@ impl JournalMetadata {
         JournalMetadata {
             nickname,
             authority,
-            entries: 0, // Entries start at 0
+            entries: 0,
             bump,
         }
     }

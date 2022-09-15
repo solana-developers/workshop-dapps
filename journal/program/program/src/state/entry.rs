@@ -2,18 +2,17 @@ use borsh::{ BorshDeserialize, BorshSerialize };
 use solana_program::pubkey::Pubkey;
 
 
-// The struct representing the entry account's data
-// We'll create a new one of these with every entry
+// The entry account's data
 //
 #[derive(BorshDeserialize, BorshSerialize, Debug)]
-pub struct JournalEntry {
+pub struct EntryMetadata {
     pub entry_number: u32,
     pub message: String,
     pub journal: Pubkey,
     pub bump: u8,
 }
 
-impl JournalEntry {
+impl EntryMetadata {
 
     pub const ACCOUNT_SPACE: usize = 8 + 4 + 40 + 32;
     pub const SEED_PREFIX: &'static str = "entry";
@@ -24,7 +23,7 @@ impl JournalEntry {
         journal: Pubkey,
         bump: u8,
     ) -> Self {
-        JournalEntry {
+        EntryMetadata {
             entry_number,
             message,
             journal,
