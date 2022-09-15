@@ -6,7 +6,7 @@ pub mod instructions;
 pub mod state;
 
 
-declare_id!("8F4ess66QE6ZcLLttrRuvWvq41hYvUeu2oZ6TabQycKK");
+declare_id!("HVKt4X5mXbqexWzA3izF6zNj4zgKgZKLSXTPMooVgrDd");
 
 
 #[program]

@@ -9,31 +9,12 @@ pub fn create_profile(
     display_name: String,
 ) -> Result<()> {
 
-    let profile = SolanaTwitterProfile::new(
-        handle,
-        display_name,
-        ctx.accounts.authority.key(),
-        *ctx.bumps.get(SolanaTwitterProfile::SEED_PREFIX).expect("Bump not found."),
-    );
-    ctx.accounts.profile.set_inner(profile.clone());
+
     Ok(())
 }
 
 #[derive(Accounts)]
 pub struct CreateProfile<'info> {
-    #[account(
-        init,
-        payer = authority,
-        space = SolanaTwitterProfile::ACCOUNT_SPACE,
-        seeds = [
-            SolanaTwitterProfile::SEED_PREFIX.as_ref(),
-            authority.key().as_ref(),
-        ],
-        bump
-    )]
-    pub profile: Account<'info, SolanaTwitterProfile>,
-    #[account(mut)]
-    pub authority: Signer<'info>,
-    pub system_program: Program<'info, System>,
+
 }
 
