@@ -65,6 +65,7 @@ describe("Journal dApp!", async () => {
             (await connection.getAccountInfo(pubkey)).data
         );
         console.log("Journal:");
+        console.log(`${pubkey}`);
         console.log(`   Nickname:       ${journalData.nickname}`);
     }
 
@@ -73,6 +74,7 @@ describe("Journal dApp!", async () => {
             (await connection.getAccountInfo(pubkey)).data
         );
         console.log("Journal Entry:");
+        console.log(`${pubkey}`);
         console.log(`   Entry #:       ${EntryMetadataData.entry_number}`);
         console.log(`   Message:       ${EntryMetadataData.message}`);
     }

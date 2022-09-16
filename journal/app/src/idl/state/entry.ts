@@ -22,6 +22,10 @@ export class EntryMetadata {
         this.bump = props.bump;
     }
 
+    toBase58() {
+        return borsh.serialize(EntryMetadataSchema, this).toString()
+    };
+
     toBuffer() { 
         return Buffer.from(borsh.serialize(EntryMetadataSchema, this)) 
     };

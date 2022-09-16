@@ -26,10 +26,7 @@ export const HomeView: FC = ({ }) => {
 
     <div className="md:hero mx-auto p-4">
       <div className="md:hero-content flex flex-col">
-        <h1 className="text-center text-5xl md:pl-12 font-bold text-transparent bg-clip-text text-[#89eb34] mt-4">
-          My Journal
-        </h1>
-        <h4 className="md:w-full text-center text-slate-300 mt-6">
+        <h4 className="text-center text-slate-300 my-2">
           {wallet && <p>SOL Balance: {(balance || 0).toLocaleString()}</p>}
         </h4>
         <Journal/>

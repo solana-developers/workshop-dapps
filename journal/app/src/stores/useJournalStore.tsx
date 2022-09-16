@@ -24,13 +24,13 @@ const useJournalStore = create<JournalStore>((set, _get) => ({
       const data = JournalMetadata.fromBuffer(
         (await connection.getAccountInfo(journalAddress)).data
       );
-      console.log(`Journal fetched successfully!`);
-      return {
+      journal = {
         nickname: data.nickname,
         authority: data.authority,
         entries: data.entries,
         bump: data.bump,
-      }
+      };
+      console.log(`Journal fetched successfully!`);
     } catch (e) {
       console.log(`Error fetching journal: `, e);
     }

@@ -2,6 +2,7 @@ import create, { State } from 'zustand'
 import { Connection, PublicKey } from '@solana/web3.js'
 import { EntryMetadataInterface } from 'models/types';
 import { EntryMetadata } from '../idl/state/entry';
+import bs58 from 'bs58';
 
 interface EntryStore extends State {
   entries: EntryMetadataInterface[];
@@ -26,24 +27,24 @@ const useEntryStore = create<EntryStore>((set, _get) => ({
         {
           filters: [
             {
-              dataSize: new EntryMetadata({
-                entry_number: 1,
-                message: "",
-                journal: journalAddress,
-                bump: 1,
-              }).toBuffer().length,
+              dataSize: 74,
             },
-            // {
-            // memcmp: {
-            //   bytes: J,
-            // },
-            // }
+            {
+              memcmp: {
+                offset: 8,
+                bytes: new EntryMetadata({
+                  entry_number: 1,
+                  message: "",
+                  journal: journalAddress,
+                  bump: 1,
+                }).toBase58(),
+              },
+            },
           ],
         }
       )).map((a) => {
         const data = EntryMetadata.fromBuffer(a.account.data);
         if (data.journal === journalAddress) {
-          console.log(`Entries fetched successfully!`);
           return {
             entryNumber: data.entry_number,
             message: data.message,
@@ -52,6 +53,7 @@ const useEntryStore = create<EntryStore>((set, _get) => ({
           }
         }
       });
+      console.log(`${entries.length} entries fetched successfully!`);
     } catch (e) {
       console.log(`Error fetching journal entries: `, e);
     }

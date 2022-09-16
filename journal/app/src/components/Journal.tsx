@@ -13,10 +13,9 @@ export const Journal: FC = () => {
     const { publicKey, sendTransaction } = useWallet();
 
     const [ programId, setProgramId ] = useState<PublicKey>(
-        new PublicKey("HAhEvS67NL6R7EmJkc5kGE1Bd7tXFj8M4KPTQ1jS49jE")
+        new PublicKey("J1aqi2DijQwGTQJvBqGfFxNQYXpJsKeCcGJwpSurWjSd")
     );
 
-    const [ journalInit, setJournalInit ] = useState<boolean>(false);
     const [ journalNickname, setJournalNickname ] = useState<string>(undefined);
     const [ entryMessage, setEntryMessage ] = useState<string>(undefined);
 
@@ -29,23 +28,12 @@ export const Journal: FC = () => {
             programId,
             journalNickname,
         );
-        await sendTransaction(
+        await connection.confirmTransaction(await sendTransaction(
             new Transaction().add(ix),
             connection, 
-        );
-        setJournalNickname(journalNickname);
-        setJournalInit(true);
+        ));
         getJournal(publicKey, programId, connection);
-    }, [
-        publicKey, 
-        programId, 
-        connection, 
-        journalNickname, 
-        setJournalNickname, 
-        journalInit, 
-        setJournalInit, 
-        getJournal
-    ]);
+    }, [publicKey, journalNickname, getJournal]);
 
     const onClickCreateEntry = useCallback(async () => {
         const [ix, _] = await createNewEntryInstruction(
@@ -54,53 +42,40 @@ export const Journal: FC = () => {
             programId,
             entryMessage,
         );
-        await sendTransaction(
+        await connection.confirmTransaction(await sendTransaction(
             new Transaction().add(ix),
             connection, 
-        );
-        setEntryMessage(undefined);
+        ));
         getEntries(publicKey, programId, connection);
-    }, [
-        publicKey, 
-        programId, 
-        connection, 
-        entryMessage, 
-        setEntryMessage, 
-        getEntries
-    ]);
+    }, [publicKey, entryMessage, getEntries]);
 
     useEffect(() => {
         getJournal(publicKey, programId, connection);
-        if (journal) { setJournalInit(true) };
         getEntries(publicKey, programId, connection);
-    }, [
-        publicKey, 
-        programId, 
-        connection, 
-        journal, 
-        getJournal, 
-        journalInit, 
-        setJournalInit
-    ]);
+    }, [publicKey, getJournal, getEntries]);
 
     return(
         <div>
             { publicKey ? 
-                <div className="">
-                    { journalInit ? 
+                <div className="text-center">
+                    { journal ? 
                         <div>
-                            <div className="">
-                                <p className="">Nickname: {journalNickname}</p>
-                                <input className="" 
-                                    type="text" placeholder="Write something..." 
-                                    onChange={e => setEntryMessage(e.target.value)}
-                                />
-                                <button className="" 
-                                    onClick={() => onClickCreateEntry()}>
-                                        <span>Publish</span>
-                                </button>
+                            <div>
+                                <h1 className="text-center text-5xl font-bold text-transparent bg-clip-text text-[#89eb34] mb-6">
+                                    <p><span className="text-[#68ccca]">Journal: </span>{journal.nickname}</p>
+                                </h1>
+                                <div className="border-2 rounded-lg border-[#6e6e6e] px-4 py-2 bg-[#1f1f1f]">
+                                    <input className="w-72 h-12 text-black px-4 rounded-md" 
+                                        type="text" placeholder="Write something..." 
+                                        onChange={e => setEntryMessage(e.target.value)}
+                                    />
+                                    <button className="text-lg text-black border-2 rounded-lg border-[#6e6e6e] px-6 py-2 ml-4 bg-[#68ccca]" 
+                                        onClick={() => onClickCreateEntry()}>
+                                            <span>Publish</span>
+                                    </button>
+                                </div>
                             </div>
-                            <div className="">
+                            <div>
                                 {entries && entries.map(
                                     (e) => { return(
                                     <div className="">
@@ -111,12 +86,12 @@ export const Journal: FC = () => {
                             </div>
                         </div>
                         :
-                        <div className="">
-                            <input className="" 
+                        <div className="border-2 rounded-lg border-[#6e6e6e] px-4 py-2 bg-[#1f1f1f]">
+                            <input className="w-72 h-12 text-black px-4 rounded-md" 
                                 type="text" placeholder="Enter a nickname for your journal" 
                                 onChange={e => setJournalNickname(e.target.value)}
                             />
-                            <button className="" 
+                            <button className="text-lg text-black border-2 rounded-lg border-[#6e6e6e] px-6 py-2 ml-4 bg-[#68ccca]" 
                                 onClick={() => onClickCreateJournal()}>
                                     <span>Create Journal</span>
                             </button>
@@ -124,8 +99,8 @@ export const Journal: FC = () => {
                     }
                 </div>
                 : 
-                <div className="">
-                    <p className="">
+                <div>
+                    <p className="text-center text-2xl my-6 animate-pulse text-[#68ccca]">
                         Connect your wallet!
                     </p>
                 </div>
