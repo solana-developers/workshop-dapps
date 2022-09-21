@@ -83,11 +83,16 @@ export const Tweet: FC<TweetProps> = (props: TweetProps) => {
 
 
     return(
-        <div className="text-lg border-2 rounded-lg border-[#6e6e6e] px-6 py-2 mt-4 bg-[#1f1f1f]">
-            <p className="text-[#a3a3a3]">
-                {props.walletPubkey.toString()}
+        <div className="text-sm border-2 rounded-lg border-[#6e6e6e] px-6 py-2 mt-4 bg-[#1f1f1f]">
+            <p>
+                <span className="text-[#a3a3a3] text-sm text-clip">
+                    {props.walletPubkey.toString().substring(0, 32)}
+                </span>
+                <span className="text-[#a3a3a3] text-sm">
+                    ...
+                </span>
             </p>
-            <p className="text-2xl my-2">
+            <p className="text-lg">
                 <span className="text-[#29d688]">
                     {props.displayName}
                 </span>
@@ -95,10 +100,10 @@ export const Tweet: FC<TweetProps> = (props: TweetProps) => {
                     {props.handle}
                 </span>
             </p>
-            <p className="my-4">
+            <p className="my-1 text-lg">
                 {props.message}
             </p>
-            <p className="">
+            <p className="text-center">
                 <span className="text-[#29d688]" onClick={() => onClickRetweetTweet()}>
                     {tweetRetweeted ? <span>⚪</span> : <button>🔁</button>}
                 </span>

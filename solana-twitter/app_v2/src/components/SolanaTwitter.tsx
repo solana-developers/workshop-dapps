@@ -51,11 +51,11 @@ export const SolanaTwitter: FC = () => {
     
     return (
         <div>
+            <h1 className="text-center text-5xl mb-2 font-bold text-transparent bg-clip-text bg-gradient-to-tr from-[#74a8fc] to-[#c6ecf7]">
+                Solana Twitter
+            </h1>
             { wallet ?
             <div>
-                <div className="text-center">
-                    {wallet && <p>SOL Balance: {(balance || 0).toLocaleString()}</p>}
-                </div>
                 { profile ?
                     <div>
                         <WriteTweet 

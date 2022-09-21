@@ -12,7 +12,7 @@ export const AppBar: FC = props => {
   const { autoConnect, setAutoConnect } = useAutoConnect();
   const { connection } = useConnection();
   const { publicKey } = useWallet();
-  const { getUserSOLBalance } = useUserSOLBalanceStore();
+  const { balance, getUserSOLBalance } = useUserSOLBalanceStore();
 
   const onClick = useCallback(async () => {
     if (!publicKey) {
@@ -78,9 +78,10 @@ export const AppBar: FC = props => {
 
         {/* Nav Links */}
         {publicKey && <div className="hidden md:inline md:navbar-center">
-          <div className="flex items-stretch">
-          <button
-                className="text-lg text-black border-2 rounded-lg border-[#6e6e6e] px-6 py-2 mt-2 ml-4 bg-[#74a8fc]"
+          <div className="inline-flex justify-center">
+            {publicKey && <p className='my-auto'>SOL Balance: {(balance || 0).toLocaleString()}</p>}
+            <button
+                className="text-lg text-black border-2 rounded-lg border-[#6e6e6e] px-6 py-2 my-auto ml-4 bg-[#9c9c9c]"
                 onClick={onClick}
             >
                 <span>Airdrop 1 </span>

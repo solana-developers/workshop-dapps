@@ -35,11 +35,16 @@ export const WriteTweet: FC<WriteTweetProps> = (props: WriteTweetProps) => {
 
 
     return(
-        <div className="text-lg border-2 rounded-lg border-[#6e6e6e] px-6 py-2 my-6 bg-[#1f1f1f]">
-            <p className="text-[#a3a3a3]">
-                {props.walletPubkey.toString()}
+        <div className="text-sm border-2 rounded-lg border-[#74a8fc] px-6 py-2 my-6 bg-[#1f1f1f]">
+            <p>
+                <span className="text-[#a3a3a3] text-sm">
+                    {props.walletPubkey.toString().substring(0,32)}
+                </span>
+                <span className="text-[#a3a3a3] text-sm">
+                    ...
+                </span>
             </p>
-            <p className="text-2xl my-2">
+            <p className="text-xl mb-2">
                 <span className="text-[#29d688]">
                     {props.displayName}
                 </span>
@@ -48,10 +53,10 @@ export const WriteTweet: FC<WriteTweetProps> = (props: WriteTweetProps) => {
                 </span>
             </p>
             <input 
-                className="w-96 h-12 text-black px-4 rounded-md" 
+                className="w-96 h-8 text-black px-4 rounded-md" 
                 placeholder="What's on your mind?" onChange={(e) => setMessage(e.target.value)}/>
             <button 
-                className="text-lg text-black border-2 rounded-lg border-[#6e6e6e] px-6 py-2 mt-2 ml-4 bg-[#74a8fc]"
+                className="text-md text-black border-2 rounded-lg border-[#6e6e6e] px-6 py-1 mt-2 ml-4 bg-[#29d688]"
                 onClick={() => onClickPublishTweet(message)}><span>Publish</span></button>
         </div>
     );
