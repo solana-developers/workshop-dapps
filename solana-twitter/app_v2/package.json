@@ -4,8 +4,9 @@
   "license": "MIT",
   "private": false,
   "scripts": {
-    "dev": "ts-node init/init.ts && cp ../target/idl/solana_twitter_v2.json ./src/utils/idl.json && next dev",
-    "build": "ts-node init/init.ts && cp ../target/idl/solana_twitter_v2.json ./src/utils/idl.json && next build",
+    "quick-dev": "ts-node init/init.ts && cp ../target/idl/solana_twitter_v2.json ./src/utils/idl.json && next dev",
+    "dev": "next dev",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint"
   },

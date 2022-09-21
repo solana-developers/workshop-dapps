@@ -4,8 +4,9 @@
   "license": "MIT",
   "private": false,
   "scripts": {
-    "dev": "cp ../target/idl/solana_twitter_v1.json ./src/utils/idl.json && next dev",
-    "build": "cp ../target/idl/solana_twitter_v1.json ./src/utils/idl.json && next build",
+    "quick-dev": "cp ../target/idl/solana_twitter_v1.json ./src/utils/idl.json && next dev",
+    "dev": "next dev",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint"
   },
