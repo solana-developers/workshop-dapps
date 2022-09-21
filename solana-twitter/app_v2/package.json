@@ -6,8 +6,8 @@
   "scripts": {
     "dev": "ts-node init/init.ts && cp ../target/idl/solana_twitter_v2.json ./src/utils/idl.json && next dev",
     "build": "ts-node init/init.ts && cp ../target/idl/solana_twitter_v2.json ./src/utils/idl.json && next build",
-    "start": "ts-node init/init.ts && cp ../target/idl/solana_twitter_v2.json ./src/utils/idl.json && next start",
-    "lint": "ts-node init/init.ts && cp ../target/idl/solana_twitter_v2.json ./src/utils/idl.json && next lint"
+    "start": "next start",
+    "lint": "next lint"
   },
   "dependencies": {
     "@heroicons/react": "^1.0.5",
