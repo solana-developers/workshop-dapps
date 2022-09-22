@@ -5,6 +5,7 @@ import {
     GlowWalletAdapter,
     PhantomWalletAdapter,
     SolflareWalletAdapter,
+    TorusWalletAdapter,
 } from '@solana/wallet-adapter-wallets';
 import { Cluster, clusterApiUrl } from '@solana/web3.js';
 import { FC, ReactNode, useCallback, useMemo } from 'react';
@@ -22,6 +23,7 @@ const WalletContextProvider: FC<{ children: ReactNode }> = ({ children }) => {
             new GlowWalletAdapter(),
             new PhantomWalletAdapter(),
             new SolflareWalletAdapter(),
+            new TorusWalletAdapter(),
         ],
         // [network]
         []
