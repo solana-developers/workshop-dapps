@@ -47,7 +47,9 @@ fn svg_generator(
 
     // Generation of svg
     let final_svg_string = String::from(svg_string_one) + color + svg_string_two + first_word + second_word + third_word + "</text></svg>";
-    let svg_data = SvgData { image: final_svg_string.to_string() };
+    let svg_data = SvgData { 
+        image: final_svg_string, 
+    };
 
     // Determine the size of the account
     let account_span = (svg_data.try_to_vec()?).len();
