@@ -35,9 +35,7 @@ pub struct CreateLike<'info> {
         bump
     )]
     pub like: Account<'info, SolanaLike>,
-    #[account(
-        mut,
-    )]
+    #[account(mut)]
     pub tweet: Account<'info, SolanaTweet>,
     #[account(
         mut,

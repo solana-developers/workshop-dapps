@@ -35,12 +35,11 @@ pub struct CreateRetweet<'info> {
         bump
     )]
     pub retweet: Account<'info, SolanaRetweet>,
-    #[account(
-        mut,
-    )]
+    #[account(mut)]
     pub tweet: Account<'info, SolanaTweet>,
     #[account(
         mut,
+        has_one = authority,
     )]
     pub profile: Account<'info, SolanaTwitterProfile>,
     #[account(mut)]
