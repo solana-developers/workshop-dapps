@@ -9,7 +9,6 @@ pub struct SolanaTweet {
     pub like_count: u32,
     pub retweet_count: u32,
     pub body: String,
-    pub bump: u8,
 }
 
 impl SolanaTweet {
@@ -23,7 +22,6 @@ impl SolanaTweet {
         profile_pubkey: Pubkey,
         tweet_number: u32,
         body: String,
-        bump: u8,
     ) -> Self {
         
         SolanaTweet {
@@ -33,7 +31,6 @@ impl SolanaTweet {
             like_count: 0,
             retweet_count: 0,
             body,
-            bump,
         }
     }
 }

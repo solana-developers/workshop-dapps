@@ -7,7 +7,6 @@ pub struct SolanaTwitterProfile  {
     pub display_name: String,
     pub tweet_count: u32,
     pub authority: Pubkey,
-    pub bump: u8,
 }
 
 impl SolanaTwitterProfile {
@@ -20,7 +19,6 @@ impl SolanaTwitterProfile {
         handle: String,
         display_name: String,
         authority: Pubkey,
-        bump: u8,
     ) -> Self {
         
         SolanaTwitterProfile {
@@ -28,7 +26,6 @@ impl SolanaTwitterProfile {
             display_name,
             tweet_count: 0,
             authority,
-            bump,
         }
     }
 }

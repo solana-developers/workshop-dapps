@@ -1,6 +1,6 @@
 import * as anchor from '@project-serum/anchor';
 import * as constants from '../app_v1/src/utils/const';
-import { SeedUtil } from '../app_v2/src/utils/seed-util';
+import { SeedUtil } from '../app_v1/src/utils/seed-util';
 import * as util from '../app_v1/src/utils/util';
 
 

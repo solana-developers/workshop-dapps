@@ -1,7 +1,7 @@
 [features]
 seeds = false
 [programs.devnet]
-solana_twitter_v1 = "8rmU58WRSFDUDjNmVX7iidkCRLYuAvDNdAv5EmHHQB3p"
+solana_twitter_v1 = "CNsXWuU8Qq8cCkRWrCojiA7NYz3YxZmSGLGjMtBvAFuB"
 solana_twitter_v2 = "5FiwjU2n9bytPrXEZAzVeJBD1Zc16u9WTcCjn94Mn6E6"
 
 [registry]

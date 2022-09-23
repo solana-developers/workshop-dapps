@@ -13,7 +13,6 @@ pub fn create_profile(
         handle,
         display_name,
         ctx.accounts.authority.key(),
-        *ctx.bumps.get(SolanaTwitterProfile::SEED_PREFIX).expect("Bump not found."),
     );
     ctx.accounts.profile.set_inner(profile.clone());
     Ok(())

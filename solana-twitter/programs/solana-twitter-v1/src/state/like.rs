@@ -7,7 +7,6 @@ pub struct SolanaLike {
     pub profile_pubkey: Pubkey,
     pub tweet_pubkey: Pubkey,
     pub authority: Pubkey,
-    pub bump: u8,
 }
 
 impl SolanaLike {
@@ -21,7 +20,6 @@ impl SolanaLike {
         profile_pubkey: Pubkey,
         tweet_pubkey: Pubkey,
         authority: Pubkey,
-        bump: u8,
     ) -> Self {
         
         SolanaLike {
@@ -29,7 +27,6 @@ impl SolanaLike {
             profile_pubkey,
             tweet_pubkey,
             authority,
-            bump,
         }
     }
 }

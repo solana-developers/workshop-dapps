@@ -15,7 +15,6 @@ pub fn create_tweet(
         profile.key(),
         profile.tweet_count + 1,
         body,
-        *ctx.bumps.get(SolanaTweet::SEED_PREFIX).expect("Bump not found."),
     );
     ctx.accounts.tweet.set_inner(tweet.clone());
     profile.tweet_count += 1;
@@ -39,11 +38,6 @@ pub struct CreateTweet<'info> {
     #[account(
         mut,
         has_one = authority,
-        seeds = [
-            SolanaTwitterProfile::SEED_PREFIX.as_ref(),
-            authority.key().as_ref(),
-        ],
-        bump = profile.bump,
     )]
     pub profile: Account<'info, SolanaTwitterProfile>,
     #[account(mut)]

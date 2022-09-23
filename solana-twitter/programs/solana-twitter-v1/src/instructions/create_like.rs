@@ -15,7 +15,6 @@ pub fn create_like(
         ctx.accounts.profile.key(),
         tweet.key(),
         ctx.accounts.authority.key(),
-        *ctx.bumps.get(SolanaLike::SEED_PREFIX).expect("Bump not found."),
     );
     ctx.accounts.like.set_inner(like.clone());
     tweet.like_count += 1;
@@ -38,22 +37,11 @@ pub struct CreateLike<'info> {
     pub like: Account<'info, SolanaLike>,
     #[account(
         mut,
-        seeds = [
-            SolanaTweet::SEED_PREFIX.as_ref(),
-            tweet.profile_pubkey.as_ref(),
-            tweet.tweet_number.to_string().as_ref(),
-        ],
-        bump = tweet.bump,
     )]
     pub tweet: Account<'info, SolanaTweet>,
     #[account(
         mut,
         has_one = authority,
-        seeds = [
-            SolanaTwitterProfile::SEED_PREFIX.as_ref(),
-            authority.key().as_ref(),
-        ],
-        bump = profile.bump,
     )]
     pub profile: Account<'info, SolanaTwitterProfile>,
     #[account(mut)]

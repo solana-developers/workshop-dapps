@@ -147,10 +147,6 @@
           {
             "name": "authority",
             "type": "publicKey"
-          },
-          {
-            "name": "bump",
-            "type": "u8"
           }
         ]
       }
@@ -175,10 +171,6 @@
           {
             "name": "authority",
             "type": "publicKey"
-          },
-          {
-            "name": "bump",
-            "type": "u8"
           }
         ]
       }
@@ -203,10 +195,6 @@
           {
             "name": "authority",
             "type": "publicKey"
-          },
-          {
-            "name": "bump",
-            "type": "u8"
           }
         ]
       }
@@ -239,16 +227,12 @@
           {
             "name": "body",
             "type": "string"
-          },
-          {
-            "name": "bump",
-            "type": "u8"
           }
         ]
       }
     }
   ],
   "metadata": {
-    "address": "8rmU58WRSFDUDjNmVX7iidkCRLYuAvDNdAv5EmHHQB3p"
+    "address": "CNsXWuU8Qq8cCkRWrCojiA7NYz3YxZmSGLGjMtBvAFuB"
   }
 }

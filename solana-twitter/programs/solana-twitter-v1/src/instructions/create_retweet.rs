@@ -15,7 +15,6 @@ pub fn create_retweet(
         ctx.accounts.profile.key(),
         tweet.key(),
         ctx.accounts.authority.key(),
-        *ctx.bumps.get(SolanaRetweet::SEED_PREFIX).expect("Bump not found."),
     );
     ctx.accounts.retweet.set_inner(retweet.clone());
     tweet.retweet_count += 1;
@@ -38,22 +37,10 @@ pub struct CreateRetweet<'info> {
     pub retweet: Account<'info, SolanaRetweet>,
     #[account(
         mut,
-        seeds = [
-            SolanaTweet::SEED_PREFIX.as_ref(),
-            tweet.profile_pubkey.as_ref(),
-            tweet.tweet_number.to_string().as_ref(),
-        ],
-        bump = tweet.bump,
     )]
     pub tweet: Account<'info, SolanaTweet>,
     #[account(
         mut,
-        has_one = authority,
-        seeds = [
-            SolanaTwitterProfile::SEED_PREFIX.as_bytes().as_ref(),
-            authority.key().as_ref(),
-        ],
-        bump = profile.bump,
     )]
     pub profile: Account<'info, SolanaTwitterProfile>,
     #[account(mut)]
