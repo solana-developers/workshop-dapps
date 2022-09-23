@@ -1,2 +1,4 @@
 node_modules/
 svg_generator/target/
+sv-generator/Cargo.lock
+yarn.lock
