@@ -29,17 +29,21 @@ fn svg_generator(
     let payer = next_account_info(accounts_iter)?;
 
     // SVG String & hard-coded arrays
-    let svg_string_one = "";
-    let colors: Vec<String> = vec![];
-    let names: Vec<String> = vec![];
-    let svg_string_two = "";
+    let svg_string_one = "<svg xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='xMinYMin meet' viewBox='0 0 350 350'><style>.base { fill: white; font-family: serif; font-size: 24px; }</style><rect width='100%' height='100%' fill='".to_string();
+    let colors: Vec<String> = vec!["#f143f7".to_string(), "#fcff33".to_string(), "#00ffd0".to_string(), "#07f702".to_string(), "#ff2448".to_string(), "#ff771c".to_string()];
+    let first_words: Vec<&str> = vec!["Pink".to_string(), "Orange".to_string(), "Yellow".to_string(), "Scarlet".to_string(), "Ivy".to_string(), "Aqua".to_string()];
+    let second_words: Vec<String> = vec!["Positive".to_string(), "Majestic".to_string(), "Empowered".to_string(), "Heroic".to_string(), "Fierce".to_string(), "Tranquil".to_string()];
+    let third_words: Vec<String> = vec!["Llama".to_string(), "Sun".to_string(), "Moon".to_string(), "Cactus".to_string(), "Tree".to_string(), "Rainbow".to_string()];
+    let svg_string_two = "' /><text x='50%' y='50%' class='base' dominant-baseline='middle' text-anchor='middle'>".to_string();
 
     // Indexing of said arrays using rand numbers
     let color = colors.get(random_numbers.random_1 as usize);
-    let name = names.get(random_numbers.random_2 as usize);
+    let first_word = first_words.get(random_numbers.random_2 as usize);
+    let second_word = second_words.get(random_numbers.random_3 as usize);
+    let third_word = third_words.get(random_numbers.random_4 as usize);
 
     // Generation of svg
-    let final_svg_string = "";
+    let final_svg_string = svg_string_one + color + svg_string_two + first_word + second_word + third_word + "</text></svg>".to_string();
     let svg_data = SvgData { image: final_svg_string.to_string() };
 
     // Determine the size of the account
