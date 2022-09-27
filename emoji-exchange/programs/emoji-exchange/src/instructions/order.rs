@@ -1,11 +1,11 @@
-use anchor_lang::{
-    prelude::*,
-    system_program,
-};
+use anchor_lang::prelude::*;
 
-use crate::store::StoreEmoji;
-use crate::user::{ UserAccount, UserEmoji };
-use crate::vault::Vault;
+use crate::state::{ 
+    StoreEmoji, 
+    UserEmoji, 
+    UserMetadata, 
+    Vault 
+};
 
 
 /*
@@ -13,16 +13,12 @@ use crate::vault::Vault;
 */
 pub fn place_order(
     ctx: Context<PlaceOrder>,
-    _user_account_bump: u8,
-    _user_emoji_bump: u8,
-    _store_emoji_bump: u8,
-    _vault_bump: u8,
     emoji_seed: String,
     order_type: OrderType, 
     quantity: u8,
 ) -> Result<()> {
 
-    let user_account = &mut ctx.accounts.user_account;
+    let user_metadata = &mut ctx.accounts.user_metadata;
     let user_emoji = &mut ctx.accounts.user_emoji;
     let store_emoji = &mut ctx.accounts.store_emoji;
     let price_action = quantity as f64 / 10.;
@@ -32,7 +28,7 @@ pub fn place_order(
 
         OrderType::Buy => {
             msg!("New order:    BUY : {} : {}", quantity, emoji_seed);
-            msg!("  Requester: {}", ctx.accounts.user_wallet.key());
+            msg!("  Requester: {}", ctx.accounts.authority.key());
             if quantity > store_emoji.balance {
                 msg!("Emoji: {}", &store_emoji.emoji_name);
                 msg!("Store balance: {}", store_emoji.balance);
@@ -42,7 +38,7 @@ pub fn place_order(
             //     CpiContext::new(
             //         ctx.accounts.system_program.to_account_info(),
             //         system_program::Transfer {
-            //             from: ctx.accounts.user_wallet.to_account_info(),
+            //             from: ctx.accounts.authority.to_account_info(),
             //             to: ctx.accounts.vault.to_account_info(),
             //         }
             //     ),
@@ -55,27 +51,27 @@ pub fn place_order(
             msg!("NEW_PRICE: {}", new_price);
             store_emoji.price = new_price as u64;
             user_emoji.balance = new_user_balance;
-            user_account.ebucks_balance -= store_emoji.price * quantity as u64;
-            user_account.trade_count += 1;
+            user_metadata.ebucks_balance -= store_emoji.price * quantity as u64;
+            user_metadata.trade_count += 1;
         },
 
         OrderType::Sell => {
             msg!("New order:    SELL : {} : {}", quantity, emoji_seed);
-            msg!("  Requester: {}", ctx.accounts.user_wallet.key());
+            msg!("  Requester: {}", ctx.accounts.authority.key());
             if quantity > user_emoji.balance {
                 msg!("Emoji: {}", &user_emoji.emoji_name);
                 msg!("User balance: {}", user_emoji.balance);
                 return Err(error!(OrderError::InsufficientUserBalance))
             };
             // **ctx.accounts.vault.to_account_info().try_borrow_mut_lamports()? -= store_emoji.price * quantity as u64;
-            // **ctx.accounts.user_wallet.to_account_info().try_borrow_mut_lamports()? += store_emoji.price * quantity as u64;
+            // **ctx.accounts.authority.to_account_info().try_borrow_mut_lamports()? += store_emoji.price * quantity as u64;
             store_emoji.balance += quantity;
             let new_price = store_emoji.price as f64 * (1. - price_action);
             msg!("NEW_PRICE: {}", new_price);
             store_emoji.price = new_price as u64;
-            user_account.ebucks_balance += store_emoji.price * quantity as u64;
+            user_metadata.ebucks_balance += store_emoji.price * quantity as u64;
             user_emoji.balance -= quantity;
-            user_account.trade_count += 1;
+            user_metadata.trade_count += 1;
         }
     };
 
@@ -85,10 +81,6 @@ pub fn place_order(
 
 #[derive(Accounts)]
 #[instruction(
-    user_account_bump: u8,
-    user_emoji_bump: u8,
-    store_emoji_bump: u8,
-    vault_bump: u8,
     emoji_seed: String,
     order_type: OrderType, 
     quantity: u8,
@@ -96,40 +88,20 @@ pub fn place_order(
 pub struct PlaceOrder<'info> {
     #[account(
         mut, 
-        seeds = [
-            user_wallet.key.as_ref(),
-            b"_user_account"
-        ],
-        bump = user_account_bump
+        has_one = authority,
     )]
-    pub user_account: Account<'info, UserAccount>,
+    pub user_metadata: Account<'info, UserMetadata>,
     #[account(
         mut, 
-        seeds = [
-            user_wallet.key.as_ref(),
-            b"_user_emoji_", 
-            emoji_seed.as_bytes()
-        ],
-        bump = user_emoji_bump
+        has_one = authority,
     )]
     pub user_emoji: Account<'info, UserEmoji>,
-    #[account(
-        mut, 
-        seeds = [
-            b"store_emoji_", 
-            emoji_seed.as_bytes()
-        ],
-        bump = store_emoji_bump
-    )]
+    #[account(mut)]
     pub store_emoji: Account<'info, StoreEmoji>,
-    #[account(
-        mut, 
-        seeds = [ b"vault" ],
-        bump = vault_bump
-    )]
+    #[account(mut)]
     pub vault: Account<'info, Vault>,
     #[account(mut)]
-    pub user_wallet: Signer<'info>,
+    pub authority: Signer<'info>,
     pub system_program: Program<'info, System>,
 }
 

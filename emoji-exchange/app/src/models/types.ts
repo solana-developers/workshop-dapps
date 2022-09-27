@@ -15,7 +15,7 @@ export interface StoreEmojiObject {
     price: number,
 }
 
-export interface UserAccountObject {
+export interface UserMetadataObject {
     pubkey: anchor.web3.PublicKey,
     username: string,
     ebucksBalance: number,
