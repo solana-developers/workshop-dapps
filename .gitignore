@@ -4,6 +4,8 @@
 test-ledger
 sol-twit-v0
 
+/*/test-ledger/
+
 # Logs
 logs
 *.log

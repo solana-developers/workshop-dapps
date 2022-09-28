@@ -1,14 +1,14 @@
 [features]
 seeds = false
-[programs.localnet]
+[programs.devnet]
 emoji_exchange = "FWes5JocvyKdE8DbY8BmvVc1j1qPo9jXKXWBgAvevunm"
-voting_program = "5Jx5Y1cimfoAceEKLKtTwwmBqJs8HHSZg9uck88NyW5J"
+voting_program = "CnwEjpeXmnsKgHUUasCAWCcfV3rDEYwvhVydTR2y6UMn"
 
 [registry]
 url = "https://anchor.projectserum.com"
 
 [provider]
-cluster = "localnet"
+cluster = "devnet"
 wallet = "~/.config/solana/id.json"
 
 [scripts]

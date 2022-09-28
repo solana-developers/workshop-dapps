@@ -13,15 +13,15 @@ const useStoreEmojiStore = create<StoreEmojiStore>((set, _get) => ({
     getAllStoreEmojis: async (wallet: AnchorWallet | undefined) => {
         let storeEmojis: StoreEmojiObject[] = [];
         try {
-            if (!wallet) throw("Wallet not connected!");
+            // if (!wallet) throw("Wallet not connected!");
             storeEmojis = await util.loadStore(wallet);
+            set((s) => ({
+                storeEmojis: storeEmojis
+            }));
             console.log(`Successfully loaded store.`);
         } catch (e) {
             console.log(e);
         };
-        set((s) => ({
-            storeEmojis: storeEmojis
-        }));
     },
 }));
 

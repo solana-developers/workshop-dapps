@@ -1,0 +1,13 @@
+
+.anchor
+.DS_Store
+.next
+target
+**/*.rs.bk
+node_modules
+test-ledger
+.history/
+*/build/
+*/.next/
+
+wallet/
