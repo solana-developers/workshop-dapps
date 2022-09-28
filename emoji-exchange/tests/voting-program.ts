@@ -1,5 +1,4 @@
 import * as anchor from "@project-serum/anchor";
-import { VotingProgram } from "../target/types/voting_program";
 
 
 describe("voting-program", async () => {
@@ -7,7 +6,12 @@ describe("voting-program", async () => {
   const provider = anchor.AnchorProvider.env();
   anchor.setProvider(provider);
   const wallet = provider.wallet as anchor.Wallet;
-  const program = anchor.workspace.VotingProgram as anchor.Program<VotingProgram>;
+  const idl = require("./voting_program.json");
+  const program = new anchor.Program(
+    idl, 
+    new anchor.web3.PublicKey("5dJaDcqnRNeMU8pK17HmR2BqwC7P8RpNbpsJp2cX32yb"), 
+    provider
+  );
 
   const candidateId = 1;
   const candidateName = "Joe C";
