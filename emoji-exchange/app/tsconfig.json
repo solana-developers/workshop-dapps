@@ -18,7 +18,7 @@
     "incremental": true,
     "typeRoots": ["./node_modules/@types"]
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "Anchor.toml", "../cashout_app/src/stores/profitLeadersStore.tsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "Anchor.toml"],
   "exclude": ["node_modules", ".next",],
   "ts-node": {
     "require": ["tsconfig-paths/register"],
