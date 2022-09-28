@@ -1,7 +1,7 @@
 [features]
 seeds = false
 [programs.localnet]
-emoji_exchange = "CrMdx78x6xJCpCkBkQ5Fdqyd99HBynYGK5t9AezgNbCN"
+emoji_exchange = "FWes5JocvyKdE8DbY8BmvVc1j1qPo9jXKXWBgAvevunm"
 voting_program = "5Jx5Y1cimfoAceEKLKtTwwmBqJs8HHSZg9uck88NyW5J"
 
 [registry]

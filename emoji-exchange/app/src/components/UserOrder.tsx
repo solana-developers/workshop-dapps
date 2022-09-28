@@ -1,13 +1,13 @@
 import { FC, useCallback, useState } from 'react';
-import { AnchorWallet, useAnchorWallet, useWallet } from '@solana/wallet-adapter-react';
+import { AnchorWallet, useAnchorWallet, useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { OrderType } from '../models/types';
 import * as util from '../utils/util';
-import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 
 
 interface UserOrderProps {
   getAllStoreEmojis: (wallet: AnchorWallet | undefined) => void,
   getAllUserEmojis: (wallet: AnchorWallet | undefined) => void,
+  getUserMetadata: (wallet: AnchorWallet | undefined) => void,
   emojiName: string,
   display: string,
   balance: number,
@@ -16,22 +16,24 @@ interface UserOrderProps {
 
 export const UserOrder: FC<UserOrderProps> = (props: UserOrderProps) => {
   
+  const { connection } = useConnection();
   const { publicKey, sendTransaction } = useWallet();
   const wallet = useAnchorWallet();
 
   const [quantity, setQuantity] = useState<number>(0);
 
   const onClickOrder = useCallback(async () => {
-    const [tx, provider] = await util.placeOrder(
+    const tx = await util.placeOrder(
       wallet,
       props.emojiName,
       OrderType.SELL,
       quantity,
     );
-    const sx = await sendTransaction(tx, provider.connection);
-    await provider.connection.confirmTransaction(sx);
+    const sx = await sendTransaction(tx, connection);
+    await connection.confirmTransaction(sx);
     props.getAllStoreEmojis(wallet);
     props.getAllUserEmojis(wallet);
+    props.getUserMetadata(wallet);
     setQuantity(0);
   }, [quantity, wallet]);
 

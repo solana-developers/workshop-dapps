@@ -43,10 +43,14 @@ export const EmojiExchange: FC = () => {
   }, [wallet, getUserMetadata]);
 
 
+  // TODO: Need to make this pull the store every so often
   useEffect(() => {
-    getAllStoreEmojis(wallet);
+    setInterval(() => getAllStoreEmojis(wallet), 5000);
+  }, [wallet, getAllStoreEmojis]);
+
+  useEffect(() => {
     getAllUserEmojis(wallet);
-  }, [wallet, getAllStoreEmojis, getAllUserEmojis]);
+  }, [wallet, getAllUserEmojis]);
 
   useEffect(() => {
     if (userMetadata) {
@@ -81,7 +85,8 @@ export const EmojiExchange: FC = () => {
             <div>
               <div className="mx-auto mb-4 p-2 w-64 text-center border-2 rounded-lg border-[#6e6e6e]">
                 <div>
-                  <span>eBucks Balance: {userMetadata.ebucksBalance || 0}</span>
+                  <span className="text-[#f0f00a]">eBucks Balance:</span>
+                  <span>{userMetadata.ebucksBalance || 0}</span>
                 </div>
                 <div>
                   <span className="text-[#f0f00a]">eBucks Profit: </span>
@@ -130,6 +135,7 @@ export const EmojiExchange: FC = () => {
                           key={i} 
                           getAllStoreEmojis={getAllStoreEmojis} 
                           getAllUserEmojis={getAllUserEmojis} 
+                          getUserMetadata={getUserMetadata}
                           emojiName={s.emojiName} 
                           display={s.display} 
                           price={s.price} 
@@ -152,6 +158,7 @@ export const EmojiExchange: FC = () => {
                             key={i} 
                             getAllStoreEmojis={getAllStoreEmojis} 
                             getAllUserEmojis={getAllUserEmojis} 
+                            getUserMetadata={getUserMetadata}
                             emojiName={u.emojiName} 
                             display={u.display} 
                             balance={u.balance} 

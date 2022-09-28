@@ -12,7 +12,7 @@ pub struct Vault {
 
 impl Vault {
 
-    pub const ACCOUNT_SPAN: usize = 8;
+    pub const ACCOUNT_SPAN: usize = 8 + 32;
     
     pub const SEED_PREFIX: &'static str = "vault";
 

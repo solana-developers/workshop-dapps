@@ -43,6 +43,7 @@ export async function initializeVault(
 ): Promise<anchor.web3.Transaction> {
 
     const [_provider, program, seedUtil] = await getAnchorConfigs(masterWallet);
+    console.log(`Vault: ${seedUtil.vaultPda}`);
     const ix = await program.methods.createVault()
         .accounts({
             vault: seedUtil.vaultPda,
@@ -104,6 +105,7 @@ export async function createStoreEmojiTransaction(
 ): Promise<anchor.web3.Transaction> {
 
     const [_provider, program, seedUtil] = await getAnchorConfigs(masterWallet);
+    console.log(`Store Emoji: ${await seedUtil.getStoreEmojiPda(emojiSeed)}`);
     const ix = await program.methods.createStoreEmoji(
         emojiSeed, 
         display,
@@ -158,13 +160,7 @@ export async function loadStore(wallet: AnchorWallet): Promise<StoreEmojiObject[
     let store: StoreEmojiObject[] = [];
     for (var emoji of constants.EMOJIS_LIST) {
         try {
-            const storeEmojiAccount = await getStoreEmoji(wallet, emoji.seed);
-            store.push({
-                emojiName: storeEmojiAccount.emojiName as string,
-                display: storeEmojiAccount.display as string,
-                balance: storeEmojiAccount.balance as number,
-                price: storeEmojiAccount.price as number,
-            });
+            store.push(await getStoreEmoji(wallet, emoji.seed));
         } catch (_) {};
     };
     return store;
@@ -239,10 +235,12 @@ export async function getUserMetadata(
         const response = await program.account.userMetadata.fetch(
             await seedUtil.getUserMetadataPda(wallet.publicKey)
         );
+        let eBucksBalance = response.ebucksBalance as anchor.BN;
+        let eBucksBalanceNumber = eBucksBalance.toNumber();
         return {
             pubkey: provider.wallet.publicKey as anchor.web3.PublicKey,
             username: response.username as string,
-            ebucksBalance: response.ebucksBalance as number,
+            ebucksBalance: eBucksBalanceNumber,
             tradeCount: response.tradeCount as number,
             cashedOut: response.cashedOut as boolean,
         };
@@ -376,13 +374,10 @@ export async function placeOrder(
 ): Promise<anchor.web3.Transaction> {
 
     const [provider, program, seedUtil] = await getAnchorConfigs(wallet);
-    let tx = new anchor.web3.Transaction();
-    try {
-        await getUserEmoji(provider.wallet, emojiSeed);
-    } catch (_) {
-        // If the user emoji account doesn't exist yet, we add it as our first ix
-        tx.add(await createUserEmojiTransaction(provider.wallet, emojiSeed));
-    };
+    console.log(`Store Emoji: ${await seedUtil.getStoreEmojiPda(emojiSeed)}`);
+    console.log(`User Emoji: ${await seedUtil.getUserEmojiPda(emojiSeed, wallet.publicKey)}`);
+    console.log(`User Metadata: ${await seedUtil.getUserMetadataPda(wallet.publicKey)}`);
+    console.log(`Vault: ${seedUtil.vaultPda}`);
     const ix = await program.methods.placeOrder(
         emojiSeed, 
         convertOrderTypeToAnchorPayload(orderType), 
@@ -393,12 +388,10 @@ export async function placeOrder(
             userEmoji: await seedUtil.getUserEmojiPda(emojiSeed, wallet.publicKey),
             storeEmoji: await seedUtil.getStoreEmojiPda(emojiSeed),
             vault: seedUtil.vaultPda,
-            userWallet: provider.wallet.publicKey,
-            systemProgram: anchor.web3.SystemProgram.programId,
+            authority: provider.wallet.publicKey,
         })
         .instruction();
-    tx.add(ix);
-    return tx;
+    return new anchor.web3.Transaction().add(ix);
 }
 
 

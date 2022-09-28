@@ -11,9 +11,12 @@ use crate::state::Vault;
 * Creates a PDA for the store's vault.
 */
 pub fn create_vault(
-    _ctx: Context<CreateVault>,
+    ctx: Context<CreateVault>,
 ) -> Result<()> {
 
+    ctx.accounts.vault.set_inner(
+        Vault::new(ctx.accounts.authority.key())
+    );
     Ok(())
 }
 

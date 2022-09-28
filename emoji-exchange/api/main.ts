@@ -10,10 +10,11 @@ import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { EMOJIS_LIST } from '../app/src/utils/const';
 import * as constants from '../app/src/utils/const';
 import * as util from '../app/src/utils/util';
-import { exit } from "process";
 
 
 const STORE_WALLET = new anchor.Wallet(createKeypairFromFile(__dirname + '/../app/wallet/master.json'));
+
+const connection = new Connection(constants.NETWORK, 'confirmed');
 
 // Mango configs
 const mangoCluster = "mainnet";
@@ -80,20 +81,22 @@ async function modifyPrice(
 export async function initializeStore() {
     console.log("Initializing vault...");
     try {
-        var [tx, provider] = await util.initializeVault(STORE_WALLET);
-        await provider.connection.sendTransaction(tx, [STORE_WALLET.payer]);
-        var [tx, provider] = await util.fundVault(STORE_WALLET, constants.VAULT_INIT_FUND_AMOUNT);
-        await provider.connection.sendTransaction(tx, [STORE_WALLET.payer]);
+        var tx = await util.initializeVault(STORE_WALLET);
+        await connection.sendTransaction(tx, [STORE_WALLET.payer]);
+        var tx = await util.fundVault(STORE_WALLET, constants.VAULT_INIT_FUND_AMOUNT);
+        await connection.sendTransaction(tx, [STORE_WALLET.payer]);
     } catch (e) {
+        console.log(e);
         console.log("Vault already initialized.");
     };
     console.log("Vault initialized successfully.");
 
     console.log("Initializing store...");
     for (var emoji of constants.EMOJIS_LIST) {
-        var [tx, provider] = await util.createStoreEmojiTransaction(STORE_WALLET, emoji.seed, emoji.display);
+        console.log(`Emoji: ${emoji.display}`);
+        var tx = await util.createStoreEmojiTransaction(STORE_WALLET, emoji.seed, emoji.display);
         try {
-            await provider.connection.sendTransaction(tx, [STORE_WALLET.payer]);
+            await connection.sendTransaction(tx, [STORE_WALLET.payer]);
         } catch (e) {
             console.log(e);
             console.log(`Store Emoji account exists for: ${emoji.seed}`);
@@ -106,9 +109,9 @@ export async function initializeStore() {
 // Reset the game
 export async function resetEmojiExchange() {
     console.log("Resetting Emoji Exchange...");
-    var [tx, provider] = await util.reset(STORE_WALLET);
-    await provider.connection.confirmTransaction(
-        (await provider.connection.sendTransaction(tx, [STORE_WALLET.payer]))
+    var tx = await util.reset(STORE_WALLET);
+    await connection.confirmTransaction(
+        (await connection.sendTransaction(tx, [STORE_WALLET.payer]))
     );
     console.log("Reset complete.");
 }
@@ -127,8 +130,8 @@ async function main() {
             const newEmojiPrice = await modifyPrice(emoji.emojiName, mappedToken, prevEmojiPrice);
             const change = prevEmojiPrice ? Math.round((newEmojiPrice - prevEmojiPrice) / prevEmojiPrice * 100) : 0;
             const fromStart = Math.round((newEmojiPrice - constants.DEFAULT_STORE_EMOJI_STARTING_PRICE) / constants.DEFAULT_STORE_EMOJI_STARTING_PRICE * 100);
-            var [tx, provider] = await util.updateStoreEmojiPriceTransaction(STORE_WALLET, emoji.emojiName, newEmojiPrice);
-            await provider.connection.sendTransaction(tx, [STORE_WALLET.payer]);
+            var tx = await util.updateStoreEmojiPriceTransaction(STORE_WALLET, emoji.emojiName, newEmojiPrice);
+            await connection.sendTransaction(tx, [STORE_WALLET.payer]);
             console.log(
                 `Emoji: ${emoji.emojiName} Price: ${newEmojiPrice / LAMPORTS_PER_SOL} Prev: ${prevEmojiPrice / LAMPORTS_PER_SOL} Change: ${change}% From Start: ${fromStart}%`
             );
