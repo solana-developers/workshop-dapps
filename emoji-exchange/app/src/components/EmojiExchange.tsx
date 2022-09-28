@@ -45,7 +45,7 @@ export const EmojiExchange: FC = () => {
 
   // TODO: Need to make this pull the store every so often
   useEffect(() => {
-    setInterval(() => getAllStoreEmojis(wallet), 5000);
+    setInterval(() => getAllStoreEmojis(wallet), 10000);
   }, [wallet, getAllStoreEmojis]);
 
   useEffect(() => {

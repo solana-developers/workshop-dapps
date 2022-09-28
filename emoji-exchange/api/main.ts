@@ -136,7 +136,7 @@ async function main() {
                 `Emoji: ${emoji.emojiName} Price: ${newEmojiPrice / LAMPORTS_PER_SOL} Prev: ${prevEmojiPrice / LAMPORTS_PER_SOL} Change: ${change}% From Start: ${fromStart}%`
             );
         };
-        await new Promise( resolve => setTimeout(resolve, 5000) );
+        await new Promise( resolve => setTimeout(resolve, 10000) );
     };
 }
 
