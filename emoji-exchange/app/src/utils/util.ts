@@ -6,14 +6,20 @@ import {
     OrderType, 
     StoreEmojiObject, 
     UserEmojiObject,
-    UserAccountObject
+    UserMetadataObject
 } from '../models/types';
+import { SeedUtil } from "./seed-util";
 
 
-export function getAnchorConfigs(wallet: AnchorWallet): [anchor.AnchorProvider, anchor.Program] | [null, null] {
-    if (!wallet) {
-        return [null, null];
-    }
+/**
+ * Builds the Anchor configs from the IDL
+ * @param wallet 
+ * @returns Provider & Program objects
+ */
+export async function getAnchorConfigs(
+    wallet: AnchorWallet
+): Promise<[anchor.AnchorProvider, anchor.Program, SeedUtil]> {
+    
     const provider = new anchor.AnchorProvider(
         new anchor.web3.Connection(constants.NETWORK, constants.PREFLIGHT_COMMITMENT), 
         wallet, 
@@ -21,76 +27,85 @@ export function getAnchorConfigs(wallet: AnchorWallet): [anchor.AnchorProvider, 
     );
     const idl = require("../utils/idl.json");
     const program = new anchor.Program(idl, idl.metadata.address, provider);
-    return [provider, program];
+    let seedUtil = new SeedUtil(program);
+    await seedUtil.init();
+    return [provider, program, seedUtil];
 }
 
 
+/**
+ * Initializes the game's vault for payouts
+ * @param masterWallet 
+ * @returns InitializeVault Transaction
+ */
 export async function initializeVault(
-    storeWallet: AnchorWallet
-): Promise<[anchor.web3.Transaction, anchor.AnchorProvider]> {
-    const [provider, program] = getAnchorConfigs(storeWallet);
-    const vaultPda = (await anchor.web3.PublicKey.findProgramAddress(
-      [ Buffer.from(constants.VAULT_SEED) ],
-      program.programId
-    ))[0];
+    masterWallet: AnchorWallet
+): Promise<anchor.web3.Transaction> {
+
+    const [_provider, program, seedUtil] = await getAnchorConfigs(masterWallet);
+    console.log(`Vault: ${seedUtil.vaultPda}`);
     const ix = await program.methods.createVault()
         .accounts({
-            vault: vaultPda,
-            storeWallet: storeWallet.publicKey,
+            vault: seedUtil.vaultPda,
+            authority: masterWallet.publicKey,
             systemProgram: anchor.web3.SystemProgram.programId,
         })
         .instruction();
-    let tx = new anchor.web3.Transaction().add(ix);
-    return [tx, provider];
+    return new anchor.web3.Transaction().add(ix);
 }
 
+
+/**
+ * Funds the game's vault
+ * @param masterWallet 
+ * @param amount 
+ * @returns FundVault Transaction
+ */
 export async function fundVault(
-    storeWallet: AnchorWallet, 
+    masterWallet: AnchorWallet, 
     amount: number
-): Promise<[anchor.web3.Transaction, anchor.AnchorProvider]> {
-    const [provider, program] = getAnchorConfigs(storeWallet);
-    const [vaultPda, vaultPdaBump] = await anchor.web3.PublicKey.findProgramAddress(
-      [ Buffer.from(constants.VAULT_SEED) ],
-      program.programId
-    );
-    const ix = await program.methods.fundVault(
-        vaultPdaBump, new anchor.BN(amount)
-    )
+): Promise<anchor.web3.Transaction> {
+
+    const [_provider, program, seedUtil] = await getAnchorConfigs(masterWallet);
+    const ix = await program.methods.fundVault(new anchor.BN(amount))
         .accounts({
-            vault: vaultPda,
-            storeWallet: storeWallet.publicKey,
+            vault: seedUtil.vaultPda,
+            authority: masterWallet.publicKey,
             systemProgram: anchor.web3.SystemProgram.programId,
         })
         .instruction();
-    let tx = new anchor.web3.Transaction().add(ix);
-    return [tx, provider];
+    return new anchor.web3.Transaction().add(ix);
 }
 
-export async function getVaultBalance(storeWallet: AnchorWallet): Promise<number> {
-    const [provider, program] = getAnchorConfigs(storeWallet);
-    const vaultPda = (await anchor.web3.PublicKey.findProgramAddress(
-      [ Buffer.from(constants.VAULT_SEED) ],
-      program.programId
-    ))[0];
-    const balance = await provider.connection.getBalance(vaultPda);
+
+/**
+ * Get the balance of the game's vault
+ * @param masterWallet 
+ * @returns Balance (number) of USDC in the vault
+ */
+export async function getVaultBalance(masterWallet: AnchorWallet): Promise<number> {
+
+    const [provider, _program, seedUtil] = await getAnchorConfigs(masterWallet);
+    const balance = await provider.connection.getBalance(seedUtil.vaultPda);
     return balance;
 }
 
 
+/**
+ * Creates a store emoji account
+ * @param masterWallet 
+ * @param emojiSeed 
+ * @param display 
+ * @returns CreateStoreEmoji Transaction
+ */
 export async function createStoreEmojiTransaction(
-    storeWallet: AnchorWallet,
+    masterWallet: AnchorWallet,
     emojiSeed: string,
     display: string,
-): Promise<[anchor.web3.Transaction, anchor.AnchorProvider]> {
-    const [provider, program] = getAnchorConfigs(storeWallet);
-    if (!provider) throw("Provider is null");
-    const storeEmojiPda = (await anchor.web3.PublicKey.findProgramAddress(
-        [
-            Buffer.from(constants.STORE_EMOJI_SEED),
-            Buffer.from(emojiSeed),
-        ],
-        program.programId
-    ))[0];
+): Promise<anchor.web3.Transaction> {
+
+    const [_provider, program, seedUtil] = await getAnchorConfigs(masterWallet);
+    console.log(`Store Emoji: ${await seedUtil.getStoreEmojiPda(emojiSeed)}`);
     const ix = await program.methods.createStoreEmoji(
         emojiSeed, 
         display,
@@ -98,30 +113,30 @@ export async function createStoreEmojiTransaction(
         new anchor.BN(constants.DEFAULT_STORE_EMOJI_STARTING_PRICE)
     )
         .accounts({
-            storeEmoji: storeEmojiPda,
-            storeWallet: storeWallet.publicKey,
+            storeEmoji: await seedUtil.getStoreEmojiPda(emojiSeed),
+            authority: masterWallet.publicKey,
             systemProgram: anchor.web3.SystemProgram.programId,
         })
         .instruction();
-    let tx = new anchor.web3.Transaction().add(ix);
-    return [tx, provider];
+    return new anchor.web3.Transaction().add(ix);
 }
 
+
+/**
+ * Fetches a store emoji account
+ * @param wallet 
+ * @param emojiSeed 
+ * @returns StoreEmojiObject
+ */
 export async function getStoreEmoji(
     wallet: AnchorWallet,
     emojiSeed: string,
 ): Promise<StoreEmojiObject> {
-    const [provider, program] = getAnchorConfigs(wallet);
-    if (!provider) throw("Provider is null");
-    const storeEmojiPda = (await anchor.web3.PublicKey.findProgramAddress(
-        [
-            Buffer.from(constants.STORE_EMOJI_SEED),
-            Buffer.from(emojiSeed),
-        ],
-        program.programId
-    ))[0];
+    const [_provider, program, seedUtil] = await getAnchorConfigs(wallet);
     try {
-        const response = await program.account.storeEmoji.fetch(storeEmojiPda);
+        const response = await program.account.storeEmoji.fetch(
+            await seedUtil.getStoreEmojiPda(emojiSeed)
+        );
         return {
             emojiName: response.emojiName as string,
             display: response.display as string,
@@ -134,168 +149,149 @@ export async function getStoreEmoji(
     }
 }
 
+
+/**
+ * Loads all store emoji accounts
+ * @param wallet 
+ * @returns List of StoreEmojiObject
+ */
 export async function loadStore(wallet: AnchorWallet): Promise<StoreEmojiObject[]> {
+    
     let store: StoreEmojiObject[] = [];
     for (var emoji of constants.EMOJIS_LIST) {
-        const storeEmojiAccount = await getStoreEmoji(wallet, emoji.seed);
-        console.log(`Successfully loaded store emoji account for ${emoji.seed}`);
-        console.log(`emojiName: ${storeEmojiAccount.emojiName as string}`);
-        console.log(`display: ${storeEmojiAccount.display as string}`);
-        console.log(`balance: ${storeEmojiAccount.balance as number}`);
-        console.log(`price: ${storeEmojiAccount.price as number}`);
-        store.push({
-            emojiName: storeEmojiAccount.emojiName as string,
-            display: storeEmojiAccount.display as string,
-            balance: storeEmojiAccount.balance as number,
-            price: storeEmojiAccount.price as number,
-        });
+        try {
+            store.push(await getStoreEmoji(wallet, emoji.seed));
+        } catch (_) {};
     };
     return store;
 }
 
+
+/**
+ * Updates the price of a store emoji account
+ * @param masterWallet 
+ * @param emojiSeed 
+ * @param newPrice 
+ * @returns UpdateStoreEmojiPrice Transaction
+ */
 export async function updateStoreEmojiPriceTransaction(
-    storeWallet: AnchorWallet,
+    masterWallet: AnchorWallet,
     emojiSeed: string,
     newPrice: number,
-): Promise<[anchor.web3.Transaction, anchor.AnchorProvider]> {
-    const [provider, program] = getAnchorConfigs(storeWallet);
-    if (!provider) throw("Provider is null");
-    const [storeEmojiPda, storeEmojiPdaBump] = await anchor.web3.PublicKey.findProgramAddress(
-        [
-            Buffer.from(constants.STORE_EMOJI_SEED),
-            Buffer.from(emojiSeed),
-        ],
-        program.programId
-    );
+): Promise<anchor.web3.Transaction> {
+
+    const [_provider, program, seedUtil] = await getAnchorConfigs(masterWallet);
     const ix = await program.methods.updateStoreEmojiPrice(
-        storeEmojiPdaBump,
         emojiSeed, 
         new anchor.BN(newPrice),
     )
         .accounts({
-            storeEmoji: storeEmojiPda,
-            storeWallet: storeWallet.publicKey,
+            storeEmoji: await seedUtil.getStoreEmojiPda(emojiSeed),
+            authority: masterWallet.publicKey,
             systemProgram: anchor.web3.SystemProgram.programId,
         })
         .instruction();
-    let tx = new anchor.web3.Transaction().add(ix);
-    return [tx, provider];
+    return new anchor.web3.Transaction().add(ix);
 }
 
-export async function createUserAccountTransaction(
+
+/**
+ * Creates a user metadata account
+ * @param wallet 
+ * @param username 
+ * @returns CreateUserMetadata Transaction
+ */
+export async function createUserMetadataTransaction(
     wallet: AnchorWallet,
     username: string,
-): Promise<[anchor.web3.Transaction, anchor.AnchorProvider]> {
-    const [provider, program] = getAnchorConfigs(wallet);
-    if (!provider) throw("Provider is null");
-    const [vaultPda, vaultPdaBump] = await anchor.web3.PublicKey.findProgramAddress(
-        [ Buffer.from(constants.VAULT_SEED) ],
-        program.programId
-    );
-    const userAccountPda = (await anchor.web3.PublicKey.findProgramAddress(
-        [
-            provider.wallet.publicKey.toBuffer(),
-            Buffer.from(constants.USER_ACCOUNT_SEED),
-        ],
-        program.programId
-    ))[0];
-    const ix = await program.methods.createUserAccount(
+): Promise<anchor.web3.Transaction> {
+
+    const [_provider, program, seedUtil] = await getAnchorConfigs(wallet);
+    const ix = await program.methods.createUserMetadata(
         username, 
-        new anchor.BN(constants.DEFAULT_USER_ACCOUNT_STARTING_EBUCKS_BALANCE)
-        // constants.DEFAULT_USER_ACCOUNT_STARTING_EBUCKS_BALANCE
-        )
+        new anchor.BN(constants.DEFAULT_USER_STARTING_EBUCKS_BALANCE)
+    )
         .accounts({
-            userAccount: userAccountPda,
-            vault: vaultPda,
+            userMetadata: await seedUtil.getUserMetadataPda(wallet.publicKey),
+            vault: seedUtil.vaultPda,
             systemProgram: anchor.web3.SystemProgram.programId,
         })
         .instruction();
-    let tx = new anchor.web3.Transaction().add(ix);
-    return [tx, provider];
+    return new anchor.web3.Transaction().add(ix);
 }
 
-export async function getUserAccount(
+
+/**
+ * Fetches a user's metadata account
+ * @param wallet 
+ * @returns UserMetadataObject
+ */
+export async function getUserMetadata(
     wallet: AnchorWallet,
-): Promise<UserAccountObject> {
-    const [provider, program] = getAnchorConfigs(wallet);
-    if (!provider) throw("Provider is null");
-    const userAccountPda = (await anchor.web3.PublicKey.findProgramAddress(
-        [
-            provider.wallet.publicKey.toBuffer(),
-            Buffer.from(constants.USER_ACCOUNT_SEED),
-        ],
-        program.programId
-    ))[0];
+): Promise<UserMetadataObject> {
+
+    const [provider, program, seedUtil] = await getAnchorConfigs(wallet);
     try {
-        const response = await program.account.userAccount.fetch(userAccountPda);
+        const response = await program.account.userMetadata.fetch(
+            await seedUtil.getUserMetadataPda(wallet.publicKey)
+        );
+        let eBucksBalance = response.ebucksBalance as anchor.BN;
+        let eBucksBalanceNumber = eBucksBalance.toNumber();
         return {
             pubkey: provider.wallet.publicKey as anchor.web3.PublicKey,
             username: response.username as string,
-            ebucksBalance: response.ebucksBalance as number,
+            ebucksBalance: eBucksBalanceNumber,
             tradeCount: response.tradeCount as number,
             cashedOut: response.cashedOut as boolean,
         };
     } catch (e) {
-        throw Error(`User account not found for ${wallet.publicKey}`);
+        throw Error(`User metadata not found for ${wallet.publicKey}`);
     }
 }
 
+
+/**
+ * Creates a user emoji account
+ * @param wallet 
+ * @param emojiSeed 
+ * @returns CreateUserEmoji Transaction
+ */
 export async function createUserEmojiTransaction(
     wallet: AnchorWallet,
     emojiSeed: string,
-): Promise<[anchor.web3.Transaction, anchor.AnchorProvider]> {
-    const [provider, program] = getAnchorConfigs(wallet);
-    if (!provider) throw("Provider is null");
-    const [vaultPda, vaultPdaBump] = await anchor.web3.PublicKey.findProgramAddress(
-        [ Buffer.from(constants.VAULT_SEED) ],
-        program.programId
-    );
-    const [storeEmojiPda, storeEmojiPdaBump] = await anchor.web3.PublicKey.findProgramAddress(
-        [
-            Buffer.from(constants.STORE_EMOJI_SEED),
-            Buffer.from(emojiSeed),
-        ],
-        program.programId
-    );
-    const userEmojiPda = (await anchor.web3.PublicKey.findProgramAddress(
-        [
-            provider.wallet.publicKey.toBuffer(),
-            Buffer.from(constants.USER_EMOJI_SEED),
-            Buffer.from(emojiSeed),
-        ],
-        program.programId
-    ))[0];
+): Promise<anchor.web3.Transaction> {
+
+    const [_provider, program, seedUtil] = await getAnchorConfigs(wallet);
     const ix = await program.methods.createUserEmoji(
-        storeEmojiPdaBump,
         emojiSeed, 
     )
         .accounts({
-            storeEmoji: storeEmojiPda,
-            userEmoji: userEmojiPda,
-            vault: vaultPda,
+            storeEmoji: await seedUtil.getStoreEmojiPda(emojiSeed),
+            userEmoji: await seedUtil.getUserEmojiPda(emojiSeed, wallet.publicKey),
+            vault: seedUtil.vaultPda,
             systemProgram: anchor.web3.SystemProgram.programId,
         })
         .instruction();
-    let tx = new anchor.web3.Transaction().add(ix);
-    return [tx, provider];
+    return new anchor.web3.Transaction().add(ix);
 }
 
+
+/**
+ * Fetches a user emoji account
+ * @param wallet 
+ * @param emojiSeed 
+ * @returns UserEmojiObject
+ */
 export async function getUserEmoji(
     wallet: AnchorWallet,
     emojiSeed: string,
 ): Promise<UserEmojiObject> {
-    const [provider, program] = getAnchorConfigs(wallet);
-    if (!provider) throw("Provider is null");
-    const userEmojiPda = (await anchor.web3.PublicKey.findProgramAddress(
-        [
-            provider.wallet.publicKey.toBuffer(),
-            Buffer.from(constants.USER_EMOJI_SEED),
-            Buffer.from(emojiSeed),
-        ],
-        program.programId
-    ))[0];
+
+    const [_provider, program, seedUtil] = await getAnchorConfigs(wallet);
     try {
-        const response = await program.account.userEmoji.fetch(userEmojiPda);
+        const response = await program.account.userEmoji.fetch(
+            await seedUtil.getUserEmojiPda(emojiSeed, wallet.publicKey)
+        );
         return {
             emojiName: response.emojiName as string,
             display: response.display as string,
@@ -307,16 +303,17 @@ export async function getUserEmoji(
     }
 }
 
+/**
+ * Loads all user emoji accounts
+ * @param wallet 
+ * @returns List of UserEmojiObject
+ */
 export async function loadUserStore(wallet: AnchorWallet): Promise<UserEmojiObject[]> {
+    
     let userStore: UserEmojiObject[] = [];
     for (var emoji of constants.EMOJIS_LIST) {
         try {
             const userEmojiAccount = await getUserEmoji(wallet, emoji.seed);
-            console.log(`Successfully loaded user emoji account for ${emoji.seed}`);
-            console.log(`emojiName: ${userEmojiAccount.emojiName as string}`);
-            console.log(`display: ${userEmojiAccount.display as string}`);
-            console.log(`balance: ${userEmojiAccount.balance as number}`);
-            console.log(`costAverage: ${userEmojiAccount.costAverage as number}`);
             userStore.push({
                 emojiName: userEmojiAccount.emojiName as string,
                 display: userEmojiAccount.display as string,
@@ -330,121 +327,101 @@ export async function loadUserStore(wallet: AnchorWallet): Promise<UserEmojiObje
     return userStore;
 }
 
+
+// TODO: Needs work
+/**
+ * Pays out USDC from the vault to a user
+ * @param wallet 
+ * @param recipientPubkey 
+ * @returns CashOutUser Transaction
+ */
 export async function cashOutUser(
     wallet: AnchorWallet,
     recipientPubkey: anchor.web3.PublicKey
-): Promise<[anchor.web3.Transaction, anchor.AnchorProvider]> {
-    const [provider, program] = getAnchorConfigs(wallet);
-    if (!provider) throw("Provider is null");
+): Promise<anchor.web3.Transaction> {
+
+    const [provider, program, seedUtil] = await getAnchorConfigs(wallet);
     const walletBalance = await provider.connection.getBalance(wallet.publicKey);
-    const txFee = 0 // Calculate the tx fee to send
+    const txFee = 0; // Calculate the tx fee to send
     const cashOutAmount = walletBalance - txFee;
-    const [userAccountPda, userAccountPdaBump] = await anchor.web3.PublicKey.findProgramAddress(
-        [
-            provider.wallet.publicKey.toBuffer(),
-            Buffer.from(constants.USER_ACCOUNT_SEED),
-        ],
-        program.programId
-    );
     const ix = await program.methods.cashOutUser(
-        userAccountPdaBump,
         cashOutAmount, 
     )
         .accounts({
-            userAccount: userAccountPda,
+            userMetadata: await seedUtil.getUserMetadataPda(wallet.publicKey),
             recipient: recipientPubkey,
             userWallet: wallet.publicKey,
             systemProgram: anchor.web3.SystemProgram.programId,
         })
         .instruction();
-    let tx = new anchor.web3.Transaction().add(ix);
-    return [tx, provider];
+    return new anchor.web3.Transaction().add(ix);
 }
 
+
+/**
+ * Place an order to buy or sell an emoji from the exchange
+ * @param wallet 
+ * @param emojiSeed 
+ * @param orderType 
+ * @param quantity 
+ * @returns PlaceOrder Transaction
+ */
 export async function placeOrder(
     wallet: AnchorWallet,
     emojiSeed: string, 
     orderType: OrderType,
     quantity: number,
-): Promise<[anchor.web3.Transaction, anchor.AnchorProvider]> {
-    const [provider, program] = getAnchorConfigs(wallet);
-    if (!provider) throw("Provider is null");
-    let tx: anchor.web3.Transaction;
-    try {
-        await getUserEmoji(provider.wallet, emojiSeed);
-        tx = new anchor.web3.Transaction();
-    } catch (_) {
-        tx = (await createUserEmojiTransaction(provider.wallet, emojiSeed))[0];
-    };
-    const [userAccountPda, userAccountBump] = await anchor.web3.PublicKey.findProgramAddress(
-        [
-            provider.wallet.publicKey.toBuffer(),
-            Buffer.from(constants.USER_ACCOUNT_SEED),
-        ],
-        program.programId
-    );
-    const [userEmojiPda, userEmojiPdaBump] = await anchor.web3.PublicKey.findProgramAddress(
-        [
-            provider.wallet.publicKey.toBuffer(),
-            Buffer.from(constants.USER_EMOJI_SEED),
-            Buffer.from(emojiSeed),
-        ],
-        program.programId
-    );
-    const [storeEmojiPda, storeEmojiPdaBump] = await anchor.web3.PublicKey.findProgramAddress(
-        [
-            Buffer.from(constants.STORE_EMOJI_SEED),
-            Buffer.from(emojiSeed),
-        ],
-        program.programId
-    );
-    const [vaultPda, vaultPdaBump] = await anchor.web3.PublicKey.findProgramAddress(
-        [ Buffer.from(constants.VAULT_SEED) ],
-        program.programId
-    );
+): Promise<anchor.web3.Transaction> {
+
+    const [provider, program, seedUtil] = await getAnchorConfigs(wallet);
+    console.log(`Store Emoji: ${await seedUtil.getStoreEmojiPda(emojiSeed)}`);
+    console.log(`User Emoji: ${await seedUtil.getUserEmojiPda(emojiSeed, wallet.publicKey)}`);
+    console.log(`User Metadata: ${await seedUtil.getUserMetadataPda(wallet.publicKey)}`);
+    console.log(`Vault: ${seedUtil.vaultPda}`);
     const ix = await program.methods.placeOrder(
-        userAccountBump,
-        userEmojiPdaBump,
-        storeEmojiPdaBump,
-        vaultPdaBump,
         emojiSeed, 
         convertOrderTypeToAnchorPayload(orderType), 
         quantity
     )
         .accounts({
-            userAccount: userAccountPda,
-            userEmoji: userEmojiPda,
-            storeEmoji: storeEmojiPda,
-            vault: vaultPda,
-            userWallet: provider.wallet.publicKey,
-            systemProgram: anchor.web3.SystemProgram.programId,
+            userMetadata: await seedUtil.getUserMetadataPda(wallet.publicKey),
+            userEmoji: await seedUtil.getUserEmojiPda(emojiSeed, wallet.publicKey),
+            storeEmoji: await seedUtil.getStoreEmojiPda(emojiSeed),
+            vault: seedUtil.vaultPda,
+            authority: provider.wallet.publicKey,
         })
         .instruction();
-    tx.add(ix);
-    return [tx, provider];
+    return new anchor.web3.Transaction().add(ix);
 }
 
+
+/**
+ * Reset the simulation by closing all accounts
+ * @param masterWallet 
+ * @returns ResetSimulation Transaction
+ */
 export async function reset(
-    storeWallet: AnchorWallet
-): Promise<[anchor.web3.Transaction, anchor.AnchorProvider]> {
-    const [provider, program] = getAnchorConfigs(storeWallet);
+    masterWallet: AnchorWallet
+): Promise<anchor.web3.Transaction> {
+
+    const [_provider, program, _seedUtil] = await getAnchorConfigs(masterWallet);
     let tx = new anchor.web3.Transaction();
     // Close all user emojis
     for (var userEmoji of (await program.account.userEmoji.all())) {
         tx.add((await program.methods.closeUserEmoji()
             .accounts({
                 userEmoji: userEmoji.publicKey,
-                storeWallet: storeWallet.publicKey,
+                masterWallet: masterWallet.publicKey,
                 systemProgram: anchor.web3.SystemProgram.programId,
             })
             .instruction()));
     };
     // Close all user accounts
-    for (var userAccount of (await program.account.userAccount.all())) {
-        tx.add((await program.methods.closeUserAccount()
+    for (var userMetadata of (await program.account.userMetadata.all())) {
+        tx.add((await program.methods.closeUserMetadata()
             .accounts({
-                userAccount: userAccount.publicKey,
-                storeWallet: storeWallet.publicKey,
+                userMetadata: userMetadata.publicKey,
+                masterWallet: masterWallet.publicKey,
                 systemProgram: anchor.web3.SystemProgram.programId,
             })
             .instruction()));
@@ -454,7 +431,7 @@ export async function reset(
         tx.add((await program.methods.closeStoreEmoji()
             .accounts({
                 storeEmoji: storeEmoji.publicKey,
-                storeWallet: storeWallet.publicKey,
+                masterWallet: masterWallet.publicKey,
                 systemProgram: anchor.web3.SystemProgram.programId,
             })
             .instruction()));
@@ -464,10 +441,10 @@ export async function reset(
         tx.add((await program.methods.closeVault()
             .accounts({
                 vault: vault.publicKey,
-                storeWallet: storeWallet.publicKey,
+                masterWallet: masterWallet.publicKey,
                 systemProgram: anchor.web3.SystemProgram.programId,
             })
             .instruction()));
     };
-    return [tx, provider];
+    return tx;
 }

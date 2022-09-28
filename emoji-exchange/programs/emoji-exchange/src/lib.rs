@@ -1,11 +1,12 @@
 use anchor_lang::prelude::*;
 
 pub mod instructions;
+pub mod state;
 
 use instructions::*;
 
 
-declare_id!("CrMdx78x6xJCpCkBkQ5Fdqyd99HBynYGK5t9AezgNbCN");
+declare_id!("FWes5JocvyKdE8DbY8BmvVc1j1qPo9jXKXWBgAvevunm");
 
 
 #[program]
@@ -23,13 +24,11 @@ pub mod emoji_exchange {
 
     pub fn fund_vault(
         ctx: Context<FundVault>,
-        vault_bump: u8,
         lamports: u64,
     ) -> Result<()> {
 
         vault::fund_vault(
             ctx, 
-            vault_bump, 
             lamports
         )
     }
@@ -62,14 +61,12 @@ pub mod emoji_exchange {
 
     pub fn update_store_emoji_price(
         ctx: Context<UpdateStoreEmojiPrice>,
-        store_emoji_bump: u8,
         emoji_seed: String,
         new_price: u64,
     ) -> Result<()> {
         
         store::update_store_emoji_price(
             ctx, 
-            store_emoji_bump, 
             emoji_seed, 
             new_price
         )
@@ -84,37 +81,35 @@ pub mod emoji_exchange {
         )
     }
 
-    pub fn create_user_account(
-        ctx: Context<CreateUserAccount>,
+    pub fn create_user_metadata(
+        ctx: Context<CreateUserMetadata>,
         username: String,
         initial_ebucks: u64,
     ) -> Result<()> {
         
-        user::create_user_account(
+        user::create_user_metadata(
             ctx, 
             username,
             initial_ebucks,
         )
     }
 
-    pub fn close_user_account(
-        ctx: Context<CloseUserAccount>,
+    pub fn close_user_metadata(
+        ctx: Context<CloseUserMetadata>,
     ) -> Result<()> {
         
-        user::close_user_account(
+        user::close_user_metadata(
             ctx, 
         )
     }
 
     pub fn create_user_emoji(
         ctx: Context<CreateUserEmoji>,
-        store_emoji_bump: u8,
         emoji_seed: String,
     ) -> Result<()> {
         
         user::create_user_emoji(
             ctx, 
-            store_emoji_bump,
             emoji_seed
         )
     }
@@ -130,10 +125,6 @@ pub mod emoji_exchange {
 
     pub fn place_order(
         ctx: Context<PlaceOrder>,
-        user_account_bump: u8,
-        user_emoji_bump: u8,
-        store_emoji_bump: u8,
-        vault_bump: u8,
         emoji_seed: String,
         order_type: OrderType, 
         quantity: u8,
@@ -141,10 +132,6 @@ pub mod emoji_exchange {
         
         order::place_order(
             ctx,
-            user_account_bump,
-            user_emoji_bump,
-            store_emoji_bump,
-            vault_bump,
             emoji_seed,
             order_type,
             quantity,

@@ -31,7 +31,7 @@ describe("emoji-exchange", async () => {
     } SOL`);
     await anchor.web3.sendAndConfirmTransaction(
       connection,
-      (await util.reset(storeWallet))[0],
+      await util.reset(storeWallet),
       [storeWallet.payer]
     );
     console.log("Reset complete.");
@@ -41,17 +41,17 @@ describe("emoji-exchange", async () => {
   });
 
   it("Initialize vault", async () => {
-      await anchor.web3.sendAndConfirmTransaction(
-        connection,
-        (await util.initializeVault(storeWallet))[0],
-        [storeWallet.payer]
-      );
+    await anchor.web3.sendAndConfirmTransaction(
+      connection,
+      await util.initializeVault(storeWallet),
+      [storeWallet.payer]
+    );
   });
 
   it("Fund vault", async () => {
     await anchor.web3.sendAndConfirmTransaction(
       connection,
-      (await util.fundVault(storeWallet, constants.VAULT_INIT_FUND_AMOUNT))[0],
+      await util.fundVault(storeWallet, constants.VAULT_INIT_FUND_AMOUNT),
       [storeWallet.payer]
     );
     await printVaultBalance();
@@ -61,7 +61,7 @@ describe("emoji-exchange", async () => {
     for (var emoji of constants.EMOJIS_LIST) {
       await anchor.web3.sendAndConfirmTransaction(
         connection, 
-        (await util.createStoreEmojiTransaction(storeWallet, emoji.seed, emoji.display))[0],
+        await util.createStoreEmojiTransaction(storeWallet, emoji.seed, emoji.display),
         [storeWallet.payer]
       );
     }
@@ -71,7 +71,7 @@ describe("emoji-exchange", async () => {
   it("Update the price of an emoji", async () => {
     await anchor.web3.sendAndConfirmTransaction(
       connection,
-      (await util.updateStoreEmojiPriceTransaction(storeWallet, constants.EMOJIS_LIST[0].seed, 20))[0],
+      await util.updateStoreEmojiPriceTransaction(storeWallet, constants.EMOJIS_LIST[0].seed, 20),
       [storeWallet.payer]
     );
     await printStoreBalances();
@@ -79,64 +79,64 @@ describe("emoji-exchange", async () => {
   it("Update the price of another emoji", async () => {
     await anchor.web3.sendAndConfirmTransaction(
       connection,
-      (await util.updateStoreEmojiPriceTransaction(storeWallet, constants.EMOJIS_LIST[1].seed, 30))[0],
+      await util.updateStoreEmojiPriceTransaction(storeWallet, constants.EMOJIS_LIST[1].seed, 30),
       [storeWallet.payer]
     );
     await printStoreBalances();
   })
 
-  it("Initalize user #1 account", async () => {
+  it("Initalize user #1 metadata", async () => {
     userWallet1 = await primeNewWallet("Test Wallet #1");
     await anchor.web3.sendAndConfirmTransaction(
       connection,
-      (await util.createUserAccountTransaction(userWallet1, "test_user_1"))[0],
+      await util.createUserMetadataTransaction(userWallet1, "test_user_1"),
       [userWallet1.payer]
     );
-    await printAccount(userWallet1);
+    await printMetadata(userWallet1);
   });
 
   it("User #1 buy some emojis", async () => {
     await anchor.web3.sendAndConfirmTransaction(
       connection,
-      (await util.placeOrder(userWallet1, constants.EMOJIS_LIST[4].seed, OrderType.BUY, 6))[0],
+      await util.placeOrder(userWallet1, constants.EMOJIS_LIST[4].seed, OrderType.BUY, 6),
       [userWallet1.payer]
     );
     await printStoreBalances();
     await printUserBalances(userWallet1);
     await printVaultBalance();
-    await printAccount(userWallet1);
+    await printMetadata(userWallet1);
   });
   it("User #1 buy a few more of the same emoji", async () => {
     await anchor.web3.sendAndConfirmTransaction(
       connection,
-      (await util.placeOrder(userWallet1, constants.EMOJIS_LIST[4].seed, OrderType.BUY, 3))[0],
+      await util.placeOrder(userWallet1, constants.EMOJIS_LIST[4].seed, OrderType.BUY, 3),
       [userWallet1.payer]
     );
     await printStoreBalances();
     await printUserBalances(userWallet1);
     await printVaultBalance();
-    await printAccount(userWallet1);
+    await printMetadata(userWallet1);
   });
   it("User #1 sell some of that same emoji", async () => {
     await anchor.web3.sendAndConfirmTransaction(
       connection,
-      (await util.placeOrder(userWallet1, constants.EMOJIS_LIST[4].seed, OrderType.SELL, 3))[0],
+      await util.placeOrder(userWallet1, constants.EMOJIS_LIST[4].seed, OrderType.SELL, 3),
       [userWallet1.payer]
     );
     await printStoreBalances();
     await printUserBalances(userWallet1);
     await printVaultBalance();
-    await printAccount(userWallet1);
+    await printMetadata(userWallet1);
   });
 
-  it("Initalize user #2 account", async () => {
+  it("Initalize user #2 metadata", async () => {
     userWallet2 = await primeNewWallet("Test Wallet #2");
     await anchor.web3.sendAndConfirmTransaction(
       connection,
-      (await util.createUserAccountTransaction(userWallet2, "test_user_2"))[0],
+      await util.createUserMetadataTransaction(userWallet2, "test_user_2"),
       [userWallet2.payer]
     );
-    await printAccount(userWallet2);
+    await printMetadata(userWallet2);
   });
 
   it("User #2 try to buy too many emojis", async () => {
@@ -144,7 +144,7 @@ describe("emoji-exchange", async () => {
     try {
       await anchor.web3.sendAndConfirmTransaction(
         connection,
-        (await util.placeOrder(userWallet2, constants.EMOJIS_LIST[4].seed, OrderType.BUY, 100))[0],
+        await util.placeOrder(userWallet2, constants.EMOJIS_LIST[4].seed, OrderType.BUY, 100),
         [userWallet2.payer]
       );
       orderNotPlaced = false;
@@ -155,25 +155,25 @@ describe("emoji-exchange", async () => {
     assert(orderNotPlaced, `Loaded sell order failed to be blocked.`);
     await printStoreBalances();
     await printUserBalances(userWallet2);
-    await printAccount(userWallet2);
+    await printMetadata(userWallet2);
   });
   it("User #2 buy some emojis", async () => {
     await anchor.web3.sendAndConfirmTransaction(
       connection,
-      (await util.placeOrder(userWallet2, constants.EMOJIS_LIST[6].seed, OrderType.BUY, 5))[0],
+      await util.placeOrder(userWallet2, constants.EMOJIS_LIST[6].seed, OrderType.BUY, 5),
       [userWallet2.payer]
     );
     await printStoreBalances();
     await printUserBalances(userWallet2);
     await printVaultBalance();
-    await printAccount(userWallet2);
+    await printMetadata(userWallet2);
   });
   it("User #2 try to sell too many emojis", async () => {
     let orderNotPlaced: boolean = true;
     try {
       await anchor.web3.sendAndConfirmTransaction(
         connection,
-        (await util.placeOrder(userWallet2, constants.EMOJIS_LIST[6].seed, OrderType.SELL, 100))[0],
+        await util.placeOrder(userWallet2, constants.EMOJIS_LIST[6].seed, OrderType.SELL, 100),
         [userWallet2.payer]
       );
       orderNotPlaced = false;
@@ -184,18 +184,18 @@ describe("emoji-exchange", async () => {
     await printStoreBalances();
     await printUserBalances(userWallet2);
     await printVaultBalance();
-    await printAccount(userWallet2);
+    await printMetadata(userWallet2);
   });
   it("User #2 sell some emojis", async () => {
     await anchor.web3.sendAndConfirmTransaction(
       connection,
-      (await util.placeOrder(userWallet2, constants.EMOJIS_LIST[6].seed, OrderType.SELL, 2))[0],
+      await util.placeOrder(userWallet2, constants.EMOJIS_LIST[6].seed, OrderType.SELL, 2),
       [userWallet2.payer]
     );
     await printStoreBalances();
     await printUserBalances(userWallet2);
     await printVaultBalance();
-    await printAccount(userWallet2);
+    await printMetadata(userWallet2);
   });
 
 
@@ -226,8 +226,8 @@ describe("emoji-exchange", async () => {
     };
   }
 
-  async function printAccount(userWallet: anchor.Wallet) {
-    const account = await util.getUserAccount(userWallet);
+  async function printMetadata(userWallet: anchor.Wallet) {
+    const account = await util.getUserMetadata(userWallet);
     console.log("-------------------------------------------------------------------------------");
     console.log(`Username: ${account.username}`);
     console.log(`Trade Count: ${account.tradeCount}`);

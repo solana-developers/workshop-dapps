@@ -1,14 +1,16 @@
 [features]
 seeds = false
-[programs.devnet]
-emoji_exchange = "CrMdx78x6xJCpCkBkQ5Fdqyd99HBynYGK5t9AezgNbCN"
+[programs.localnet]
+emoji_exchange = "FWes5JocvyKdE8DbY8BmvVc1j1qPo9jXKXWBgAvevunm"
+voting_program = "5Jx5Y1cimfoAceEKLKtTwwmBqJs8HHSZg9uck88NyW5J"
 
 [registry]
 url = "https://anchor.projectserum.com"
 
 [provider]
-cluster = "devnet"
+cluster = "localnet"
 wallet = "~/.config/solana/id.json"
 
 [scripts]
-test = "cp ./target/idl/emoji_exchange.json ./app/src/utils/idl.json && yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/emoji-exchange.ts"
+test-emoji-exchange = "cp ./target/idl/emoji_exchange.json ./app/src/utils/idl.json && yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/emoji-exchange.ts"
+test-voting-program = "cp ./target/idl/voting_program.json ./app/src/utils/idl.json && yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/voting-program.ts"

@@ -4,19 +4,17 @@ import * as anchor from "@project-serum/anchor";
 import useUserSOLBalanceStore from '../stores/useUserSOLBalanceStore';
 import useStoreEmojiStore from 'stores/StoreEmojiStore';
 import useUserEmojiStore from 'stores/UserEmojiStore';
-import useUserAccountStore from 'stores/UserAccountStore';
+import useUserMetadataStore from 'stores/UserMetadataStore';
 import { StoreOrder } from './StoreOrder';
 import { UserOrder } from './UserOrder';
 import * as util from '../utils/util';
-import { DEFAULT_USER_ACCOUNT_STARTING_EBUCKS_BALANCE, MIN_TRADE_COUNT_FOR_CASHOUT } from '../utils/const';
+import { DEFAULT_USER_STARTING_EBUCKS_BALANCE, MIN_TRADE_COUNT_FOR_CASHOUT } from '../utils/const';
 
 export const EmojiExchange: FC = () => {
 
+  const { connection } = useConnection();
   const { publicKey, sendTransaction } = useWallet();
   const wallet = useAnchorWallet();
-  const { connection } = useConnection();
-
-  const [ init, setInit ] = useState<boolean>(false);
 
   const balance = useUserSOLBalanceStore((s) => s.balance)
   const { getUserSOLBalance } = useUserSOLBalanceStore()
@@ -24,56 +22,44 @@ export const EmojiExchange: FC = () => {
   const [ username, setUsername ] = useState<string>('');
   const [ recipientPubkey, setRecipientPubkey ] = useState<anchor.web3.PublicKey>();
   const [ exportEligible, setExportEligible ] = useState<boolean>(false);
-  const userAccount = useUserAccountStore((s) => s.userAccount);
-  const { getUserAccount } = useUserAccountStore();
-  const storeEmojis = useStoreEmojiStore((s) => s.storeEmojis);
-  const { getAllStoreEmojis } = useStoreEmojiStore();
-  const userEmojis = useUserEmojiStore((s) => s.userEmojis);
-  const { getAllUserEmojis } = useUserEmojiStore();
+
+  const { userMetadata, getUserMetadata } = useUserMetadataStore();
+  const { storeEmojis, getAllStoreEmojis } = useStoreEmojiStore();
+  const { userEmojis, getAllUserEmojis } = useUserEmojiStore();
+
 
   const onClickInit = useCallback(async () => {
-    const [tx, provider] = await util.createUserAccountTransaction(wallet, username);
-    const sx = await sendTransaction(tx, provider.connection);
-    await provider.connection.confirmTransaction(sx);
-    getUserAccount(wallet);
+    const tx = await util.createUserMetadataTransaction(wallet, username);
+    const sx = await sendTransaction(tx, connection);
+    await connection.confirmTransaction(sx);
+    getUserMetadata(wallet);
   }, [username, wallet]);
 
   const onClickCashOut = useCallback(async () => {
-    const [tx, provider] = await util.cashOutUser(wallet, recipientPubkey);
-    const sx = await sendTransaction(tx, provider.connection);
-    await provider.connection.confirmTransaction(sx);
-    getUserAccount(wallet);
-  }, [wallet, getUserAccount]);
+    const tx = await util.cashOutUser(wallet, recipientPubkey);
+    const sx = await sendTransaction(tx, connection);
+    await connection.confirmTransaction(sx);
+    getUserMetadata(wallet);
+  }, [wallet, getUserMetadata]);
+
+
+  // TODO: Need to make this pull the store every so often
+  useEffect(() => {
+    setInterval(() => getAllStoreEmojis(wallet), 5000);
+  }, [wallet, getAllStoreEmojis]);
 
   useEffect(() => {
-    var interval = 5000;
-    if (!init) {
-      interval = 1500;
-    };
-    const loadPriceData = setInterval(() => {
-      getAllStoreEmojis(wallet);
-      getAllUserEmojis(wallet);
-    }, interval);
-    return () => {
-      clearInterval(loadPriceData);
-    };
-  }, [wallet, init, getAllStoreEmojis, getAllUserEmojis]);
+    getAllUserEmojis(wallet);
+  }, [wallet, getAllUserEmojis]);
 
   useEffect(() => {
-    var interval = 1500;
-    const loadUserAccount = setInterval(() => {
-      if (userAccount) {
-        console.log(`Trade Count: ${userAccount.tradeCount}`);
-        if (userAccount.tradeCount >= MIN_TRADE_COUNT_FOR_CASHOUT) setExportEligible(true);
-      } else {
-        getUserAccount(wallet);
-      };
-      setInit(true);
-    }, interval);
-    return () => {
-      clearInterval(loadUserAccount);
+    if (userMetadata) {
+      console.log(`Trade Count: ${userMetadata.tradeCount}`);
+      if (userMetadata.tradeCount >= MIN_TRADE_COUNT_FOR_CASHOUT) setExportEligible(true);
+    } else {
+      getUserMetadata(wallet);
     };
-  }, [wallet, init, getUserAccount]);
+  }, [wallet, getUserMetadata]);
 
   useEffect(() => {
     if (publicKey) {
@@ -81,6 +67,7 @@ export const EmojiExchange: FC = () => {
       getUserSOLBalance(publicKey, connection)
     }
 }, [publicKey, connection, getUserSOLBalance])
+
 
   return (
     <div>
@@ -94,20 +81,22 @@ export const EmojiExchange: FC = () => {
               </div>
             </div>
             }
-            {userAccount &&
+            {userMetadata &&
             <div>
               <div className="mx-auto mb-4 p-2 w-64 text-center border-2 rounded-lg border-[#6e6e6e]">
                 <div>
-                  <span>eBucks Balance: {userAccount.ebucksBalance || 0}</span>
+                  <span className="text-[#f0f00a]">eBucks Balance:</span>
+                  <span>{userMetadata.ebucksBalance || 0}</span>
                 </div>
                 <div>
-                  <span className="text-[#f0f00a]">eBucks Profit: </span><span>{userAccount.ebucksBalance - DEFAULT_USER_ACCOUNT_STARTING_EBUCKS_BALANCE || 0}</span>
+                  <span className="text-[#f0f00a]">eBucks Profit: </span>
+                  <span>{userMetadata.ebucksBalance - DEFAULT_USER_STARTING_EBUCKS_BALANCE || 0}</span>
                 </div>
               </div>
             </div>
             }
           </div>
-          {exportEligible && !userAccount.cashedOut &&
+          {exportEligible && !userMetadata.cashedOut &&
             <div className="mx-auto mb-4 p-6 text-center">
               <p>Congratulations!</p>
               <p>You can now cash out your SOL balance!</p>
@@ -125,13 +114,13 @@ export const EmojiExchange: FC = () => {
               </button>
             </div>
           }
-          {userAccount ? 
+          {userMetadata ? 
             <div>
-              { userAccount.cashedOut ?
+              { userMetadata.cashedOut ?
                 <div className="mx-auto mb-4 ml-2 p-6 border-2 rounded-lg border-[#d4005c] text-center">
                   <p>Looks like you've already cashed out.</p>
                   <p>Thanks for playing!</p>
-              </div>
+                </div>
                 :
                 <div className="flex flex-row max-w-full">
                   <div className="ml-2 p-6 border-2 rounded-lg border-[#6e6e6e]">
@@ -142,12 +131,22 @@ export const EmojiExchange: FC = () => {
                     </div>
                     <div className="mt-2">
                       {storeEmojis.map((s, i) => { 
-                        return <StoreOrder key={i} getAllStoreEmojis={getAllStoreEmojis} getAllUserEmojis={getAllUserEmojis} emojiName={s.emojiName} display={s.display} price={s.price} balance={s.balance} />
+                        return <StoreOrder 
+                          key={i} 
+                          getAllStoreEmojis={getAllStoreEmojis} 
+                          getAllUserEmojis={getAllUserEmojis} 
+                          getUserMetadata={getUserMetadata}
+                          emojiName={s.emojiName} 
+                          display={s.display} 
+                          price={s.price} 
+                          balance={s.balance} />
                       })}
                     </div>
                   </div>
                   <div className="ml-2 p-6 border-2 rounded-lg border-[#6e6e6e]">
-                    <span className="mb-2 text-left text-2xl">Emojis owned by <span className="text-[#00d466]">{userAccount.username}</span>:</span>
+                    <span className="mb-2 text-left text-2xl">
+                      Emojis owned by <span className="text-[#00d466]">{userMetadata.username}</span>:
+                    </span>
                     <div className="mt-4">
                       <span className="ml-8">Qty</span>
                       <span className="ml-8">Cost Avg</span>
@@ -155,7 +154,15 @@ export const EmojiExchange: FC = () => {
                     <div className="mt-4">
                       {userEmojis.map((u, i) => { 
                         if (u.balance > 0) {
-                          return <UserOrder key={i} getAllStoreEmojis={getAllStoreEmojis} getAllUserEmojis={getAllUserEmojis} emojiName={u.emojiName} display={u.display} balance={u.balance} costAverage={u.costAverage} />
+                          return <UserOrder 
+                            key={i} 
+                            getAllStoreEmojis={getAllStoreEmojis} 
+                            getAllUserEmojis={getAllUserEmojis} 
+                            getUserMetadata={getUserMetadata}
+                            emojiName={u.emojiName} 
+                            display={u.display} 
+                            balance={u.balance} 
+                            costAverage={u.costAverage} />
                         };
                       })}
                     </div>
