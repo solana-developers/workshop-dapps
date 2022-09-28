@@ -4,9 +4,10 @@
   "license": "MIT",
   "private": false,
   "scripts": {
-    "dev": "cp ../target/idl/emoji_exchange.json ./src/utils/idl.json && next dev",
-    "build": "cp ../target/idl/emoji_exchange.json ./src/utils/idl.json && next build",
-    "start": "cp ../target/idl/emoji_exchange.json ./src/utils/idl.json && next start",
+    "local-dev": "cp ../target/idl/emoji_exchange.json ./src/utils/idl.json && next dev",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
