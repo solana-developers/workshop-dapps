@@ -23,7 +23,7 @@ const WalletContextProvider: FC<{ children: ReactNode }> = ({ children }) => {
     // const network = networkConfiguration as WalletAdapterNetwork;
     const endpoint = NETWORK;
 
-    console.log(endpoint);
+    // console.log(endpoint);
 
     const wallets = useMemo(
         () => [

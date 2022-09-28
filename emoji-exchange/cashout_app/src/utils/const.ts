@@ -1,8 +1,9 @@
 import * as anchor from "@project-serum/anchor";
 
 
-export const NETWORK = "https://api.devnet.solana.com/";
+// export const NETWORK = "https://api.devnet.solana.com/";
 // export const NETWORK = "http://localhost:8899";
+export const NETWORK = process.env.RPC_ENDPOINT;
 export const PREFLIGHT_COMMITMENT = "confirmed";
 
 export const VAULT_SEED_PREFIX = "vault";
