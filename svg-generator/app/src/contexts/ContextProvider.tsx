@@ -4,17 +4,26 @@ import { WalletModalProvider as ReactUIWalletModalProvider } from '@solana/walle
 import {
     PhantomWalletAdapter,
     SolflareWalletAdapter,
+    SolletExtensionWalletAdapter,
+    SolletWalletAdapter,
     TorusWalletAdapter,
+    // LedgerWalletAdapter,
+    // SlopeWalletAdapter,
 } from '@solana/wallet-adapter-wallets';
+import { Cluster, clusterApiUrl } from '@solana/web3.js';
 import { FC, ReactNode, useCallback, useMemo } from 'react';
 import { AutoConnectProvider, useAutoConnect } from './AutoConnectProvider';
 import { notify } from "../utils/notifications";
+import { NetworkConfigurationProvider, useNetworkConfiguration } from './NetworkConfigurationProvider';
 import { NETWORK } from 'utils/const';
 
 const WalletContextProvider: FC<{ children: ReactNode }> = ({ children }) => {
-    
     const { autoConnect } = useAutoConnect();
+    // const { networkConfiguration } = useNetworkConfiguration();
+    // const network = networkConfiguration as WalletAdapterNetwork;
     const endpoint = NETWORK;
+
+    // console.log(endpoint);
 
     const wallets = useMemo(
         () => [
@@ -45,8 +54,12 @@ const WalletContextProvider: FC<{ children: ReactNode }> = ({ children }) => {
 
 export const ContextProvider: FC<{ children: ReactNode }> = ({ children }) => {
     return (
-        <AutoConnectProvider>
-            <WalletContextProvider>{children}</WalletContextProvider>
-        </AutoConnectProvider>
+        <>
+            <NetworkConfigurationProvider>
+                <AutoConnectProvider>
+                    <WalletContextProvider>{children}</WalletContextProvider>
+                </AutoConnectProvider>
+            </NetworkConfigurationProvider>
+        </>
     );
 };
