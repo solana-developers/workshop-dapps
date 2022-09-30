@@ -5,18 +5,19 @@ import {
     Transaction, 
     TransactionInstruction 
 } from '@solana/web3.js';
-import { getRandomNumberData, SvgData } from './util';
+import { getRandomNumberData, SvgData } from '../app/src/utils/util';
 
 
 const connection = new Connection(
-    "https://api.devnet.solana.com",
+    // "https://api.devnet.solana.com",
+    "http://localhost:8899",
     "confirmed",
 );
 const payer = createKeypairFromFile(
     require('os').homedir() + '/.config/solana/id.json'
 );
 const program = createKeypairFromFile(
-    './svg_generator/target/deploy/svg_generator-keypair.json'
+    './target/deploy/svg_generator-keypair.json'
 );
 
 
@@ -52,7 +53,7 @@ async function printSvg(svgAccount: Keypair): Promise<void> {
     const accountInfo = await connection.getAccountInfo(
         svgAccount.publicKey,
     );
-    console.log(SvgData.fromBuffer(accountInfo?.data))
+    if (accountInfo) console.log(SvgData.fromBuffer(accountInfo.data));
 }
 
 function createKeypairFromFile(path: string): Keypair {

@@ -10,16 +10,12 @@ use solana_program::{
     sysvar::Sysvar,
 };
 
-use crate::constants::{
-    svg_string_one,
-    colors,
-    first_words,
-    second_words,
-    third_words,
-    svg_string_two,
+use crate::svg::{
+    build_random_svg_data,
+    RandomNumbers,
 };
 
-mod constants;
+mod svg;
 
 
 entrypoint!(svg_generator);
@@ -39,17 +35,8 @@ fn svg_generator(
     let svg_account = next_account_info(accounts_iter)?;
     let payer = next_account_info(accounts_iter)?;
 
-    // Indexing of said arrays using rand numbers
-    let color = colors.get(random_numbers.random_1 as usize).expect("Index out of range.");
-    let first_word = first_words.get(random_numbers.random_2 as usize).expect("Index out of range.");
-    let second_word = second_words.get(random_numbers.random_3 as usize).expect("Index out of range.");
-    let third_word = third_words.get(random_numbers.random_4 as usize).expect("Index out of range.");
-
-    // Generation of svg
-    let final_svg_string = String::from(svg_string_one) + color + svg_string_two + first_word + second_word + third_word + "</text></svg>";
-    let svg_data = SvgData { 
-        image: final_svg_string, 
-    };
+    // Create the random svg string data
+    let svg_data = build_random_svg_data(random_numbers);
 
     // Determine the size of the account
     let account_span = (svg_data.try_to_vec()?).len();
@@ -73,17 +60,4 @@ fn svg_generator(
     )?;
 
     Ok(())
-}
-
-#[derive(BorshDeserialize, BorshSerialize, Debug)]
-struct RandomNumbers {
-    random_1: u8,
-    random_2: u8,
-    random_3: u8,
-    random_4: u8,
-}
-
-#[derive(BorshDeserialize, BorshSerialize, Debug)]
-struct SvgData {
-    image: String,
 }

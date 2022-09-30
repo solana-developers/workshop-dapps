@@ -76,6 +76,7 @@ export function getRandomNumberData(): Buffer {
 
 function generateRandomNumber(): number {
     const min = 0;
-    const max = 4;
-    return Math.random() * (max - min) + min;
+    const max = 5;
+    const num = Math.floor(Math.random() * (max - min + 1) + min);
+    return num;
 };
