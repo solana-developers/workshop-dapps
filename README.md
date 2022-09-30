@@ -57,22 +57,22 @@ Your instructor may use one of the applications stored in this repository to con
 ## Resources for Learning Solana Development
 
 ### Web-based IDE
-[Solana Playground IDE](https://beta.solpg.io/)
+* [Solana Playground IDE](https://beta.solpg.io/)
 ### Wallets
-[Phantom Wallet](https://phantom.app/download)
-[Solflare Wallet](https://solflare.com/)
+* [Phantom Wallet](https://phantom.app/download)
+* [Solflare Wallet](https://solflare.com/)
 ### Local Toolkit Installation
-[NodeJS](https://nodejs.org/en/download/)
-[Rust](https://rustup.rs/)
-[Solana CLI](https://docs.solana.com/cli/install-solana-cli-tools)
-[Anchor](https://www.anchor-lang.com/)
-[Seahorse](https://seahorse-lang.org/)
+* [NodeJS](https://nodejs.org/en/download/)
+* [Rust](https://rustup.rs/)
+* [Solana CLI](https://docs.solana.com/cli/install-solana-cli-tools)
+* [Anchor](https://www.anchor-lang.com/)
+* [Seahorse](https://seahorse-lang.org/)
 ### dApp & Program Development
-[Spawn a Template Project Repo automatically!](https://www.npmjs.com/package/create-solana-dapp)
-[Solana Cookbook](https://solanacookbook.com)
-[Program Examples](https://github.com/solana-developers/program-examples)
-[Client Examples](https://github.com/solana-developers/web3-examples)
-[Solana Bytes YouTube Tutorials](https://www.youtube.com/playlist?list=PLilwLeBwGuK51Ji870apdb88dnBr1Xqhm)
-[Rust Solana YouTube Tutorials](https://www.youtube.com/playlist?list=PLUBKxx7QjtVnU3hkPc8GF1Jh4DE7cf4n1)
-[Full Solana Course](https://github.com/Unboxed-Software/solana-course)
-[Solana Core Docs](https://docs.solana.com/)
+* [Spawn a Template Project Repo automatically!](https://www.npmjs.com/package/create-solana-dapp)
+* [Solana Cookbook](https://solanacookbook.com)
+* [Program Examples](https://github.com/solana-developers/program-examples)
+* [Client Examples](https://github.com/solana-developers/web3-examples)
+* [Solana Bytes YouTube Tutorials](https://www.youtube.com/playlist?list=PLilwLeBwGuK51Ji870apdb88dnBr1Xqhm)
+* [Rust Solana YouTube Tutorials](https://www.youtube.com/playlist?list=PLUBKxx7QjtVnU3hkPc8GF1Jh4DE7cf4n1)
+* [Full Solana Course](https://github.com/Unboxed-Software/solana-course)
+* [Solana Core Docs](https://docs.solana.com/)
