@@ -1,34 +1,27 @@
-import { WalletAdapterNetwork, WalletError } from '@solana/wallet-adapter-base';
+import { WalletError } from '@solana/wallet-adapter-base';
 import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
 import { WalletModalProvider as ReactUIWalletModalProvider } from '@solana/wallet-adapter-react-ui';
 import {
     PhantomWalletAdapter,
     SolflareWalletAdapter,
-    SolletExtensionWalletAdapter,
-    SolletWalletAdapter,
     TorusWalletAdapter,
-    // LedgerWalletAdapter,
-    // SlopeWalletAdapter,
 } from '@solana/wallet-adapter-wallets';
-import { Cluster, clusterApiUrl } from '@solana/web3.js';
 import { FC, ReactNode, useCallback, useMemo } from 'react';
 import { AutoConnectProvider, useAutoConnect } from './AutoConnectProvider';
 import { notify } from "../utils/notifications";
-import { NetworkConfigurationProvider, useNetworkConfiguration } from './NetworkConfigurationProvider';
+import { NetworkConfigurationProvider } from './NetworkConfigurationProvider';
 import { NETWORK } from 'utils/const';
 
-const WalletContextProvider: FC<{ children: ReactNode }> = ({ children }) => {
-    const { autoConnect } = useAutoConnect();
-    // const { networkConfiguration } = useNetworkConfiguration();
-    // const network = networkConfiguration as WalletAdapterNetwork;
-    const endpoint = NETWORK;
 
-    // console.log(endpoint);
+const WalletContextProvider: FC<{ children: ReactNode }> = ({ children }) => {
+    
+    const { autoConnect } = useAutoConnect();
+    const endpoint = NETWORK;
 
     const wallets = useMemo(
         () => [
             new PhantomWalletAdapter(),
-            new SolflareWalletAdapter(),
+            // new SolflareWalletAdapter(),
             new TorusWalletAdapter(),
         ],
         []
