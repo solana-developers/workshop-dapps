@@ -11,8 +11,8 @@ use solana_program::{
 };
 
 use crate::svg::{
-    build_random_svg_data,
     RandomNumbers,
+    SvgData,
 };
 
 mod svg;
@@ -36,7 +36,7 @@ fn svg_generator(
     let payer = next_account_info(accounts_iter)?;
 
     // Create the random svg string data
-    let svg_data = build_random_svg_data(random_numbers);
+    let svg_data = SvgData::new_from_randoms(random_numbers);
 
     // Determine the size of the account
     let account_span = (svg_data.try_to_vec()?).len();

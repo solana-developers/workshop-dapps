@@ -9,8 +9,8 @@ import { getRandomNumberData, SvgData } from '../app/src/utils/util';
 
 
 const connection = new Connection(
-    // "https://api.devnet.solana.com",
-    "http://localhost:8899",
+    "https://api.devnet.solana.com",
+    // "http://localhost:8899",
     "confirmed",
 );
 const payer = createKeypairFromFile(

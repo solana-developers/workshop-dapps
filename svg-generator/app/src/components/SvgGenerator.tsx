@@ -11,6 +11,8 @@ export const SvgGenerator: FC = () => {
     const { connection } = useConnection();
     const { publicKey, sendTransaction } = useWallet();
 
+    const [ showUrlQrCodes, setShowUrlQrCodes ] = useState<boolean>(false);
+
     const [ 
         programIdString, 
         setProgramIdString 
@@ -62,16 +64,31 @@ export const SvgGenerator: FC = () => {
 
 
     return(
-        <div className='flex flex-col'>
-            <WorkshopLinks/>
-            <div className='flex flex-row rounded-md border-2 border-[#2b2b2b] px-8 py-4 mt-4 ml-8'>
+        <div className='flex flex-col w-full'>
+            { showUrlQrCodes ? 
+                <div>
+                    <button className="text-md text-black border-2 rounded-lg border-[#6e6e6e] px-6 py-2 ml-4 bg-[#58a5bf]" 
+                        onClick={() => setShowUrlQrCodes(false)}>
+                            <span>Hide URL QR Codes</span>
+                    </button>
+                    <WorkshopLinks/>
+                </div>
+                :
+                <div>
+                    <button className="text-md text-black border-2 rounded-lg border-[#6e6e6e] px-6 py-2 ml-4 bg-[#58a5bf]" 
+                        onClick={() => setShowUrlQrCodes(true)}>
+                            <span>Show URL QR Codes</span>
+                    </button>
+                </div>
+            }
+            <div className='rounded-md border-2 border-[#2b2b2b] px-8 py-4 mt-4'>
                 { publicKey ?
-                    <div>
-                        <div>
+                    <div className='flex flex-row p-0'>
+                        <div className='my-auto ml-auto mr-4'>
                             <div className='mt-4 text-xl'>
                                 <p>Enter your program's ID:</p>
                             </div>
-                            <div className='mt-4 text-2xl'>
+                            <div className='mt-4 text-lg'>
                                 <input className="w-72 h-12 text-black px-4 rounded-md" 
                                     type="text" 
                                     id="programIdString"
@@ -80,20 +97,17 @@ export const SvgGenerator: FC = () => {
                                     value={programIdString}
                                 />
                             </div>
-                            {/* <div className='mt-4 text-xl'>
-                                <p>Press the button below to generate a new SVG image!</p>
-                            </div> */}
                             <div className='mt-4 text-2xl'>
-                                <button className="text-lg text-black border-2 rounded-lg border-[#6e6e6e] px-6 py-2 ml-4 bg-[#68ccca]" 
+                                <button className="text-lg text-black border-2 rounded-lg border-[#6e6e6e] px-6 py-2 ml-4 bg-[#83eb34]" 
                                     onClick={() => onClickGenerateSvg()}>
                                         <span>Generate!</span>
                                 </button>
                             </div>
                         </div>
-                        <div>
+                        <div className='my-auto ml-4 mr-auto'>
                             { svgString != "" && 
                                 <div>
-                                    <SVG className='mt-4 max-w-xs h-auto' src={svgString} scale="50" />
+                                    <SVG src={svgString} />
                                 </div>
                             }
                         </div>

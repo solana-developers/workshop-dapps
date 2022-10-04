@@ -33,7 +33,7 @@ export const RequestAirdrop: FC = () => {
     return (
         <div>
             <button
-                className="px-8 m-2 btn bg-[#3f733d] hover:from-pink-500 hover:to-yellow-500 ..."
+                className="px-8 m-2 btn bg-[#83eb34] hover:from-pink-500 hover:to-yellow-500 text-[#000000] ..."
                 onClick={onClick}
             >
                 <span>Airdrop 1 </span>

@@ -10,7 +10,7 @@ interface QrCodeGenProps {
 const QrCodeGen: FC<QrCodeGenProps> = (props: QrCodeGenProps) => {
 
     return (
-        <div className="px-6 py-2 w-auto">
+        <div className="px-12 py-2 w-auto">
             <p 
                 className="text-xl text-center text-[#28b4fa] pb-2"
             >

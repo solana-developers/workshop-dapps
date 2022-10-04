@@ -65,11 +65,13 @@ export const AppBar: FC = props => {
 
         {/* Airdrop */}
         <div className="hidden md:inline md:navbar-center">
-          <div className="flex text-center">
-            <RequestAirdrop />
-          </div>
-          <div className="flex text-center">
-            {wallet && <p>SOL Balance: {(balance || 0).toLocaleString()}</p>}
+          <div className='flex flex-row'>
+            <div>
+              <RequestAirdrop />
+            </div>
+            <div className='my-auto'>
+              {wallet && <p>SOL Balance: {(balance || 0).toLocaleString()}</p>}
+            </div>
           </div>
         </div>
 

@@ -1,80 +1,6 @@
 use borsh::{ BorshDeserialize, BorshSerialize };
 
 
-pub const SVG_STRING_ONE: &str = "<svg \
-    xmlns='http://www.w3.org/2000/svg' \
-    preserveAspectRatio='xMinYMin meet' \
-    viewBox='0 0 350 350'><style>.base \
-    { fill: white; font-family: serif; \
-    font-size: 24px; }</style><rect \
-    width='100%' height='100%' fill='";
-
-pub const COLORS_LIST: [&str; 6] = [
-    "#f143f7", 
-    "#fcff33", 
-    "#00ffd0", 
-    "#07f702", 
-    "#ff2448", 
-    "#ff771c",
-];
-
-pub const FIRST_WORDS_LIST: [&str; 6] = [
-    "Pink", 
-    "Orange", 
-    "Yellow", 
-    "Scarlet", 
-    "Ivy", 
-    "Aqua",
-];
-
-pub const SECOND_WORDS_LIST: [&str; 6] = [
-    "Positive", 
-    "Majestic", 
-    "Empowered", 
-    "Heroic", 
-    "Fierce", 
-    "Tranquil",
-];
-
-pub const THIRD_WORDS_LIST: [&str; 6] = [
-    "Llama", 
-    "Sun", 
-    "Moon", 
-    "Cactus", 
-    "Tree", 
-    "Rainbow",
-];
-
-pub const SVG_STRING_TWO: &str = "' /><text x='50%' \
-    y='50%' class='base' dominant-baseline='middle' \
-    text-anchor='middle'>";
-
-// Builds a random SVG string from the above components
-pub fn build_random_svg_data(
-    random_numbers: RandomNumbers
-) -> SvgData {
-
-    // Indexing of word arrays using rand numbers
-    let color = COLORS_LIST.get(random_numbers.random_1 as usize)
-        .expect("Index out of range.");
-    let first_word = FIRST_WORDS_LIST.get(random_numbers.random_2 as usize)
-        .expect("Index out of range.");
-    let second_word = SECOND_WORDS_LIST.get(random_numbers.random_3 as usize)
-        .expect("Index out of range.");
-    let third_word = THIRD_WORDS_LIST.get(random_numbers.random_4 as usize)
-        .expect("Index out of range.");
-
-    // Generation of svg string & creation of data object
-    let final_svg_string = String::from(SVG_STRING_ONE) + color 
-        + SVG_STRING_TWO + first_word + " " + second_word + " " 
-        + third_word + " " + "</text></svg>";
-    
-    SvgData { 
-        image: final_svg_string, 
-    }
-}
-
-
 // **
 // Our program's instruction data
 // **
@@ -92,4 +18,97 @@ pub struct RandomNumbers {
 #[derive(BorshDeserialize, BorshSerialize, Debug)]
 pub struct SvgData {
     image: String,
+}
+
+// **
+// Builds the SVG string from random indexes
+// **
+impl SvgData {
+
+    fn new_with_root() -> SvgData {
+        SvgData {
+            image: "<svg xmlns='http://www.w3.org/2000/svg' \
+                preserveAspectRatio='xMinYMin meet' \
+                viewBox='0 0 350 350' width='50%' \
+                height='50%'>\
+                <style>.base \
+                { fill: white; font-family: serif; font-size: 52px; }\
+                </style><rect width='100%' height='100%' fill='".to_string()
+        }
+    }
+
+    fn add_fill(&mut self, fill_index: u8) {
+        self.image += [
+            "#f143f7", 
+            "#fcff33", 
+            "#00ffd0", 
+            "#07f702", 
+            "#ff2448", 
+            "#ff771c",
+        ].get(fill_index as usize)
+            .expect("Index out of range.");
+        self.image += "'/>";
+    }
+
+    fn add_text_one(&mut self, text_one_index: u8) {
+        self.image += "<text x='50%' y='25%' \
+            class='base' dominant-baseline='middle' \
+            text-anchor='middle'>";
+        self.image += [
+            "Pink", 
+            "Orange", 
+            "Yellow", 
+            "Scarlet", 
+            "Ivy", 
+            "Aqua",
+        ].get(text_one_index as usize)
+            .expect("Index out of range.");
+        self.image += "</text>";
+    }
+
+    fn add_text_two(&mut self, text_two_index: u8) {
+        self.image += "<text x='50%' y='50%' \
+            class='base' dominant-baseline='middle' \
+            text-anchor='middle'>";
+        self.image += [
+            "Positive", 
+            "Majestic", 
+            "Empowered", 
+            "Heroic", 
+            "Fierce", 
+            "Tranquil",
+        ].get(text_two_index as usize)
+            .expect("Index out of range.");
+        self.image += "</text>";
+    }
+
+    fn add_text_three(&mut self, text_three_index: u8) {
+        self.image += "<text x='50%' y='75%' \
+            class='base' dominant-baseline='middle' \
+            text-anchor='middle'>";
+        self.image += [
+            "Llama", 
+            "Sun", 
+            "Moon", 
+            "Cactus", 
+            "Tree", 
+            "Rainbow",
+        ].get(text_three_index as usize)
+            .expect("Index out of range.");
+        self.image += "</text>";
+    }
+
+    fn add_cap(&mut self) {
+        self.image += "</svg>";
+    }
+
+    pub fn new_from_randoms(random_numbers: RandomNumbers) -> SvgData {
+        let mut svg_data = SvgData::new_with_root();
+        svg_data.add_fill(random_numbers.random_1);
+        svg_data.add_text_one(random_numbers.random_2);
+        svg_data.add_text_two(random_numbers.random_3);
+        svg_data.add_text_three(random_numbers.random_4);
+        svg_data.add_cap();
+        return svg_data
+    }
 }
