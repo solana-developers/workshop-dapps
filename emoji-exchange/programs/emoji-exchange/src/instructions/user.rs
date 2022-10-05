@@ -8,6 +8,7 @@ use crate::state::{
     StoreEmoji, 
     UserEmoji, 
     UserMetadata,
+    Vault,
 };
 
 
@@ -61,15 +62,20 @@ pub struct CreateUserMetadata<'info> {
 pub fn cash_out_user(
     ctx: Context<CashOutUser>,
     amount: u64,
+    vault_bump: u8,
 ) -> Result<()> {
 
     system_program::transfer(
-        CpiContext::new(
+        CpiContext::new_with_signer(
             ctx.accounts.system_program.to_account_info(),
             system_program::Transfer {
-                from: ctx.accounts.authority.to_account_info(),
-                to: ctx.accounts.recipient.to_account_info(),
-            }
+                from: ctx.accounts.vault.to_account_info(),
+                to: ctx.accounts.authority.to_account_info(),
+            },
+            &[&[
+                Vault::SEED_PREFIX.as_bytes().as_ref(),
+                &[vault_bump],
+            ]]
         ),
         amount
     )?;
@@ -78,6 +84,10 @@ pub fn cash_out_user(
 }
 
 #[derive(Accounts)]
+#[instruction(
+    amount: u64,
+    vault_bump: u8,
+)]
 pub struct CashOutUser<'info> {
     #[account(
         mut,
@@ -85,9 +95,15 @@ pub struct CashOutUser<'info> {
     )]
     pub user_metadata: Account<'info, UserMetadata>,
     #[account(mut)]
-    pub recipient: SystemAccount<'info>,
-    #[account(mut)]
-    pub authority: Signer<'info>,
+    pub authority: SystemAccount<'info>,
+    #[account(
+        mut,
+        seeds = [
+            Vault::SEED_PREFIX.as_bytes().as_ref(),
+        ],
+        bump = vault_bump,
+    )]
+    pub vault: Account<'info, Vault>,
     pub system_program: Program<'info, System>,
 }
 

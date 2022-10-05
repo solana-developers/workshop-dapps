@@ -190,41 +190,6 @@
       ]
     },
     {
-      "name": "cashOutUser",
-      "accounts": [
-        {
-          "name": "userMetadata",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "authority",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "vault",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "amount",
-          "type": "u64"
-        },
-        {
-          "name": "vaultBump",
-          "type": "u8"
-        }
-      ]
-    },
-    {
       "name": "closeUserMetadata",
       "accounts": [
         {
@@ -471,6 +436,6 @@
     }
   ],
   "metadata": {
-    "address": "86GDPzi1UcCP91Ruvn2CJxSZnbwjmptn5ikKJAiqubyP"
+    "address": "FWes5JocvyKdE8DbY8BmvVc1j1qPo9jXKXWBgAvevunm"
   }
 }

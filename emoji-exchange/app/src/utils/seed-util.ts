@@ -6,6 +6,7 @@ export class SeedUtil {
 
     program: anchor.Program;
     vaultPda: anchor.web3.PublicKey;
+    vaultPdaBump: number;
     likePda: anchor.web3.PublicKey;
     likeMetadataPda: anchor.web3.PublicKey;
     retweetPda: anchor.web3.PublicKey;
@@ -21,9 +22,10 @@ export class SeedUtil {
     }
 
     async init() {
-        this.vaultPda = await this.derivePda([
-            Buffer.from(constants.VAULT_SEED_PREFIX),
-        ]);
+        [this.vaultPda, this.vaultPdaBump] = await anchor.web3.PublicKey.findProgramAddress(
+            [ Buffer.from(constants.VAULT_SEED_PREFIX) ], 
+            this.program.programId
+        );
     }
 
     async getStoreEmojiPda(

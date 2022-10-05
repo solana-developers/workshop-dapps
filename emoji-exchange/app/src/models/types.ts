@@ -23,6 +23,14 @@ export interface UserMetadataObject {
     cashedOut: boolean,
 }
 
+export interface ProfitLeaderObject {
+    pubkey: string,
+    username: string,
+    ebucksBalance: number,
+    ebucksProfit: number,
+    tradeCount: number,
+}
+
 export interface UserEmojiObject {
     emojiName: string,
     display: string,

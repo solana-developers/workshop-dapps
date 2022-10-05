@@ -23,14 +23,6 @@ export const StoreOrder: FC<StoreOrderProps> = (props: StoreOrderProps) => {
   const [quantity, setQuantity] = useState<number>(0);
 
   const onClickOrder = useCallback(async () => {
-    try {
-      let userEmoji = await util.getUserEmoji(wallet, props.emojiName);
-      console.log(`User Emoji: ${userEmoji.display}`);
-    } catch(_) {
-      const tx = await util.createUserEmojiTransaction(wallet, props.emojiName);
-      const sx = await sendTransaction(tx, connection);
-      await connection.confirmTransaction(sx);
-    }
     const tx = await util.placeOrder(
       wallet,
       props.emojiName,
@@ -46,23 +38,23 @@ export const StoreOrder: FC<StoreOrderProps> = (props: StoreOrderProps) => {
   }, [quantity, wallet]);
 
   return (
-    <div>
-      <span className="text-2xl">{props.display}</span>
+    <div className='w-full flex flex-row my-2'>
+      <span className="text-2xl m-auto">{props.display}</span>
 
-      <span className="text-l ml-4 mr-2">{props.balance}</span>
+      <span className="text-l m-auto ml-6">{props.balance}</span>
 
-      <span className="text-l ml-4 mr-2">{`${props.price} eBucks`}</span>
+      <span className="text-l m-auto ml-6">{`${props.price} eBucks`}</span>
 
       <input 
         type="number" 
-        className="input input-bordered w-20 m-2" 
+        className="input input-bordered w-20 my-auto ml-4 mr-2" 
         placeholder="Quantity"
         value={quantity}
         onChange={(e) => setQuantity(+e.target.value as number)}
       />
       
       <button
-        className="px-8 m-2 w-20 btn animate-pulse bg-[#00d466] hover:from-pink-500 hover:to-yellow-500"
+        className="btn animate-pulse bg-[#00d466] px-8 my-auto m-2 w-20"
         onClick={() => onClickOrder()}>
           <span>Buy</span>
       </button>

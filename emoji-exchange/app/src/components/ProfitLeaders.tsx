@@ -1,5 +1,5 @@
 import { FC, useEffect } from 'react';
-import { useAnchorWallet, useConnection, useWallet } from '@solana/wallet-adapter-react';
+import { useAnchorWallet } from '@solana/wallet-adapter-react';
 import useProfitLeaderStore from 'stores/useProfitLeadersStore';
 
 
@@ -11,6 +11,10 @@ export const ProfitLeaders: FC = () => {
 
 
   useEffect(() => {
+    getAllProfitLeaders(wallet);
+  }, []);
+
+  useEffect(() => {
     setInterval(() => getAllProfitLeaders(wallet), 5000);
   }, [wallet, getAllProfitLeaders]);
 
@@ -18,13 +22,12 @@ export const ProfitLeaders: FC = () => {
   return (
     <div>
       { wallet &&
-      <div>
-        { profitLeaders
-          .sort((a, b) => a.ebucksProfit > b.ebucksProfit ? 1 : -1)
-          .map((p, i) => { 
-            return (
-              <div className="ml-2 p-6 border-2 rounded-lg border-[#6e6e6e]">
-                <div key={i}>
+        <div>
+          { profitLeaders
+            .sort((a, b) => a.ebucksProfit < b.ebucksProfit ? 1 : -1)
+            .map((p, i) => { 
+              return (
+                <div key={i} className="ml-2 my-2 p-6 border-2 rounded-lg border-[#6e6e6e]">
                   <div className="text-sm text-[#a3a3a3]">
                     <span>{p.pubkey}</span>
                   </div>
@@ -36,12 +39,11 @@ export const ProfitLeaders: FC = () => {
                     <span className="ml-2 text-[#fcba03]">{p.ebucksBalance}</span>
                   </div>
                 </div>
-              </div>
-            )
-          })
-        }
-      </div>
-    }
+              )
+            })
+          }
+        </div>
+      }
     </div>
   )
 }

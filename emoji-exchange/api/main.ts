@@ -14,7 +14,7 @@ import * as util from '../app/src/utils/util';
 
 const STORE_WALLET = new anchor.Wallet(createKeypairFromFile(__dirname + '/../app/wallet/master.json'));
 
-const connection = new Connection(constants.NETWORK, 'confirmed');
+const connection = new Connection("https://api.devnet.solana.com", 'confirmed');
 
 // Mango configs
 const mangoCluster = "mainnet";

@@ -1,40 +1,26 @@
-import { FC, useCallback } from 'react';
+import { FC, useEffect } from 'react';
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
-import { LAMPORTS_PER_SOL, TransactionSignature } from '@solana/web3.js';
 import { useAutoConnect } from '../contexts/AutoConnectProvider';
-import { notify } from "../utils/notifications";
 import useUserSOLBalanceStore from '../stores/useUserSOLBalanceStore';
-import NetworkSwitcher from './NetworkSwitcher';
+import { RequestAirdrop } from './RequestAirdrop';
 
 
 export const AppBar: FC = props => {
 
   const { autoConnect, setAutoConnect } = useAutoConnect();
   const { connection } = useConnection();
-  const { publicKey } = useWallet();
-  const { getUserSOLBalance } = useUserSOLBalanceStore();
+  const wallet = useWallet();
 
-  const onClick = useCallback(async () => {
-    if (!publicKey) {
-        console.log('error', 'Wallet not connected!');
-        notify({ type: 'error', message: 'error', description: 'Wallet not connected!' });
-        return;
+  const balance = useUserSOLBalanceStore((s) => s.balance)
+  const { getUserSOLBalance } = useUserSOLBalanceStore()
+
+  useEffect(() => {
+    if (wallet.publicKey) {
+      console.log(wallet.publicKey.toBase58())
+      getUserSOLBalance(wallet.publicKey, connection)
     }
-
-    let signature: TransactionSignature = '';
-
-    try {
-        signature = await connection.requestAirdrop(publicKey, LAMPORTS_PER_SOL);
-        await connection.confirmTransaction(signature, 'confirmed');
-        notify({ type: 'success', message: 'Airdrop successful!', txid: signature });
-
-        getUserSOLBalance(publicKey, connection);
-    } catch (error: any) {
-        notify({ type: 'error', message: `Airdrop failed!`, description: error?.message, txid: signature });
-        console.log('error', `Airdrop failed! ${error?.message}`, signature);
-    }
-  }, [publicKey, connection, getUserSOLBalance]);
+  }, [wallet, connection, getUserSOLBalance])
 
   return (
     <div>
@@ -74,6 +60,18 @@ export const AppBar: FC = props => {
                 </clipPath>
               </defs>
             </svg>
+          </div>
+        </div>
+
+        {/* Airdrop */}
+        <div className="hidden md:inline md:navbar-center">
+          <div className='flex flex-row'>
+            <div>
+              <RequestAirdrop />
+            </div>
+            <div className='my-auto'>
+              {wallet && <p>SOL Balance: {(balance || 0).toLocaleString()}</p>}
+            </div>
           </div>
         </div>
 

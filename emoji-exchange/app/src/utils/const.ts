@@ -1,9 +1,9 @@
 import * as anchor from "@project-serum/anchor";
 
 
-// export const NETWORK = "https://api.devnet.solana.com/";
+export const NETWORK = "https://api.devnet.solana.com/";
 // export const NETWORK = "http://localhost:8899";
-export const NETWORK = process.env.RPC_ENDPOINT;
+// export const NETWORK = process.env.RPC_ENDPOINT;
 export const PREFLIGHT_COMMITMENT = "confirmed";
 
 export const VAULT_SEED_PREFIX = "vault";
@@ -17,7 +17,7 @@ export const DEFAULT_STORE_EMOJI_STARTING_PRICE = 10;
 export const DEFAULT_USER_STARTING_EBUCKS_BALANCE = 200;
 export const PRICE_CHANGE_MULTIPLIER: number = 500;
 
-export const MIN_TRADE_COUNT_FOR_CASHOUT = 5;
+export const MIN_PROFIT_FOR_CASHOUT = -75;
 
 export const EMOJIS_LIST = [
     { seed: "emoji_1", display: "😀", mappedToken: "SOL" },

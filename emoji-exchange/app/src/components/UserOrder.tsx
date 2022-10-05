@@ -5,7 +5,6 @@ import * as util from '../utils/util';
 
 
 interface UserOrderProps {
-  getAllStoreEmojis: (wallet: AnchorWallet | undefined) => void,
   getAllUserEmojis: (wallet: AnchorWallet | undefined) => void,
   getUserMetadata: (wallet: AnchorWallet | undefined) => void,
   emojiName: string,
@@ -31,30 +30,29 @@ export const UserOrder: FC<UserOrderProps> = (props: UserOrderProps) => {
     );
     const sx = await sendTransaction(tx, connection);
     await connection.confirmTransaction(sx);
-    props.getAllStoreEmojis(wallet);
     props.getAllUserEmojis(wallet);
     props.getUserMetadata(wallet);
     setQuantity(0);
   }, [quantity, wallet]);
 
   return (
-    <div>
-      <span style={{fontSize: "32px"}}>{props.display}</span>
+    <div className='w-full flex flex-row my-2'>
+      <span className="text-2xl m-auto">{props.display}</span>
 
-      <span style={{fontSize: "20px", marginLeft: "1.25em", marginRight: "0.75em"}}>{props.balance}</span>
+      <span className="text-l m-auto ml-6">{props.balance}</span>
 
-      <span style={{fontSize: "20px", marginLeft: "1.25em", marginRight: "0.75em"}}>{`${props.costAverage} eBucks`}</span>
+      <span className="text-l m-auto ml-6">{`${props.costAverage} eBucks`}</span>
 
       <input 
         type="number" 
-        className="input input-bordered w-20 m-2" 
+        className="input input-bordered w-20 my-auto ml-4 mr-2" 
         placeholder="Quantity"
         value={quantity}
         onChange={(e) => setQuantity(+e.target.value as number)}
       />
       
       <button
-        className="px-8 m-2 w-20 btn animate-pulse bg-[#d4005c] hover:from-pink-500 hover:to-yellow-500 ..."
+        className="btn animate-pulse bg-[#d4005c] px-8 my-auto m-2 w-20"
         onClick={() => onClickOrder()}>
           <span>Sell</span>
       </button>

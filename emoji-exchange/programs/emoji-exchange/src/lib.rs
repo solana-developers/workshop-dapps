@@ -94,6 +94,19 @@ pub mod emoji_exchange {
         )
     }
 
+    pub fn cash_out_user(
+        ctx: Context<CashOutUser>,
+        amount: u64,
+        vault_bump: u8,
+    ) -> Result<()> {
+        
+        user::cash_out_user(
+            ctx, 
+            amount,
+            vault_bump,
+        )
+    }
+
     pub fn close_user_metadata(
         ctx: Context<CloseUserMetadata>,
     ) -> Result<()> {

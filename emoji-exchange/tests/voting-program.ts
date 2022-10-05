@@ -9,7 +9,7 @@ describe("voting-program", async () => {
   const idl = require("./voting_program.json");
   const program = new anchor.Program(
     idl, 
-    new anchor.web3.PublicKey("5dJaDcqnRNeMU8pK17HmR2BqwC7P8RpNbpsJp2cX32yb"), 
+    new anchor.web3.PublicKey("HqWBg3ptm9zhuphRYJyzqvqjHpvgj3NhiS2Nr19t3ydW"), 
     provider
   );
 
