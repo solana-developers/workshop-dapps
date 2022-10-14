@@ -13,7 +13,8 @@ import { notify } from "../utils/notifications";
 const WalletContextProvider: FC<{ children: ReactNode }> = ({ children }) => {
 
     const { autoConnect } = useAutoConnect();
-    const endpoint = "http://localhost:8899";
+    // const endpoint = "http://localhost:8899";
+    const endpoint = "https://api.devnet.solana.com";
 
     const wallets = useMemo(
         () => [

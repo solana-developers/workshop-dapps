@@ -23,6 +23,7 @@ impl EntryMetadata {
         journal: Pubkey,
         bump: u8,
     ) -> Self {
+        
         EntryMetadata {
             entry_number,
             message,

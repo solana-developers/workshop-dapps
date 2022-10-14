@@ -2,7 +2,7 @@ import create, { State } from 'zustand'
 import { Connection, PublicKey } from '@solana/web3.js'
 import { EntryMetadataInterface } from 'models/types';
 import { EntryMetadata } from '../idl/state/entry';
-import bs58 from 'bs58';
+import { JournalMetadata } from 'idl/state/journal';
 
 interface EntryStore extends State {
   entries: EntryMetadataInterface[];
@@ -18,41 +18,33 @@ const useEntryStore = create<EntryStore>((set, _get) => ({
   getEntries: async (walletPubkey, programId, connection) => {
     let entries: EntryMetadataInterface[] = [];
     try {
-      const [journalAddress, _] = await PublicKey.findProgramAddress(
+      const [journalAddress, _journalBump] = await PublicKey.findProgramAddress(
         [ Buffer.from("journal"), walletPubkey.toBuffer() ],
         programId,
       );
-      entries = (await connection.getProgramAccounts(
-        programId,
-        {
-          filters: [
-            {
-              dataSize: 74,
-            },
-            {
-              memcmp: {
-                offset: 8,
-                bytes: new EntryMetadata({
-                  entry_number: 1,
-                  message: "",
-                  journal: journalAddress,
-                  bump: 1,
-                }).toBase58(),
-              },
-            },
-          ],
-        }
-      )).map((a) => {
-        const data = EntryMetadata.fromBuffer(a.account.data);
-        if (data.journal === journalAddress) {
-          return {
-            entryNumber: data.entry_number,
-            message: data.message,
-            journal: data.journal,
-            bump: data.bump,
-          }
-        }
-      });
+      const journalData = JournalMetadata.fromBuffer(
+        (await connection.getAccountInfo(journalAddress)).data
+      );
+      const entryCount = journalData.entries;
+      for (var x = 1; x <= entryCount; x++) {
+        const [entryAddress, _entryBump] = await PublicKey.findProgramAddress(
+            [
+                Buffer.from("entry"),
+                Buffer.from((x).toString()),
+                journalAddress.toBuffer(),
+            ],
+            programId
+        );
+        const entryData = EntryMetadata.fromBuffer(
+          (await connection.getAccountInfo(entryAddress)).data
+        );
+        entries.push({
+          entryNumber: entryData.entry_number,
+          message: entryData.message,
+          journal: entryData.journal,
+          bump: entryData.bump,
+        });
+      };
       console.log(`${entries.length} entries fetched successfully!`);
     } catch (e) {
       console.log(`Error fetching journal entries: `, e);

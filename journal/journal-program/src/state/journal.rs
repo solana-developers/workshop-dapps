@@ -22,6 +22,7 @@ impl JournalMetadata {
         authority: Pubkey,
         bump: u8,
     ) -> Self {
+        
         JournalMetadata {
             nickname,
             authority,

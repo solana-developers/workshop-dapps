@@ -77,9 +77,9 @@ export const Journal: FC = () => {
                             </div>
                             <div>
                                 {entries && entries.map(
-                                    (e) => { return(
-                                    <div className="">
-                                        <span className="">{e.message}</span>
+                                    (e, i) => { return(
+                                    <div className="border-2 rounded-lg border-[#6e6e6e] my-2 px-4 py-2 bg-[#1f1f1f]" key={i}>
+                                        <span className="text-lg">{e.message}</span>
                                     </div>
                                     ) }
                                 )}
