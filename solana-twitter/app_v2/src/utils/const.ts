@@ -11,7 +11,8 @@ export const RETWEET_SEED_PREFIX = "retweet"
 export const RETWEET_MINT_SEED_PREFIX = "retweet_mint"
 export const RETWEET_MINT_AUTHORITY_SEED_PREFIX = "retweet_mint_authority"
 
-export const NETWORK = "https://api.devnet.solana.com";
+export const NETWORK = process.env.RPC_ENDPOINT;
+// export const NETWORK = "https://api.devnet.solana.com";
 // export const NETWORK = "http://localhost:8899";
 export const PREFLIGHT_COMMITMENT = "confirmed";
 
