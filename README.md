@@ -76,3 +76,6 @@ Your instructor may use one of the applications stored in this repository to con
 * [Rust Solana YouTube Tutorials](https://www.youtube.com/playlist?list=PLUBKxx7QjtVnU3hkPc8GF1Jh4DE7cf4n1)
 * [Full Solana Course](https://github.com/Unboxed-Software/solana-course)
 * [Solana Core Docs](https://docs.solana.com/)
+### Additional Tools
+* [Solana Wallet Adapter](https://github.com/solana-labs/wallet-adapter)
+* [Solana Pay](https://github.com/solana-labs/solana-pay)
