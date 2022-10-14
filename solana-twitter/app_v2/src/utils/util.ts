@@ -28,7 +28,7 @@ export async function getAnchorConfigs(
         wallet, 
         { "preflightCommitment": constants.PREFLIGHT_COMMITMENT }
     );
-    const idl = require("../utils/idl.json");
+    const idl = require("./idl.json");
     const program = new anchor.Program(idl, idl.metadata.address, provider);
     let seedUtil = new SeedUtil(program);
     await seedUtil.init(wallet.publicKey);
@@ -436,43 +436,4 @@ export async function getAllRetweetsForTweet(
         };
     };
     return allRetweets
-};
-
-/**
- * Create the mints for Likes and Retweets
- * @param masterWallet 
- * @returns 
- */
- export async function createMints(
-    masterWallet: AnchorWallet,
-): Promise<[anchor.web3.Transaction, anchor.AnchorProvider]> {
-    
-    const [provider, program, seedUtil] = await getAnchorConfigs(masterWallet);
-    if (!provider) throw("Provider is null");
-    const likeMintIx = await program.methods.createLikeMint()
-        .accounts({
-            likeMetadata: seedUtil.likeMetadataPda,
-            likeMint: seedUtil.likeMintPda,
-            likeMintAuthority: seedUtil.likeMintAuthorityPda,
-            payer: provider.wallet.publicKey,
-            rent: anchor.web3.SYSVAR_RENT_PUBKEY,
-            systemProgram: anchor.web3.SystemProgram.programId,
-            tokenProgram: anchor.utils.token.TOKEN_PROGRAM_ID,
-            tokenMetadataProgram: constants.TOKEN_METADATA_PROGRAM_ID,
-        })
-        .instruction();
-    const retweetMintIx = await program.methods.createRetweetMint()
-        .accounts({
-            retweetMetadata: seedUtil.retweetMetadataPda,
-            retweetMint: seedUtil.retweetMintPda,
-            retweetMintAuthority: seedUtil.retweetMintAuthorityPda,
-            payer: provider.wallet.publicKey,
-            rent: anchor.web3.SYSVAR_RENT_PUBKEY,
-            systemProgram: anchor.web3.SystemProgram.programId,
-            tokenProgram: anchor.utils.token.TOKEN_PROGRAM_ID,
-            tokenMetadataProgram: constants.TOKEN_METADATA_PROGRAM_ID,
-        })
-        .instruction();
-    let tx = new anchor.web3.Transaction().add(likeMintIx).add(retweetMintIx);
-    return [tx, provider];
 };

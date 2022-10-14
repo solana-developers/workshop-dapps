@@ -30,6 +30,7 @@ export async function getAnchorConfigs(
     );
     const idl = require("../utils/idl.json");
     const program = new anchor.Program(idl, idl.metadata.address, provider);
+    console.log(program.programId.toString());
     let seedUtil = new SeedUtil(program);
     await seedUtil.init(wallet.publicKey);
     return [provider, program, seedUtil];
