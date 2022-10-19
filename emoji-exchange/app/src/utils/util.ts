@@ -1,8 +1,10 @@
 import { AnchorWallet } from "@solana/wallet-adapter-react";
 import * as anchor from "@project-serum/anchor";
+import { getOrCreateAssociatedTokenAccount } from "@solana/spl-token";
 import * as constants from './const';
 import { 
     convertOrderTypeToAnchorPayload,
+    GameObject,
     OrderType, 
     ProfitLeaderObject, 
     StoreEmojiObject, 
@@ -10,7 +12,6 @@ import {
     UserMetadataObject
 } from '../models/types';
 import { SeedUtil } from "./seed-util";
-import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 
 
 /**
@@ -35,92 +36,17 @@ export async function getAnchorConfigs(
 }
 
 
-/**
- * Initializes the game's vault for payouts
- * @param masterWallet 
- * @returns InitializeVault Transaction
- */
-export async function initializeVault(
-    masterWallet: AnchorWallet
-): Promise<anchor.web3.Transaction> {
-
-    const [_provider, program, seedUtil] = await getAnchorConfigs(masterWallet);
-    console.log(`Vault: ${seedUtil.vaultPda}`);
-    const ix = await program.methods.createVault()
-        .accounts({
-            vault: seedUtil.vaultPda,
-            authority: masterWallet.publicKey,
-            systemProgram: anchor.web3.SystemProgram.programId,
-        })
-        .instruction();
-    return new anchor.web3.Transaction().add(ix);
-}
-
-
-/**
- * Funds the game's vault
- * @param masterWallet 
- * @param amount 
- * @returns FundVault Transaction
- */
-export async function fundVault(
-    masterWallet: AnchorWallet, 
-    amount: number
-): Promise<anchor.web3.Transaction> {
-
-    const [_provider, program, seedUtil] = await getAnchorConfigs(masterWallet);
-    const ix = await program.methods.fundVault(new anchor.BN(amount))
-        .accounts({
-            vault: seedUtil.vaultPda,
-            authority: masterWallet.publicKey,
-            systemProgram: anchor.web3.SystemProgram.programId,
-        })
-        .instruction();
-    return new anchor.web3.Transaction().add(ix);
-}
-
-
-/**
- * Get the balance of the game's vault
- * @param masterWallet 
- * @returns Balance (number) of USDC in the vault
- */
-export async function getVaultBalance(masterWallet: AnchorWallet): Promise<number> {
-
-    const [provider, _program, seedUtil] = await getAnchorConfigs(masterWallet);
-    const balance = await provider.connection.getBalance(seedUtil.vaultPda);
-    return balance;
-}
-
-
-/**
- * Creates a store emoji account
- * @param masterWallet 
- * @param emojiSeed 
- * @param display 
- * @returns CreateStoreEmoji Transaction
- */
-export async function createStoreEmojiTransaction(
-    masterWallet: AnchorWallet,
-    emojiSeed: string,
-    display: string,
-): Promise<anchor.web3.Transaction> {
-
-    const [_provider, program, seedUtil] = await getAnchorConfigs(masterWallet);
-    console.log(`Store Emoji: ${await seedUtil.getStoreEmojiPda(emojiSeed)}`);
-    const ix = await program.methods.createStoreEmoji(
-        emojiSeed, 
-        display,
-        constants.DEFAULT_STORE_EMOJI_STARTING_BALANCE, 
-        new anchor.BN(constants.DEFAULT_STORE_EMOJI_STARTING_PRICE)
-    )
-        .accounts({
-            storeEmoji: await seedUtil.getStoreEmojiPda(emojiSeed),
-            authority: masterWallet.publicKey,
-            systemProgram: anchor.web3.SystemProgram.programId,
-        })
-        .instruction();
-    return new anchor.web3.Transaction().add(ix);
+export async function getGame(
+    wallet: AnchorWallet,
+): Promise<GameObject> {
+    const [_provider, program, seedUtil] = await getAnchorConfigs(wallet);
+    const response = await program.account.game.fetch(
+        seedUtil.gamePda
+    );
+    return {
+        isActive: response.isActive as boolean,
+        prize: response.prize as number,
+    };
 }
 
 
@@ -170,34 +96,6 @@ export async function loadStore(wallet: AnchorWallet): Promise<StoreEmojiObject[
 
 
 /**
- * Updates the price of a store emoji account
- * @param masterWallet 
- * @param emojiSeed 
- * @param newPrice 
- * @returns UpdateStoreEmojiPrice Transaction
- */
-export async function updateStoreEmojiPriceTransaction(
-    masterWallet: AnchorWallet,
-    emojiSeed: string,
-    newPrice: number,
-): Promise<anchor.web3.Transaction> {
-
-    const [_provider, program, seedUtil] = await getAnchorConfigs(masterWallet);
-    const ix = await program.methods.updateStoreEmojiPrice(
-        emojiSeed, 
-        new anchor.BN(newPrice),
-    )
-        .accounts({
-            storeEmoji: await seedUtil.getStoreEmojiPda(emojiSeed),
-            authority: masterWallet.publicKey,
-            systemProgram: anchor.web3.SystemProgram.programId,
-        })
-        .instruction();
-    return new anchor.web3.Transaction().add(ix);
-}
-
-
-/**
  * Creates a user metadata account
  * @param wallet 
  * @param username 
@@ -215,7 +113,7 @@ export async function createUserMetadataTransaction(
     )
         .accounts({
             userMetadata: await seedUtil.getUserMetadataPda(wallet.publicKey),
-            vault: seedUtil.vaultPda,
+            authority: wallet.publicKey,
             systemProgram: anchor.web3.SystemProgram.programId,
         })
         .instruction();
@@ -244,7 +142,7 @@ export async function getUserMetadata(
             username: response.username as string,
             ebucksBalance: eBucksBalanceNumber,
             tradeCount: response.tradeCount as number,
-            cashedOut: response.cashedOut as boolean,
+            authority: response.authority as anchor.web3.PublicKey,
         };
     } catch (e) {
         throw Error(`User metadata not found for ${wallet.publicKey}`);
@@ -268,11 +166,11 @@ export async function getUserMetadata(
         let eBucksBalanceNumber = eBucksBalance.toNumber();
         let eBucksProfitNumber = eBucksBalanceNumber - constants.DEFAULT_USER_STARTING_EBUCKS_BALANCE;
         profitLeaders.push({
-            pubkey: metadataAccount.publicKey.toString() as string,
             username: metadataAccount.account.username as string,
             ebucksBalance: eBucksBalanceNumber,
             ebucksProfit: eBucksProfitNumber,
             tradeCount: metadataAccount.account.tradeCount as number,
+            authority: metadataAccount.account.authority as anchor.web3.PublicKey,
         })
     }
     return profitLeaders;
@@ -297,7 +195,7 @@ export async function createUserEmojiInstruction(
         .accounts({
             storeEmoji: await seedUtil.getStoreEmojiPda(emojiSeed),
             userEmoji: await seedUtil.getUserEmojiPda(emojiSeed, wallet.publicKey),
-            vault: seedUtil.vaultPda,
+            game: seedUtil.gamePda,
             systemProgram: anchor.web3.SystemProgram.programId,
         })
         .instruction();
@@ -359,30 +257,30 @@ export async function loadUserStore(wallet: AnchorWallet): Promise<UserEmojiObje
 
 // TODO: Needs work
 /**
- * Pays out USDC from the vault to a user
+ * Pays out USDC from the game to a user
  * @param wallet 
- * @param recipientPubkey 
  * @returns CashOutUser Transaction
  */
-export async function cashOutUser(
+export async function claimPrize(
     wallet: AnchorWallet,
-    recipientPubkey: anchor.web3.PublicKey
 ): Promise<anchor.web3.Transaction> {
 
-    const [_provider, program, seedUtil] = await getAnchorConfigs(wallet);
-    const walletBalance = 1 * LAMPORTS_PER_SOL;
-    const txFee = 0; // Calculate the tx fee to send
-    const cashOutAmount = walletBalance - txFee;
-    console.log(`VAULT BUMP: ${seedUtil.vaultPdaBump}`);
-    const ix = await program.methods.cashOutUser(
-        new anchor.BN(cashOutAmount), 
-        seedUtil.vaultPdaBump,
-    )
+    const userMetadata = await getUserMetadata(wallet);
+    console.log(`AUTHORITY: ${userMetadata.authority}`);
+
+    const [provider, program, seedUtil] = await getAnchorConfigs(wallet);
+    const ix = await program.methods.claimPrize()
         .accounts({
+            mint: seedUtil.USDC_MINT_ADDRESS,
+            vaultTokenAccount: await seedUtil.deriveUsdcTokenAccount(seedUtil.gamePda),
+            game: seedUtil.gamePda,
+            userTokenAccount: await seedUtil.deriveUsdcTokenAccount(wallet.publicKey),
             userMetadata: await seedUtil.getUserMetadataPda(wallet.publicKey),
-            authority: wallet.publicKey,
-            vault: seedUtil.vaultPda,
+            userAuthority: wallet.publicKey,
+            rent: anchor.web3.SYSVAR_RENT_PUBKEY,
             systemProgram: anchor.web3.SystemProgram.programId,
+            tokenProgram: anchor.utils.token.TOKEN_PROGRAM_ID,
+            associatedTokenProgram: anchor.utils.token.ASSOCIATED_PROGRAM_ID,
         })
         .instruction();
     return new anchor.web3.Transaction().add(ix);
@@ -420,65 +318,9 @@ export async function placeOrder(
             userMetadata: await seedUtil.getUserMetadataPda(wallet.publicKey),
             userEmoji: await seedUtil.getUserEmojiPda(emojiSeed, wallet.publicKey),
             storeEmoji: await seedUtil.getStoreEmojiPda(emojiSeed),
-            vault: seedUtil.vaultPda,
             authority: provider.wallet.publicKey,
         })
         .instruction();
     tx.add(placeOrderIx);
-    return tx;
-}
-
-
-/**
- * Reset the simulation by closing all accounts
- * @param masterWallet 
- * @returns ResetSimulation Transaction
- */
-export async function reset(
-    masterWallet: AnchorWallet
-): Promise<anchor.web3.Transaction> {
-
-    const [_provider, program, _seedUtil] = await getAnchorConfigs(masterWallet);
-    let tx = new anchor.web3.Transaction();
-    // Close all user emojis
-    for (var userEmoji of (await program.account.userEmoji.all())) {
-        tx.add((await program.methods.closeUserEmoji()
-            .accounts({
-                userEmoji: userEmoji.publicKey,
-                masterWallet: masterWallet.publicKey,
-                systemProgram: anchor.web3.SystemProgram.programId,
-            })
-            .instruction()));
-    };
-    // Close all user accounts
-    for (var userMetadata of (await program.account.userMetadata.all())) {
-        tx.add((await program.methods.closeUserMetadata()
-            .accounts({
-                userMetadata: userMetadata.publicKey,
-                masterWallet: masterWallet.publicKey,
-                systemProgram: anchor.web3.SystemProgram.programId,
-            })
-            .instruction()));
-    };
-    // Close all store emojis
-    for (var storeEmoji of (await program.account.storeEmoji.all())) {
-        tx.add((await program.methods.closeStoreEmoji()
-            .accounts({
-                storeEmoji: storeEmoji.publicKey,
-                masterWallet: masterWallet.publicKey,
-                systemProgram: anchor.web3.SystemProgram.programId,
-            })
-            .instruction()));
-    };
-    // Close the vault
-    for (var vault of (await program.account.vault.all())) {
-        tx.add((await program.methods.closeVault()
-            .accounts({
-                vault: vault.publicKey,
-                masterWallet: masterWallet.publicKey,
-                systemProgram: anchor.web3.SystemProgram.programId,
-            })
-            .instruction()));
-    };
     return tx;
 }

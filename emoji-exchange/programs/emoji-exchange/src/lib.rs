@@ -6,38 +6,58 @@ pub mod state;
 use instructions::*;
 
 
-declare_id!("86GDPzi1UcCP91Ruvn2CJxSZnbwjmptn5ikKJAiqubyP");
+declare_id!("G7pQNe7PPpxkQnoHUvoEkpMBTSrtPPqGMSetMsBDTkKU");
 
 
 #[program]
 pub mod emoji_exchange {
     use super::*;
 
-    pub fn create_vault(
-        ctx: Context<CreateVault>,
+    pub fn create_game(
+        ctx: Context<CreateGame>,
+        prize: u64,
     ) -> Result<()> {
         
-        vault::create_vault(
+        game::create_game(
+            ctx, 
+            prize, 
+        )
+    }
+
+    pub fn fund_vault_sol(
+        ctx: Context<FundVaultSol>,
+        amount: u64,
+    ) -> Result<()> {
+        
+        game::fund_vault_sol(
+            ctx, 
+            amount, 
+        )
+    }
+
+    pub fn fund_vault_usdc(
+        ctx: Context<FundVaultUsdc>,
+    ) -> Result<()> {
+        
+        game::fund_vault_usdc(
             ctx, 
         )
     }
 
-    pub fn fund_vault(
-        ctx: Context<FundVault>,
-        lamports: u64,
+    pub fn claim_prize(
+        ctx: Context<ClaimPrize>,
     ) -> Result<()> {
-
-        vault::fund_vault(
+        
+        game::claim_prize(
             ctx, 
-            lamports
         )
     }
 
-    pub fn close_vault(
-        ctx: Context<CloseVault>,
+    pub fn close_game(
+        ctx: Context<CloseGame>,
     ) -> Result<()> {
         
-        vault::close_vault(
+        game::close_game(
             ctx, 
         )
     }
@@ -91,19 +111,6 @@ pub mod emoji_exchange {
             ctx, 
             username,
             initial_ebucks,
-        )
-    }
-
-    pub fn cash_out_user(
-        ctx: Context<CashOutUser>,
-        amount: u64,
-        vault_bump: u8,
-    ) -> Result<()> {
-        
-        user::cash_out_user(
-            ctx, 
-            amount,
-            vault_bump,
         )
     }
 

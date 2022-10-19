@@ -4,9 +4,14 @@ import * as constants from './const';
 
 export class SeedUtil {
 
+    USDC_MINT_ADDRESS: anchor.web3.PublicKey = new anchor.web3.PublicKey(
+        "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU"
+    );
+
     program: anchor.Program;
-    vaultPda: anchor.web3.PublicKey;
-    vaultPdaBump: number;
+    gamePda: anchor.web3.PublicKey;
+    gamePdaBump: number;
+    masterUsdcTokenAccount: anchor.web3.PublicKey;
     likePda: anchor.web3.PublicKey;
     likeMetadataPda: anchor.web3.PublicKey;
     retweetPda: anchor.web3.PublicKey;
@@ -21,11 +26,19 @@ export class SeedUtil {
         ))[0]
     }
 
+    async deriveUsdcTokenAccount(pubkey: anchor.web3.PublicKey) {
+        return await anchor.utils.token.associatedAddress({
+            mint: this.USDC_MINT_ADDRESS,
+            owner: pubkey,
+        });
+    }
+
     async init() {
-        [this.vaultPda, this.vaultPdaBump] = await anchor.web3.PublicKey.findProgramAddress(
-            [ Buffer.from(constants.VAULT_SEED_PREFIX) ], 
+        [this.gamePda, this.gamePdaBump] = await anchor.web3.PublicKey.findProgramAddress(
+            [ Buffer.from(constants.GAME_SEED_PREFIX) ], 
             this.program.programId
         );
+        this.masterUsdcTokenAccount = await this.deriveUsdcTokenAccount(this.gamePda);
     }
 
     async getStoreEmojiPda(

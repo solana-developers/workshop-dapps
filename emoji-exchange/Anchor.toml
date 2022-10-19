@@ -1,8 +1,8 @@
 [features]
 seeds = false
 [programs.devnet]
-emoji_exchange = "86GDPzi1UcCP91Ruvn2CJxSZnbwjmptn5ikKJAiqubyP"
-voting_program = "2cXGBhMQmtDzQdPitek7CaJKXwZmcehVc6FpiovtKsQq"
+emoji_exchange = "G7pQNe7PPpxkQnoHUvoEkpMBTSrtPPqGMSetMsBDTkKU"
+voting_program = "BEyDk9E6jDjPAW4euLgNAr6jgetTjHR4F4zpn5NcZh6X"
 
 [registry]
 url = "https://anchor.projectserum.com"

@@ -1,7 +1,4 @@
-use anchor_lang::{
-    AccountsClose,
-    prelude::*,
-};
+use anchor_lang::prelude::*;
 
 use crate::state::StoreEmoji;
 
@@ -84,12 +81,10 @@ pub struct UpdateStoreEmojiPrice<'info> {
 * Closes a store emoji account.
 */
 pub fn close_store_emoji(
-    ctx: Context<CloseStoreEmoji>,
+    _ctx: Context<CloseStoreEmoji>,
 ) -> Result<()> {
 
-    ctx.accounts.store_emoji.close(
-        ctx.accounts.authority.to_account_info()
-    )
+    Ok(())
 }
 
 #[derive(Accounts)]
@@ -97,6 +92,7 @@ pub struct CloseStoreEmoji<'info> {
     #[account(
         mut,
         has_one = authority,
+        close = authority,
     )]
     pub store_emoji: Account<'info, StoreEmoji>,
     #[account(mut)]

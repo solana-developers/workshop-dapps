@@ -4,7 +4,6 @@ use crate::state::{
     StoreEmoji, 
     UserEmoji, 
     UserMetadata, 
-    Vault 
 };
 
 
@@ -94,8 +93,6 @@ pub struct PlaceOrder<'info> {
     pub user_emoji: Account<'info, UserEmoji>,
     #[account(mut)]
     pub store_emoji: Account<'info, StoreEmoji>,
-    #[account(mut)]
-    pub vault: Account<'info, Vault>,
     #[account(mut)]
     pub authority: Signer<'info>,
 }

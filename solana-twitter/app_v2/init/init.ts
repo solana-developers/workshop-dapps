@@ -1,6 +1,5 @@
 import * as anchor from "@project-serum/anchor";
 import * as constants from '../src/utils/const';
-import * as util from '../src/utils/util';
 import * as dotenv from 'dotenv';
 import { AnchorWallet } from "@solana/wallet-adapter-react";
 import { SeedUtil } from "utils/seed-util";

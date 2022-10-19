@@ -9,7 +9,6 @@ pub struct UserMetadata {
     pub username: String,
     pub ebucks_balance: u64,
     pub trade_count: u32,
-    pub cashed_out: bool,
     pub authority: Pubkey,
 }
 
@@ -24,7 +23,6 @@ impl UserMetadata {
         username: String,
         ebucks_balance: u64,
         trade_count: u32,
-        cashed_out: bool,
         authority: Pubkey,
     ) -> Self {
 
@@ -32,7 +30,6 @@ impl UserMetadata {
             username,
             ebucks_balance,
             trade_count,
-            cashed_out,
             authority,
         }
     }

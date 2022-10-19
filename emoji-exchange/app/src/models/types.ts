@@ -8,6 +8,11 @@ export enum OrderType {
     SELL 
 };
 
+export interface GameObject {
+    isActive: boolean,
+    prize: number,
+}
+
 export interface StoreEmojiObject {
     emojiName: string,
     display: string,
@@ -20,15 +25,15 @@ export interface UserMetadataObject {
     username: string,
     ebucksBalance: number,
     tradeCount: number,
-    cashedOut: boolean,
+    authority: anchor.web3.PublicKey,
 }
 
 export interface ProfitLeaderObject {
-    pubkey: string,
     username: string,
     ebucksBalance: number,
     ebucksProfit: number,
     tradeCount: number,
+    authority: anchor.web3.PublicKey,
 }
 
 export interface UserEmojiObject {

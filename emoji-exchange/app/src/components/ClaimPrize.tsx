@@ -1,47 +1,58 @@
 import { FC, useCallback, useEffect, useState } from 'react';
 import { AnchorWallet, useAnchorWallet, useConnection, useWallet } from '@solana/wallet-adapter-react';
-import * as anchor from "@project-serum/anchor";
 import * as util from '../utils/util';
 import { DEFAULT_USER_STARTING_EBUCKS_BALANCE, MIN_PROFIT_FOR_CASHOUT } from '../utils/const';
-import { UserMetadataObject } from 'models/types';
+import { GameObject, ProfitLeaderObject, UserMetadataObject } from 'models/types';
 
 
-interface CashOutProps {
+interface ClaimPrizeProps {
+    profitLeaders: ProfitLeaderObject[],
+    getAllProfitLeaders: (wallet: AnchorWallet | undefined) => void,
     userMetadata: UserMetadataObject,
     getUserMetadata: (wallet: AnchorWallet | undefined) => void,
+    game: GameObject,
+    getGame: (wallet: AnchorWallet | undefined) => void,
 }
 
-export const CashOut: FC<CashOutProps> = (props: CashOutProps) => {
+export const ClaimPrize: FC<ClaimPrizeProps> = (props: ClaimPrizeProps) => {
 
     const { connection } = useConnection();
     const { publicKey, sendTransaction } = useWallet();
     const wallet = useAnchorWallet();
 
-    const [ recipientPubkey, setRecipientPubkey ] = useState<anchor.web3.PublicKey>();
-    const [ exportEligible, setExportEligible ] = useState<boolean>(false);
+    const [ prizeEligible, setPrizeEligible ] = useState<boolean>(false);
 
 
-    const onClickCashOut = useCallback(async () => {
-        const tx = await util.cashOutUser(wallet, recipientPubkey);
+    const onClickClaimPrize = useCallback(async () => {
+        const tx = await util.claimPrize(wallet);
         const sx = await sendTransaction(tx, connection);
         await connection.confirmTransaction(sx);
         props.getUserMetadata(wallet);
+        props.getGame(wallet);
     }, [wallet, props.getUserMetadata]);
 
 
     useEffect(() => {
-        if (props.userMetadata) {
-            console.log(`Trade Count: ${props.userMetadata.tradeCount}`);
-            let eBucksProfit = props.userMetadata.ebucksBalance - DEFAULT_USER_STARTING_EBUCKS_BALANCE;
-            if (eBucksProfit <= MIN_PROFIT_FOR_CASHOUT) {
-                setExportEligible(true);
+        if (props.userMetadata && props.profitLeaders) {
+            const eBucksProfit = props.userMetadata.ebucksBalance - DEFAULT_USER_STARTING_EBUCKS_BALANCE;
+            const isInProfitRange: boolean = eBucksProfit >= MIN_PROFIT_FOR_CASHOUT;
+            const isTopProfitLeader: boolean = props.profitLeaders[0].authority.toString() === wallet.publicKey.toString();
+            if (isInProfitRange && isTopProfitLeader) {
+                setPrizeEligible(true);
             } else {
-                setExportEligible(false);
+                setPrizeEligible(false);
             }
         } else {
           props.getUserMetadata(wallet);
+          props.getAllProfitLeaders(wallet);
         };
-      }, [wallet, props.userMetadata, props.getUserMetadata]);
+      }, [
+        wallet, 
+        props.userMetadata, 
+        props.getUserMetadata,
+        props.profitLeaders,
+        props.getAllProfitLeaders,
+    ]);
 
 
     return(
@@ -58,20 +69,15 @@ export const CashOut: FC<CashOutProps> = (props: CashOutProps) => {
                     </div>
                 </div>
             </div>
-            {(exportEligible && !props.userMetadata.cashedOut) &&
+            {prizeEligible  &&
                 <div className="mx-auto mb-4 p-6 text-center">
                     <p>Congratulations!</p>
-                    <p>You can now cash out your SOL balance!</p>
+                    <p>You can now claim the game's prize!</p>
+                    <p> <span className='text-[#00d466]'>Prize:</span> {(props.game.prize * 0.000001).toString()} USDC</p>
                     <p><span className="font-bold text-[#d4005c]">Warning:</span> You can only do this once.</p>
-                    {/* <input 
-                        type="text" 
-                        className="input input-bordered w-60 m-2" 
-                        placeholder="Enter PublicKey to cash out to:"
-                        onChange={(e) => setRecipientPubkey(new anchor.web3.PublicKey(e.target.value))}
-                    /> */}
                     <button
                         className="px-8 m-2 w-40 btn animate-pulse bg-[#d4005c] hover:from-pink-500 hover:to-yellow-500 ..."
-                        onClick={() => onClickCashOut()}>
+                        onClick={() => onClickClaimPrize()}>
                         <span>Cash Out</span>
                     </button>
                 </div>

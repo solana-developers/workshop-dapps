@@ -1,9 +1,15 @@
 {
     "compilerOptions": {
+        "esModuleInterop": true,
+        "lib": ["es6"],
         "module": "commonjs",
+        "moduleResolution": "node",
         "types": ["node"]
     },
     "exclude": [
         "node_modules"
-    ]
+    ],
+    "ts-node": {
+        "files": true
+      }
 }

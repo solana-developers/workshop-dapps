@@ -4,9 +4,11 @@ import useUserMetadataStore from 'stores/useUserMetadataStore';
 import * as util from '../utils/util';
 import { Store } from './Store';
 import { UserStore } from './UserStore';
-import { CashOut } from './CashOut';
+import { ClaimPrize } from './ClaimPrize';
 import useUserEmojiStore from 'stores/useUserEmojiStore';
 import { ProfitLeaders } from './ProfitLeaders';
+import useGameStore from 'stores/useGameStore';
+import useProfitLeaderStore from 'stores/useProfitLeadersStore';
 
 
 export const EmojiExchange: FC = () => {
@@ -14,6 +16,9 @@ export const EmojiExchange: FC = () => {
   const { connection } = useConnection();
   const { publicKey, sendTransaction } = useWallet();
   const wallet = useAnchorWallet();
+
+  const { game, getGame } = useGameStore();
+  const { profitLeaders, getAllProfitLeaders } = useProfitLeaderStore();
 
   const [ username, setUsername ] = useState<string>('');
   const { userMetadata, getUserMetadata } = useUserMetadataStore();
@@ -32,74 +37,82 @@ export const EmojiExchange: FC = () => {
 
   useEffect(() => {
     getUserMetadata(wallet);
+    getGame(wallet);
+    getAllProfitLeaders(wallet);
   }, [wallet])
 
 
   return (
     <div>
-      { wallet ?
+      { wallet && game ?
         <div>
           { showExchange ? 
-          <div>
-            <div className='flex flex-col mb-4 mx-auto'>
-              <button className="text-md rounded-lg bg-[#00d466] px-6 py-2 mx-auto" 
-                  onClick={() => setShowExchange(false)}>
-                      <span>Show Profit Leaders</span>
-              </button>
-            </div>
-            {userMetadata ? 
-              <div>
-                { userMetadata.cashedOut ?
-                  <div className="mx-auto mb-4 ml-2 p-6 border-2 rounded-lg border-[#d4005c] text-center">
-                    <p>Looks like you've already cashed out.</p>
-                    <p>Thanks for playing!</p>
-                  </div>
-                  :
-                  <div>
-                    <CashOut 
-                      userMetadata={userMetadata}
-                      getUserMetadata={getUserMetadata}
-                    />
-                    <div className="flex flex-row max-w-full">
-                      <Store 
-                        getUserMetadata={getUserMetadata}
-                        getAllUserEmojis={getAllUserEmojis}
-                        wallet={wallet}
-                      />
-                      <UserStore 
-                        getUserMetadata={getUserMetadata}
-                        wallet={wallet}
-                        username={userMetadata.username}
-                      />
-                    </div> 
-                  </div>
-                }
-              </div>
-              :
-              <div>
-                <input 
-                  type="text" 
-                  className="input input-bordered max-w-xs m-2" 
-                  placeholder="Username"
-                  onChange={(e) => setUsername(e.target.value)}
-                />
-                <button
-                  className="px-8 m-2 btn bg-gradient-to-br from-[#f0940a] to-[#f0f00a] hover:from-pink-500 hover:to-yellow-500 ..."
-                  onClick={() => onClickInit()}>
-                    <span>Initialize User</span>
+            <div>
+              <div className='flex flex-col mb-4 mx-auto'>
+                <button className="text-md rounded-lg bg-[#00d466] px-6 py-2 mx-auto" 
+                    onClick={() => setShowExchange(false)}>
+                        <span>Show Profit Leaders</span>
                 </button>
               </div>
-            }
-          </div>
+              { game.isActive ?
+                <div>
+                  {userMetadata ? 
+                    <div>
+                      <ClaimPrize 
+                        profitLeaders={profitLeaders}
+                        getAllProfitLeaders={getAllProfitLeaders}
+                        userMetadata={userMetadata}
+                        getUserMetadata={getUserMetadata}
+                        game={game}
+                        getGame={getGame}
+                      />
+                      <div className="flex flex-row max-w-full">
+                        <Store 
+                          getUserMetadata={getUserMetadata}
+                          getAllUserEmojis={getAllUserEmojis}
+                          wallet={wallet}
+                        />
+                        <UserStore 
+                          getUserMetadata={getUserMetadata}
+                          wallet={wallet}
+                          username={userMetadata.username}
+                        />
+                      </div> 
+                    </div>
+                  :
+                    <div>
+                      <input 
+                        type="text" 
+                        className="input input-bordered max-w-xs m-2" 
+                        placeholder="Username"
+                        onChange={(e) => setUsername(e.target.value)}
+                      />
+                      <button
+                        className="px-8 m-2 btn bg-gradient-to-br from-[#f0940a] to-[#f0f00a] hover:from-pink-500 hover:to-yellow-500 ..."
+                        onClick={() => onClickInit()}>
+                          <span>Initialize User</span>
+                      </button>
+                    </div>
+                  }
+                </div>
+              :
+                <div>
+                  <p>The game has ended. Thanks for playing!</p>
+                </div>
+              }
+            </div>
           :
-          <div className='flex flex-col mb-4 mx-auto'>
-            <button className="text-md rounded-lg bg-[#00d466] px-6 py-2 mx-auto" 
-                onClick={() => setShowExchange(true)}>
-                    <span>Show Exchange</span>
-            </button>
-            <ProfitLeaders />
-          </div>
-        }
+            <div className='flex flex-col mb-4 mx-auto'>
+              <button className="text-md rounded-lg bg-[#00d466] px-6 py-2 mx-auto" 
+                  onClick={() => setShowExchange(true)}>
+                      <span>Show Exchange</span>
+              </button>
+              <ProfitLeaders
+                profitLeaders={profitLeaders}
+                getAllProfitLeaders={getAllProfitLeaders}
+              />
+            </div>
+          }
         </div>
         :
         <div>

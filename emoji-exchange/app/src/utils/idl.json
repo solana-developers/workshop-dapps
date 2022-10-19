@@ -3,31 +3,10 @@
   "name": "emoji_exchange",
   "instructions": [
     {
-      "name": "createVault",
+      "name": "createGame",
       "accounts": [
         {
-          "name": "vault",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "authority",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "fundVault",
-      "accounts": [
-        {
-          "name": "vault",
+          "name": "game",
           "isMut": true,
           "isSigner": false
         },
@@ -44,16 +23,134 @@
       ],
       "args": [
         {
-          "name": "lamports",
+          "name": "prize",
           "type": "u64"
         }
       ]
     },
     {
-      "name": "closeVault",
+      "name": "fundVaultSol",
       "accounts": [
         {
-          "name": "vault",
+          "name": "game",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "fundVaultUsdc",
+      "accounts": [
+        {
+          "name": "mint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "vaultTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "game",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "masterTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "claimPrize",
+      "accounts": [
+        {
+          "name": "mint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "vaultTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "game",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userMetadata",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userAuthority",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "closeGame",
+      "accounts": [
+        {
+          "name": "game",
           "isMut": true,
           "isSigner": false
         },
@@ -190,41 +287,6 @@
       ]
     },
     {
-      "name": "cashOutUser",
-      "accounts": [
-        {
-          "name": "userMetadata",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "authority",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "vault",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "amount",
-          "type": "u64"
-        },
-        {
-          "name": "vaultBump",
-          "type": "u8"
-        }
-      ]
-    },
-    {
       "name": "closeUserMetadata",
       "accounts": [
         {
@@ -316,11 +378,6 @@
           "isSigner": false
         },
         {
-          "name": "vault",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "authority",
           "isMut": true,
           "isSigner": true
@@ -345,6 +402,30 @@
     }
   ],
   "accounts": [
+    {
+      "name": "Game",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "isActive",
+            "type": "bool"
+          },
+          {
+            "name": "prize",
+            "type": "u64"
+          },
+          {
+            "name": "authority",
+            "type": "publicKey"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
     {
       "name": "StoreEmoji",
       "type": {
@@ -419,22 +500,6 @@
             "type": "u32"
           },
           {
-            "name": "cashedOut",
-            "type": "bool"
-          },
-          {
-            "name": "authority",
-            "type": "publicKey"
-          }
-        ]
-      }
-    },
-    {
-      "name": "Vault",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
             "name": "authority",
             "type": "publicKey"
           }
@@ -471,6 +536,6 @@
     }
   ],
   "metadata": {
-    "address": "86GDPzi1UcCP91Ruvn2CJxSZnbwjmptn5ikKJAiqubyP"
+    "address": "G7pQNe7PPpxkQnoHUvoEkpMBTSrtPPqGMSetMsBDTkKU"
   }
 }

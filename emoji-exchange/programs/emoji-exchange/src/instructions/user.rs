@@ -1,14 +1,9 @@
-use anchor_lang::{
-    AccountsClose,
-    prelude::*,
-    system_program,
-};
+use anchor_lang::prelude::*;
 
 use crate::state::{ 
     StoreEmoji, 
     UserEmoji, 
     UserMetadata,
-    Vault,
 };
 
 
@@ -26,7 +21,6 @@ pub fn create_user_metadata(
             username,
             initial_ebucks,
             0,
-            false,
             ctx.accounts.authority.key(),
         )
     );
@@ -34,10 +28,6 @@ pub fn create_user_metadata(
 }
 
 #[derive(Accounts)]
-#[instruction(
-    username: String,
-    initial_ebucks: u64,
-)]
 pub struct CreateUserMetadata<'info> {
     #[account(
         init, 
@@ -57,72 +47,21 @@ pub struct CreateUserMetadata<'info> {
 
 
 /*
-* Marks a user as cashed out by updating their account.
+* Closes a user account account.
 */
-pub fn cash_out_user(
-    ctx: Context<CashOutUser>,
-    amount: u64,
-    vault_bump: u8,
+pub fn close_user_metadata(
+    _ctx: Context<CloseUserMetadata>,
 ) -> Result<()> {
 
-    system_program::transfer(
-        CpiContext::new_with_signer(
-            ctx.accounts.system_program.to_account_info(),
-            system_program::Transfer {
-                from: ctx.accounts.vault.to_account_info(),
-                to: ctx.accounts.authority.to_account_info(),
-            },
-            &[&[
-                Vault::SEED_PREFIX.as_bytes().as_ref(),
-                &[vault_bump],
-            ]]
-        ),
-        amount
-    )?;
-    ctx.accounts.user_metadata.cashed_out = true;
     Ok(())
 }
 
 #[derive(Accounts)]
-#[instruction(
-    amount: u64,
-    vault_bump: u8,
-)]
-pub struct CashOutUser<'info> {
-    #[account(
-        mut,
-        has_one = authority,
-    )]
-    pub user_metadata: Account<'info, UserMetadata>,
-    #[account(mut)]
-    pub authority: SystemAccount<'info>,
-    #[account(
-        mut,
-        seeds = [
-            Vault::SEED_PREFIX.as_bytes().as_ref(),
-        ],
-        bump = vault_bump,
-    )]
-    pub vault: Account<'info, Vault>,
-    pub system_program: Program<'info, System>,
-}
-
-
-/*
-* Closes a user account account.
-*/
-pub fn close_user_metadata(
-    ctx: Context<CloseUserMetadata>,
-) -> Result<()> {
-
-    ctx.accounts.user_metadata.close(
-        ctx.accounts.store_wallet.to_account_info()
-    )
-}
-
-#[derive(Accounts)]
 pub struct CloseUserMetadata<'info> {
-    #[account(mut)]
+    #[account(
+        mut,
+        close = store_wallet,
+    )]
     pub user_metadata: Account<'info, UserMetadata>,
     #[account(mut)]
     pub store_wallet: Signer<'info>,
@@ -179,17 +118,18 @@ pub struct CreateUserEmoji<'info> {
 * Closes a user emoji account.
 */
 pub fn close_user_emoji(
-    ctx: Context<CloseUserEmoji>,
+    _ctx: Context<CloseUserEmoji>,
 ) -> Result<()> {
 
-    ctx.accounts.user_emoji.close(
-        ctx.accounts.store_wallet.to_account_info()
-    )
+    Ok(())
 }
 
 #[derive(Accounts)]
 pub struct CloseUserEmoji<'info> {
-    #[account(mut)]
+    #[account(
+        mut,
+        close = store_wallet,
+    )]
     pub user_emoji: Account<'info, UserEmoji>,
     #[account(mut)]
     pub store_wallet: Signer<'info>,
