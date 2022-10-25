@@ -33,7 +33,7 @@ export const ClaimPrize: FC<ClaimPrizeProps> = (props: ClaimPrizeProps) => {
 
 
     useEffect(() => {
-        if (props.userMetadata && props.profitLeaders) {
+        if (props.userMetadata && props.profitLeaders && props.profitLeaders[0]) {
             const eBucksProfit = props.userMetadata.ebucksBalance - DEFAULT_USER_STARTING_EBUCKS_BALANCE;
             const isInProfitRange: boolean = eBucksProfit >= MIN_PROFIT_FOR_CASHOUT;
             const isTopProfitLeader: boolean = props.profitLeaders[0].authority.toString() === wallet.publicKey.toString();

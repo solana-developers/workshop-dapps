@@ -14,7 +14,7 @@ export const DEFAULT_STORE_EMOJI_STARTING_BALANCE = 40;
 export const DEFAULT_STORE_EMOJI_STARTING_PRICE = 10;
 export const DEFAULT_USER_STARTING_EBUCKS_BALANCE = 200;
 
-export const MIN_PROFIT_FOR_CASHOUT = 0;
+export const MIN_PROFIT_FOR_CASHOUT = 100;
 
 export const EMOJIS_LIST = [
     { seed: "emoji_1", display: "😀", mappedToken: "SOL" },

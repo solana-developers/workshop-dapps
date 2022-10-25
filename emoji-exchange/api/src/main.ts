@@ -72,7 +72,7 @@ async function main() {
         fundUsdc: options.fundUsdc,
     }, anchorConfigs);
     await initializeStore(anchorConfigs);
-    // await runPriceModifier(anchorConfigs);
+    await runPriceModifier(anchorConfigs);
 }
 
 main().then(

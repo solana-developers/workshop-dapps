@@ -15,7 +15,7 @@ pub struct UserMetadata {
 
 impl UserMetadata {
 
-    pub const ACCOUNT_SPAN: usize = 8 + 40 + 8 + 4 + 1;
+    pub const ACCOUNT_SPAN: usize = 8 + 40 + 8 + 4 + 32;
     
     pub const SEED_PREFIX: &'static str = "user_metadata";
 

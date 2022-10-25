@@ -9,8 +9,8 @@ import {
 } from "@blockworks-foundation/mango-client";
 import * as anchor from "@project-serum/anchor";
 import { DEFAULT_STORE_EMOJI_STARTING_PRICE, EMOJIS_LIST } from "../../app/src/utils/const";
-import { loadStore } from '../../app/src/utils/util';
 import { AnchorConfigs } from "./main";
+import { StoreEmojiObject } from "../../app/src/models/types";
 
 
 
@@ -101,11 +101,47 @@ async function updateStoreEmojiPrice(
 }
 
 
+async function getStoreEmoji(
+    config: AnchorConfigs, 
+    emojiSeed: string,
+): Promise<StoreEmojiObject> {
+    try {
+        const response = await config.program.account.storeEmoji.fetch(
+            await config.seedUtil.getStoreEmojiPda(emojiSeed)
+        );
+        return {
+            emojiName: response.emojiName as string,
+            display: response.display as string,
+            balance: response.balance as number,
+            price: response.price as number,
+        };
+    } catch (e) {
+        console.log(e);
+        throw Error(`Store emoji account not found for ${emojiSeed}`);
+    }
+}
+
+
+async function loadStore(
+    config: AnchorConfigs,
+): Promise<StoreEmojiObject[]> {
+    
+    let store: StoreEmojiObject[] = [];
+    for (var emoji of EMOJIS_LIST) {
+        try {
+            store.push(await getStoreEmoji(config, emoji.seed));
+        } catch (_) {};
+    };
+    return store;
+}
+
+
 export async function runPriceModifier(config: AnchorConfigs) {
 
-    const store = await loadStore(config.provider.wallet);
+    const store = await loadStore(config);
     while (true) {
         console.log("------------------");
+        console.log(`Store Length: ${store.length}`);
         for (var emoji of store) {
             const prevEmojiPrice = emoji.price;
             const mappedToken = getMappedToken(emoji.emojiName);
