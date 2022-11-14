@@ -43,7 +43,7 @@ async function main() {
         name: "USC Blockhain NFT",
         symbol: "USC",
         description: "NFT minted in the Solana Beginner Workshop!",
-        image: "https://irp.cdn-website.com/0d216ddc/dms3rep/multi/bclogo.svg",
+        image: "https://cdn.vox-cdn.com/thumbor/eH8zj2HW0ElvKW8UpsdkJtxxMRA=/0x0:1000x605/1400x1050/filters:focal(420x223:580x383):format(png)/cdn.vox-cdn.com/uploads/chorus_image/image/48780381/duck.0.png",
     })
 
     const { nft } = await metaplex.nfts().create({
