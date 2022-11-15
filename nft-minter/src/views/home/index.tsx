@@ -1,6 +1,6 @@
 
 import { FC } from 'react';
-import { NftMinter } from '../../components/NFtMinter';
+import { NftMinter } from '../../components/NftMinter';
 
 
 export const HomeView: FC = ({ }) => {
