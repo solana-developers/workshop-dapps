@@ -33,7 +33,7 @@ export const NftMinter: FC = () => {
         const metaplex = Metaplex.make(connection)
             .use(walletAdapterIdentity(wallet.adapter))
             // .use(bundlrStorage({ address: "https://devnet.bundlr.network" }));
-            .use(bundlrStorage());
+            .use(bundlrStorage({ address: "https://devnet.bundlr.network" }));
         
         const { uri } = await metaplex.nfts().uploadMetadata({
             title,
