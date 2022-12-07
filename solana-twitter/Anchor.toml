@@ -1,8 +1,8 @@
 [features]
 seeds = false
 [programs.devnet]
-solana_twitter_v1 = "GWKRWZs3GqW6me62SdGyMuCD3PfAfhxLKCLtcVa8GyK4"
-solana_twitter_v2 = "4Xx2AakFudv75Rjk4j51HCysdkC9xumJBjSoKAGRgH4Y"
+solana_twitter_v1 = "BnsBsM7xZ6XhxmiFXkMp8veyBnPdBkfauVcGfn9onzTk"
+solana_twitter_v2 = "3YvoWYBSgq1ge4wpopNXZbKjfQpcZ7Gkh4QWNMQddXiS"
 
 [registry]
 url = "https://anchor.projectserum.com"
