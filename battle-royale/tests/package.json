@@ -1,0 +1,22 @@
+{
+  "name": "tests",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "@project-serum/anchor": "^0.25.0",
+    "@solana/web3.js": "^1.70.0"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.3.4",
+    "@types/mocha": "^10.0.1",
+    "chai": "^4.3.7",
+    "fs": "^0.0.1-security",
+    "mocha": "^10.1.0",
+    "ts-mocha": "^10.0.0",
+    "typescript": "^4.9.4"
+  },
+  "scripts": {
+    "import": "yarn run ts-mocha -p ./tsconfig.json -t 1000000 ./import.ts"
+  }
+}

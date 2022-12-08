@@ -1,0 +1,14 @@
+[features]
+seeds = false
+[programs.localnet]
+battle_royale = "8LhtRoYDBrzaYZu91NA45mQipxiXBx9cx1iSy1B6Eu5W"
+
+[registry]
+url = "https://anchor.projectserum.com"
+
+[provider]
+cluster = "localnet"
+wallet = "/Users/joesol/.config/solana/id.json"
+
+[scripts]
+test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"
